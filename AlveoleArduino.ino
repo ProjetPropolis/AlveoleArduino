@@ -50,7 +50,8 @@ byte dataArray1[3] = {NULL, NULL, NULL};//the bigest number we will receive is i
 byte dataArray2[3] = {NULL, NULL, NULL};//the bigest number we will receive is in the 3 number;
 bool record =0;
 int dataBufferIndex = 0;
-int lengthOfNbr = 0;
+int lengthOfNbr1 = 0;
+int lengthOfNbr2 = 0;
 
 long int results[CHANNEL_COUNT];
 long int results2[CHANNEL_COUNT];
@@ -66,8 +67,8 @@ bool prevStatus[CHANNEL_COUNT];
 bool hasChanged[CHANNEL_COUNT];
 bool tileStatus[CHANNEL_COUNT];
 uint32_t prevValues[CHANNEL_COUNT];
-int dataId;
-int dataState;
+int dataId = 420;
+int dataState = 420;
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
 int currentId = 0;
@@ -96,13 +97,13 @@ void setup() {
   }
 
   // Settings up the led strips
-  FastLED.addLeds<CHIPSET, 6, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 7, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 8, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 9, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 10, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 11, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 12, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 16, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
 
   FastLED.setBrightness( BRIGHTNESS );
 
@@ -111,20 +112,20 @@ void setup() {
 
 }
 
-int tick = 0;
+//int tick = 0;
 void loop() {
   // important! non-blocking listen routine
   //Serial.println("loop");
   readTheData();
-  if(tick == 500){
-    sendHexStatus(6, 3);
-    tick = 0;
-  }
+  //if(tick == 500){
+  //  sendHexStatus(6, 3);
+  //  tick = 0;
+  //}
   if(mustReadPressure){
     //Serial.println("mustReadPressure");
     readPressurePlate();
   }
-  tick++;
+  //tick++;
 }
 
 
@@ -177,44 +178,52 @@ void decipherPacket(){
       //reset the nbrArray array to null element
     }
     else if(c == 99){
-      Serial.println("packet parser");
+      Serial.println("finish id go to state");
       //Serial.println("reading id");
       int bufferId = String((char*)dataArray1).toInt();
       memcpy (&id, &bufferId, sizeof(bufferId));
+      dataId = id;
+      Serial.println("bufferId" + String(id));
       //Serial.println("id: " + String(id));
       
       for(int i = 0; i<dataArray1[3]; i++){
         dataArray1[i] = NULL;
       }
-      lengthOfNbr = 0;
       dataBufferIndex = 2;
     }
     else if(c == 122){
       Serial.println("packet end");
       int bufferState = String((char*)dataArray2).toInt();
       memcpy (&state, &bufferState, sizeof(bufferState));
-      
+      Serial.println("bufferState" + String(state));
+      dataState = state;
       for(int i = 0; i<dataArray2[3]; i++){
         dataArray2[i] = NULL;
       }
       
-      lengthOfNbr = 0;
+      lengthOfNbr1 = 0;
+      lengthOfNbr2 = 0;
       record = 0;
       dataBufferIndex = 0;
     }
     else if(record != 0){
+      Serial.println("character read: " + String(c));
+      Serial.println("index of buffer : " + String(dataBufferIndex));
+      byte theValue;
       if(dataBufferIndex == 1){
-        dataArray1[lengthOfNbr] = c;
-        lengthOfNbr = lengthOfNbr + 1;
+        dataArray1[lengthOfNbr1] = c;
+        lengthOfNbr1 = lengthOfNbr1 + 1;
+        Serial.println("character id: " + String(c));
       }
       else if(dataBufferIndex == 2){
-        dataArray2[lengthOfNbr] = c;
-        lengthOfNbr = lengthOfNbr + 1;
+        dataArray2[lengthOfNbr2] = c;
+        lengthOfNbr2 = lengthOfNbr2 + 1;
+        Serial.println("character state: " + String(c));
       }
     }
 
-    dataId = id;
-    dataState = state;
+    Serial.println("dataId : " + String(dataId));
+    Serial.println("dataState : " + String(dataState));
   }
 }
 
@@ -332,7 +341,7 @@ void testPattern() {
 // Fill the dots one after the other with a color
 void colorWipe(CRGB color) {
   for (uint16_t i = 0; i < NUM_LEDS; i++) {
-    leds[currentId][i] = color;
+    leds[dataId][i] = color;
   }
   FastLED.show();
 }
