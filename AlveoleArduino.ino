@@ -1,14 +1,12 @@
 // hardware libraries to access use the shield
 
-#include <Ethernet.h>
-#include <EthernetUdp.h>
-#include <SPI.h>
-#include <OSCBundle.h>
-#include <OSCBoards.h>
 #include "FastLED.h"
 #include <HX711.h>
+#include <stdio.h>
 #include <string.h>
-#include "HX711-multi.h"
+#include <cstring>
+#include <stdlib.h>
+#include "HX711-multi-teensy.h"
 
 //LED related variables
 #define LED_PIN    22
@@ -20,22 +18,25 @@
 #define FRAMES_PER_SECOND 10 
 
 //Pressure Plate related variable
-#define CLK A0
-#define CLK2 A1
+#define CLK 4
+#define CLK2 5
 //--first group of clock time hook to CLK1 
-#define DOUT1 A2
-#define DOUT2 A3
-#define DOUT3 A4
-#define DOUT4 A5
+#define DOUT1 22
+#define DOUT2 21
+#define DOUT3 20
+#define DOUT4 19
 //--second group of clock time hook to CLK2
-#define DOUT5 A8
-#define DOUT6 A9
-#define DOUT7 A10
+#define DOUT5 18
+#define DOUT6 17
+#define DOUT7 16
 //time out of the tare function ?is it use?
 #define TARE_TIMEOUT_SECONDS 4 
 
-byte DOUTS1[4] = {DOUT1,DOUT2,DOUT3,DOUT4};
-byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
+//byte DOUTS1[4] = {DOUT1,DOUT2,DOUT3,DOUT4};
+//byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
+
+byte DOUTS1[0] = {};
+byte DOUTS2[0] = {};
 //--array of all the index that are going to be send, needed for unity to understand if we dont have all the tiles
 int indexs[7] = {0,1,2,3,4,5,6};
 
@@ -44,14 +45,21 @@ int indexs[7] = {0,1,2,3,4,5,6};
 #define CHANNEL2 sizeof(DOUTS2) /sizeof(byte)
 #define CHANNEL_COUNT CHANNEL1 + CHANNEL2
 
+//--serial communication related variable
+byte dataArray1[3] = {NULL, NULL, NULL};//the bigest number we will receive is in the 3 number;
+byte dataArray2[3] = {NULL, NULL, NULL};//the bigest number we will receive is in the 3 number;
+bool record =0;
+int dataBufferIndex = 0;
+int lengthOfNbr1 = 0;
+int lengthOfNbr2 = 0;
 
 long int results[CHANNEL_COUNT];
 long int results2[CHANNEL_COUNT];
 //int channelCount = CHANNEL1 + CHANNEL2;
 
 //--define the channels
-HX711MULTI scales(CHANNEL1, DOUTS1, CLK);
-HX711MULTI scales2(CHANNEL2, DOUTS2, CLK2);
+HX711MULTITEENSY scales(CHANNEL1, DOUTS1, CLK);
+HX711MULTITEENSY scales2(CHANNEL2, DOUTS2, CLK2);
 
 //datas array use for calculating the outcome of the receive data
 int threshold = 7;
@@ -59,22 +67,10 @@ bool prevStatus[CHANNEL_COUNT];
 bool hasChanged[CHANNEL_COUNT];
 bool tileStatus[CHANNEL_COUNT];
 uint32_t prevValues[CHANNEL_COUNT];
-
-EthernetUDP Udp;
-
-byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-};
-
-//arduino IP address
-IPAddress ip(192, 168, 0, 3);
-//destination IP adress
-IPAddress outIp(192,168,0,10); 
+int dataId = 420;
+int dataState = 420;
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
-
-const unsigned int inPort = 12001;
-const unsigned int outPort = 15001;
 int currentId = 0;
 
 unsigned int intervalRead = 25 ;
@@ -83,21 +79,16 @@ unsigned int prevRead = 0;
 
 uint32_t maxReadableValue = 70000;
 
+int idSensor = 4;
+int stateSensor = 1;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   //setup ethernet part
-  Ethernet.begin(mac, ip);
-  Udp.begin(inPort);
-
-  Serial.println(Ethernet.localIP());
-
-  Serial.println(CHANNEL_COUNT);
+  //delay(3000); // sanity delay
+  Serial.println("serial begin");
   
-  sendLog(999);
-
-  delay(3000); // sanity delay
-
+  
   for(int i = 0; i < CHANNEL_COUNT; i++){
     tileStatus[i] = 0; //Initialise status to 0
     prevStatus[i] = 0; //Initialise previous status to 0
@@ -106,47 +97,35 @@ void setup() {
   }
 
   // Settings up the led strips
-  FastLED.addLeds<CHIPSET, 22, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 24, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 26, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 28, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 30, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 32, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 34, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 16, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
 
   FastLED.setBrightness( BRIGHTNESS );
 
   //tare();
-  testPattern();
+  //testPattern();
 
 }
 
+//int tick = 0;
 void loop() {
   // important! non-blocking listen routine
-  Serial.println("loop");
-  OSCBundle bundleIN;
-  int size;
-  if ( (size = Udp.parsePacket()) > 0)
-  {
-
-    while (size--)
-      bundleIN.fill(Udp.read());
-    Serial.println(bundleIN.hasError());
-
-  }
-  //if(!bundleIN.hasError()){
-  bundleIN.route("/hex", receiveStatus);
-  // }
+  //Serial.println("loop");
+  readTheData();
+  //if(tick == 500){
+  //  sendHexStatus(6, 3);
+  //  tick = 0;
+  //}
   if(mustReadPressure){
-    Serial.println("mustReadPressure");
+    //Serial.println("mustReadPressure");
     readPressurePlate();
   }
-  
- // tare();
- //testPattern();
- //delay(30);
- 
-  delay(100);
+  //tick++;
 }
 
 
@@ -161,52 +140,108 @@ bool mustReadPressure (){
   }
   
 }
-void tare() {
-  //check if the data has finished been read
-  //bool tareSuccessful = false;
-
-  //unsigned long tareStartTime = millis();
-  //while (!tareSuccessful && millis()<(tareStartTime+TARE_TIMEOUT_SECONDS*10)) {
-   // tareSuccessful = scales.tare(1,10000);  //reject 'tare' if still ringing
- // }
-}
-void receiveStatus(OSCMessage &msg) {  // *note the & before msg
-  //testPattern();
-  //Serial.println("status" + String(msg.getInt(0)));
-  //Testin on 7 leds only
-  /*switch(msg.getInt(0)){
-    case 0: leds[currentId] = CRGB::Black;    // Black/off
-            break;
-    case 1: leds[currentId] = CRGB::White;
-            break;
-    case 2: leds[currentId] = CRGB::Red;
-            break;
-    }*/
-  int theIndex = msg.getFloat(0);
+//----!!!!!finish this function and call the other one with array in arg!----
+void readTheData() {  // *note the & before msg
+  decipherPacket();
+  //Serial.println(dataId);
+  //Serial.println(dataState);
+  int theIndex = dataId;
   for(int i = 0; i < CHANNEL_COUNT; i++){
     int indexReceive = theIndex;
     int indexToSend = indexs[i];
     if(indexReceive == indexToSend){
-      sendLog(indexs[i]);
       currentId = indexs[i]; 
     } 
   }
-  
-  int hexStatus = msg.getFloat(1);
-  
+  int hexStatus = dataState;
+
   switch (hexStatus) {
-    case 0: colorWipe(CRGB(50,0,80));    // Black/off
+    case 0: colorWipe(CRGB(0,0,0));    
+    // Black/off
       break;
-    case 1: colorWipe(CRGB(75,75,0)); 
+    case 1: colorWipe(CRGB(75,75,0));    
+    //Yellow/on
       break;
-    case 2: colorWipe(CRGB::Red);
+    case 2: colorWipe(CRGB(50,0,80));    
+    //Purple/corrupted
       break;
+    case 3: colorWipe(CRGB(155,35,35)); 
+    //Red/ultra-corrupted
+      break;
+    case 4: colorWipe(CRGB(0,80,120))
+    //Blue/cleanse
   }
-
-
 }
 
-void sendData(int ID, int state) {
+void decipherPacket(){
+  int id;
+  int state;
+  while (Serial.available() > 0) {
+    byte c = Serial.read();
+    //if we catch the ascii code for "a" character aka 97
+    if(c == 97){
+      Serial.println("packet start");
+      record = 1;
+      dataBufferIndex = 1;
+      //reset the nbrArray array to null element
+    }
+    else if(c == 99){
+      Serial.println("finish id go to state");
+      //Serial.println("reading id");
+      int bufferId = String((char*)dataArray1).toInt();
+      memcpy (&id, &bufferId, sizeof(bufferId));
+      dataId = id;
+      Serial.println("bufferId" + String(id));
+      //Serial.println("id: " + String(id));
+      
+      for(int i = 0; i<dataArray1[3]; i++){
+        dataArray1[i] = NULL;
+      }
+      dataBufferIndex = 2;
+    }
+    else if(c == 122){
+      Serial.println("packet end");
+      int bufferState = String((char*)dataArray2).toInt();
+      memcpy (&state, &bufferState, sizeof(bufferState));
+      Serial.println("bufferState" + String(state));
+      dataState = state;
+      for(int i = 0; i<dataArray2[3]; i++){
+        dataArray2[i] = NULL;
+      }
+      
+      lengthOfNbr1 = 0;
+      lengthOfNbr2 = 0;
+      record = 0;
+      dataBufferIndex = 0;
+    }
+    else if(record != 0){
+      Serial.println("character read: " + String(c));
+      Serial.println("index of buffer : " + String(dataBufferIndex));
+      byte theValue;
+      if(dataBufferIndex == 1){
+        dataArray1[lengthOfNbr1] = c;
+        lengthOfNbr1 = lengthOfNbr1 + 1;
+        Serial.println("character id: " + String(c));
+      }
+      else if(dataBufferIndex == 2){
+        dataArray2[lengthOfNbr2] = c;
+        lengthOfNbr2 = lengthOfNbr2 + 1;
+        Serial.println("character state: " + String(c));
+      }
+    }
+
+    Serial.println("dataId : " + String(dataId));
+    Serial.println("dataState : " + String(dataState));
+  }
+}
+
+void sendHexStatus(int ID, int state){
+  int hexId = ID;
+  int hexState = indexs[state];
+  Serial.println((String)hexId + "," + hexState + "e/hexData");  
+}
+
+/*void sendData(int ID, int state) {
     int hexId = ID;
     int hexState = indexs[state];
     OSCMessage msg("/hex");
@@ -220,28 +255,8 @@ void sendData(int ID, int state) {
 
     //delay(20);
     //currentId = hexId;
-   /*switch (hexState) {
-    case 0: colorWipe(CRGB::Black);    // Black/off
-      break;
-    case 1: colorWipe(CRGB(50,0,30));
-      break;
-    case 2: colorWipe(CRGB::Red);
-      break;
-  }*/
-}
+}*/
 
-void sendLog(float data){
-  
-  float theMessage = data;
-  OSCMessage msg("/debug");
-  msg.add((int32_t)data);
-  
-  Udp.beginPacket(outIp, outPort);
-  msg.send(Udp); // send the bytes to the SLIP stream
-  Udp.endPacket(); // mark the end of the OSC Packet
-  msg.empty(); // free space occupied by message
-
-}
 
 void readPressurePlate(){
   //combine the two analogue pin result state into one array
@@ -249,16 +264,10 @@ void readPressurePlate(){
   long int buffer2[CHANNEL2];
   scales.read(results);
   scales2.read(results2);
-  //memcpy(results, buffer1, sizeof(buffer1));
-  //memcpy(results, buffer2, sizeof(buffer2));
   for(int u=0; u<CHANNEL_COUNT; u++){
     Serial.println(results[u]);
   }
-  Serial.println("size of results:");
-  //Serial.println(CHANNEL_COUNT);
-  //Serial.println(CHANNEL1);
-  //Serial.println(CHANNEL2);
-  //sendLog();
+  //Serial.println("size of results:");
   int chn2Index = 0;
   uint32_t value;
   for (int i=0; i<CHANNEL_COUNT; i++) {
@@ -274,7 +283,7 @@ void readPressurePlate(){
         tileStatus[i] = (delta > threshold) ? 1 :0;
         
         if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
-          sendData(theIndex,tileStatus[i]);
+          sendHexStatus(theIndex,tileStatus[i]);
         }
         
         prevValues[i] = value; 
@@ -283,25 +292,6 @@ void readPressurePlate(){
       }
   }   
 }
-
-/*void animationCtrl(int ID){
-  Serial.println("------- animationCtrl ------");
-  scales.read(results);
-  int tileToAnim = ID;
-  for(int i = 0; i < scales.get_count(); i++){
-    if(hasChanged[i] != 0) {
-      Serial.println("has changed");
-      if(tileStatus[i] == 1) {
-        Serial.println("flash Blue");
-        colorWipe(CRGB::Blue,tileToAnim);
-      }
-      else{
-        Serial.println("close Light");
-        colorWipe(CRGB::Black,tileToAnim);
-      }
-    }
-  }
-}*/
 
 void testPattern() {
   for (int i = 0; i < 6; i ++) {
@@ -358,8 +348,9 @@ void testPattern() {
 
 // Fill the dots one after the other with a color
 void colorWipe(CRGB color) {
+  //dataId = the strip that need to be change
   for (uint16_t i = 0; i < NUM_LEDS; i++) {
-    leds[currentId][i] = color;
+    leds[dataId][i] = color;
   }
   FastLED.show();
 }
