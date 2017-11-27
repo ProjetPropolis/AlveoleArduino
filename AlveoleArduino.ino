@@ -19,17 +19,17 @@
 #define FRAMES_PER_SECOND 10 
 
 //Pressure Plate related variable
-#define CLK 4
-#define CLK2 5
+#define CLK 0
+#define CLK2 1
 //--first group of clock time hook to CLK1 
-#define DOUT1 22
-#define DOUT2 21
-#define DOUT3 20
-#define DOUT4 19
+#define DOUT1 2
+#define DOUT2 3
+#define DOUT3 4
+#define DOUT4 5
 //--second group of clock time hook to CLK2
-#define DOUT5 18
-#define DOUT6 17
-#define DOUT7 16
+#define DOUT5 6
+#define DOUT6 7
+#define DOUT7 9
 //time out of the tare function ?is it use?
 #define TARE_TIMEOUT_SECONDS 4 
 
@@ -84,7 +84,8 @@ int idSensor = 4;
 int stateSensor = 1;
 
 /*==== sub-hexStatus manager ===*/
-Chrono masterChrono;
+Chrono masterChrono_Corrupt;
+Chrono masterChrono_Ultracorrupt;
 int pastHexStatus = 0;
 
 /*==== on() Variables ===*/
@@ -137,10 +138,10 @@ float delayBrightness_Ultracorrupt = 0.75;
 int dashLenght_Ultracorrupt = 4;
 
 /*==== ultracorruptPressed() Variables ===*/
-Chrono myChrono_UltracorruptPressed;
-int ledIndex_UltracorruptPressed = 0;
-int ledIndexGlitch1_UltracorruptPressed;
-int state_UltracorruptPressed;
+//Chrono myChrono_UltracorruptPressed;
+//int ledIndex_UltracorruptPressed[7] = {0, 0, 0, 0, 0, 0, 0};
+//int ledIndexGlitch1_UltracorruptPressed[7];
+//int state_UltracorruptPressed;
 
 /*==== cleanser() Variables ===*/
 Chrono myChrono0_Cleanser;
@@ -177,7 +178,7 @@ CRGB yellow_On(200, 100, 15);
 CRGB orange_On(110, 0, 0);
 CHSV purple_Corrupt(210, 255, 255);
 CHSV palePurple_Corrupt(210, 50, 255);
-CHSV red_Ultracorrupt(0, 255, 255);
+CRGB red_Ultracorrupt(255, 0, 0);
 CHSV blue_Cleanser(140, 255, 255);
 CHSV paleBlue_cleansing(140, 200, 255);
 
@@ -197,13 +198,13 @@ void setup() {
   }
 
   // Settings up the led strips
-  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<CHIPSET, 16, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
 
   FastLED.setBrightness( BRIGHTNESS );
   
@@ -226,8 +227,8 @@ void setup() {
   }
 
   /*==== ultracorruptPressed() Setup Variables ===*/
-  ledIndexGlitch1_UltracorruptPressed = random8(NUM_LEDS-2);
-  state_UltracorruptPressed = 0;
+  //ledIndexGlitch1_UltracorruptPressed = random8(NUM_LEDS-2);
+  //state_UltracorruptPressed = 0;
 
   /*==== cleanser() Setup Variables ===*/
   for(int x = 0; x < 6; x++){
@@ -299,11 +300,11 @@ void readTheData() {  // *note the & before msg
     case 1: on();    
     //Yellow/on
       break;
-    case 2: //corrupt(); 
+    case 2:  
       if(pastHexStatus == 1){
-        masterChrono.restart();
+        masterChrono_Corrupt.restart();
       }
-      if(!masterChrono.hasPassed(6000)){
+      if(!masterChrono_Corrupt.hasPassed(6000)){
         on();
         corrupt();
       }else{
@@ -311,11 +312,22 @@ void readTheData() {  // *note the & before msg
       }
     //Purple/corrupted
       break;
-    case 3: ultracorrupt(); 
+    case 3:
+      if(pastHexStatus == 3){
+        masterChrono_Ultracorrupt.restart();
+      }
+      if(!masterChrono_Ultracorrupt.hasPassed(3000)){
+        ultracorruptPressed(); 
+      }else{
+        CRGB red_Ultracorrupt(255, 0, 0);
+        ultracorrupt(); 
+      }
     //Red/ultra-corrupted
       break;
     case 4: cleanser();
     //Blue/cleanse
+    case 5: cleansing();
+    //BlueYellow/cleansing
 
     pastHexStatus = hexStatus;
   }
@@ -515,7 +527,7 @@ void off(){
 
 
 void on(){
-  
+   
      if(ledIndex_On[dataId] < NUM_LEDS){
       leds[dataId][ledIndex_On[dataId]] = yellow_On;
       ledIndex_On[dataId]++;
@@ -535,6 +547,7 @@ void on(){
 
 void corrupt(){
   
+    //Brightness Manager
     if(stateBrightness_Corrupt[dataId] == 0){
       if(val_Corrupt[dataId] > 150){
         val_Corrupt[dataId]-=delayBrightness_Corrupt;
@@ -551,6 +564,7 @@ void corrupt(){
       }
     }
 
+    //Writing BLACK for the 5 Dashes
     for(int x = 0; x < dashLenght_Corrupt; x++){
       leds[dataId][ledIndexGlitch1_Corrupt[dataId] + x].setHSV(210, 255, 0);
       leds[dataId][ledIndexGlitch2_Corrupt[dataId] + x].setHSV(210, 255, 0);
@@ -560,10 +574,8 @@ void corrupt(){
     }
     leds[dataId][ledIndexGlitch1_Corrupt[dataId]+2].setHSV(210, 255, 0);
     leds[dataId][ledIndexGlitch2_Corrupt[dataId]+2].setHSV(210, 255, 0);
-
-    //theChrono = "myChrono"+String(dataId)+"_Corrupt";
     
-    //Serial.println(theChrono);
+    //Changing 5 Dashes starting index
     if(myChrono_Corrupt[dataId].hasPassed(delayIndex_Corrupt)){
       ledIndexGlitch1_Corrupt[dataId] = constrain(random8(ledIndexGlitch1_Corrupt[dataId]-stepRandom_Corrupt, ledIndexGlitch1_Corrupt[dataId]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+2));
       ledIndexGlitch2_Corrupt[dataId] = constrain(random8(ledIndexGlitch2_Corrupt[dataId]-stepRandom_Corrupt, ledIndexGlitch2_Corrupt[dataId]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+2));
@@ -572,7 +584,8 @@ void corrupt(){
       ledIndexGlitch5_Corrupt[dataId] = constrain(random8(ledIndexGlitch5_Corrupt[dataId]-stepRandom_Corrupt, ledIndexGlitch5_Corrupt[dataId]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+2));
       myChrono_Corrupt[dataId].restart();
     }
-    
+
+    //Writing PURPLE for the 5 Dashes
     for(int x = 0; x < dashLenght_Corrupt; x++){
       leds[dataId][ledIndexGlitch1_Corrupt[dataId] + x] = purple_Corrupt;
       leds[dataId][ledIndexGlitch2_Corrupt[dataId] + x] = purple_Corrupt;
@@ -587,7 +600,8 @@ void corrupt(){
 
 
 void ultracorrupt(){
-  
+    /*
+    //Brightness Manager
     if(stateBrightness_Ultracorrupt[dataId] == 0){
       if(val_Ultracorrupt[dataId] > 100){
         val_Ultracorrupt[dataId]-=delayBrightness_Ultracorrupt;
@@ -603,7 +617,8 @@ void ultracorrupt(){
         stateBrightness_Ultracorrupt[dataId] = 0;
       }
     }
-
+    */
+    //Writing BLACK for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
       leds[dataId][ledIndexGlitch1_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
       leds[dataId][ledIndexGlitch2_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
@@ -611,7 +626,8 @@ void ultracorrupt(){
       leds[dataId][ledIndexGlitch4_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
       leds[dataId][ledIndexGlitch5_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
     }
-    
+
+    //Changing 5 Dashes starting index
     if(myChrono_Ultracorrupt[dataId].hasPassed(delayIndex_Ultracorrupt)){
       ledIndexGlitch1_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
       ledIndexGlitch2_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
@@ -620,7 +636,8 @@ void ultracorrupt(){
       ledIndexGlitch5_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
       myChrono_Ultracorrupt[dataId].restart();
     }
-    
+
+    //Writing RED for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
       leds[dataId][ledIndexGlitch1_Ultracorrupt[dataId] + x] = red_Ultracorrupt;
       leds[dataId][ledIndexGlitch2_Ultracorrupt[dataId] + x] = red_Ultracorrupt;
@@ -634,22 +651,8 @@ void ultracorrupt(){
 
 
 void ultracorruptPressed(){
-    /*NEEDS TO BE CHANGED*/
-    if(ledIndex_UltracorruptPressed < NUM_LEDS){
-      if(ledIndex_UltracorruptPressed == ledIndexGlitch1_UltracorruptPressed && state_UltracorruptPressed == 0){
-        leds[dataId][ledIndex_UltracorruptPressed] = red_Ultracorrupt;
-        leds[dataId][ledIndex_UltracorruptPressed+1] = red_Ultracorrupt;
-        state_UltracorruptPressed = 1;
-      }else{
-        leds[dataId][ledIndex_UltracorruptPressed].setHSV(0, 255, 0);
-        leds[dataId][ledIndex_UltracorruptPressed+1].setHSV(0, 255, 0);
-        ledIndex_UltracorruptPressed++;
-        ledIndexGlitch1_UltracorruptPressed = random8(NUM_LEDS-2);
-        state_UltracorruptPressed = 0;
-      }
-    }else{
-      ledIndex_UltracorruptPressed = 0;
-    }
+  
+    red_Ultracorrupt = CRGB::White;
     
 }
 
@@ -658,6 +661,7 @@ void cleanser(){
   
     if(myChrono_Cleanser[dataId].hasPassed(delayProgressLed_Cleanser)){
        if(stateLedIndex1_Cleanser[dataId] == 0 && stateLedIndex2_Cleanser[dataId] == 0){
+         //Writing BLUE for the strip's first half from firstLED
          if(ledIndex1_Cleanser[dataId] < (NUM_LEDS*0.5)-1){
            leds[dataId][ledIndex1_Cleanser[dataId]] = blue_Cleanser;
            ledIndex1_Cleanser[dataId]++;
@@ -666,6 +670,7 @@ void cleanser(){
            ledIndex1_Cleanser[dataId] = 0;
            stateLedIndex1_Cleanser[dataId] = 1;
          }
+         //Writing BLUE for the strip's second half from middleLED
          if(ledIndex2_Cleanser[dataId] < NUM_LEDS-1){
            leds[dataId][ledIndex2_Cleanser[dataId]] = blue_Cleanser;
            ledIndex2_Cleanser[dataId]++;
@@ -675,6 +680,7 @@ void cleanser(){
            stateLedIndex2_Cleanser[dataId] = 1;
          }
        }else if(stateLedIndex1_Cleanser[dataId] == 1 && stateLedIndex2_Cleanser[dataId] == 1){
+         //Writing BLACK for the strip's first half from firstLED
          if(ledIndex1_Cleanser[dataId] < (NUM_LEDS*0.5)-1){
            leds[dataId][ledIndex1_Cleanser[dataId]].setHSV(140, 255, 0);
            ledIndex1_Cleanser[dataId]++;
@@ -683,6 +689,7 @@ void cleanser(){
            ledIndex1_Cleanser[dataId] = (NUM_LEDS*0.5)-1;
            stateLedIndex1_Cleanser[dataId] = 2;
          }
+         //Writing BLACK for the strip's second half from middleLED
          if(ledIndex2_Cleanser[dataId] < NUM_LEDS-1){
            leds[dataId][ledIndex2_Cleanser[dataId]].setHSV(140, 255, 0);
            ledIndex2_Cleanser[dataId]++;
@@ -692,6 +699,7 @@ void cleanser(){
            stateLedIndex2_Cleanser[dataId] = 2;
          }
        }else if(stateLedIndex1_Cleanser[dataId] == 2 && stateLedIndex2_Cleanser[dataId] == 2){
+         //Writing BLUE for the strip's first half from middleLED
          if(ledIndex1_Cleanser[dataId] > 0){
            leds[dataId][ledIndex1_Cleanser[dataId]] = blue_Cleanser;
            ledIndex1_Cleanser[dataId]--;
@@ -700,6 +708,7 @@ void cleanser(){
            ledIndex1_Cleanser[dataId] = (NUM_LEDS*0.5)-1;
            stateLedIndex1_Cleanser[dataId] = 3;
          }
+         //Writing BLUE for the strip's second half from lastLED
          if(ledIndex2_Cleanser[dataId] > NUM_LEDS*0.5){
            leds[dataId][ledIndex2_Cleanser[dataId]] = blue_Cleanser;
            ledIndex2_Cleanser[dataId]--;
@@ -709,6 +718,7 @@ void cleanser(){
            stateLedIndex2_Cleanser[dataId] = 3;
          }
        }else if(stateLedIndex1_Cleanser[dataId] == 3 && stateLedIndex2_Cleanser[dataId] == 3){
+         //Writing BLACK for the strip's second half from middleLED
          if(ledIndex1_Cleanser[dataId] > 0){
            leds[dataId][ledIndex1_Cleanser[dataId]].setHSV(140, 255, 0);
            ledIndex1_Cleanser[dataId]--;
@@ -717,6 +727,7 @@ void cleanser(){
            ledIndex1_Cleanser[dataId] = 0;
            stateLedIndex1_Cleanser[dataId] = 0;
          }
+         //Writing BLACK for the strip's second half from lastLED
          if(ledIndex2_Cleanser[dataId] > NUM_LEDS*0.5){
            leds[dataId][ledIndex2_Cleanser[dataId]].setHSV(140, 255, 0);
            ledIndex2_Cleanser[dataId]--;
@@ -737,6 +748,7 @@ void cleansing(){
 
     if(myChrono_cleansing[dataId].hasPassed(delayProgressLed_cleansing)){
        if(stateLedIndex1_cleansing[dataId] == 0 && stateLedIndex2_cleansing[dataId] == 0){
+         //Writing BLUE for the strip's first half from firstLED
          if(ledIndex1_cleansing[dataId] < (NUM_LEDS*0.5)-1){
            leds[dataId][ledIndex1_cleansing[dataId]] = paleBlue_cleansing;
            ledIndex1_cleansing[dataId]++;
@@ -745,6 +757,7 @@ void cleansing(){
            ledIndex1_cleansing[dataId] = 0;
            stateLedIndex1_cleansing[dataId] = 1;
          }
+         //Writing BLUE for the strip's second half from middleLED
          if(ledIndex2_cleansing[dataId] < NUM_LEDS-1){
            leds[dataId][ledIndex2_cleansing[dataId]] = paleBlue_cleansing;
            ledIndex2_cleansing[dataId]++;
@@ -754,6 +767,7 @@ void cleansing(){
            stateLedIndex2_cleansing[dataId] = 1;
          }
        }else if(stateLedIndex1_cleansing[dataId] == 1 && stateLedIndex2_cleansing[dataId] == 1){
+         //Writing YELLOW for the strip's first half from firstLED
          if(ledIndex1_cleansing[dataId] < (NUM_LEDS*0.5)-1){
            leds[dataId][ledIndex1_cleansing[dataId]] = yellow_On;
            ledIndex1_cleansing[dataId]++;
@@ -762,6 +776,7 @@ void cleansing(){
            ledIndex1_cleansing[dataId] = (NUM_LEDS*0.5)-1;
            stateLedIndex1_cleansing[dataId] = 2;
          }
+         //Writing YELLOW for the strip's second half from middleLED
          if(ledIndex2_cleansing[dataId] < NUM_LEDS-1){
            leds[dataId][ledIndex2_cleansing[dataId]] = yellow_On;
            ledIndex2_cleansing[dataId]++;
@@ -771,6 +786,7 @@ void cleansing(){
            stateLedIndex2_cleansing[dataId] = 2;
          }
        }else if(stateLedIndex1_cleansing[dataId] == 2 && stateLedIndex2_cleansing[dataId] == 2){
+         //Writing BLUE for the strip's first half from middleLED
          if(ledIndex1_cleansing[dataId] > 0){
            leds[dataId][ledIndex1_cleansing[dataId]] = paleBlue_cleansing;
            ledIndex1_cleansing[dataId]--;
@@ -779,6 +795,7 @@ void cleansing(){
            ledIndex1_cleansing[dataId] = (NUM_LEDS*0.5)-1;
            stateLedIndex1_cleansing[dataId] = 3;
          }
+         //Writing BLUE for the strip's second half from lastLED
          if(ledIndex2_cleansing[dataId] > NUM_LEDS*0.5){
            leds[dataId][ledIndex2_cleansing[dataId]] = paleBlue_cleansing;
            ledIndex2_cleansing[dataId]--;
@@ -788,6 +805,7 @@ void cleansing(){
            stateLedIndex2_cleansing[dataId] = 3;
          }
        }else if(stateLedIndex1_cleansing[dataId] == 3 && stateLedIndex2_cleansing[dataId] == 3){
+         //Writing YELLOW for the strip's first half from middleLED
          if(ledIndex1_cleansing[dataId] > 0){
            leds[dataId][ledIndex1_cleansing[dataId]] = yellow_On;
            ledIndex1_cleansing[dataId]--;
@@ -796,6 +814,7 @@ void cleansing(){
            ledIndex1_cleansing[dataId] = 0;
            stateLedIndex1_cleansing[dataId] = 0;
          }
+         //Writing YELLOW for the strip's second half from lastLED
          if(ledIndex2_cleansing[dataId] > NUM_LEDS*0.5){
            leds[dataId][ledIndex2_cleansing[dataId]] = yellow_On;
            ledIndex2_cleansing[dataId]--;
