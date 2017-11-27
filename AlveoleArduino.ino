@@ -1,7 +1,7 @@
 // hardware libraries to access use the shield
 
 #include "FastLED.h"
-#include <HX711.h>
+//#include <HX711.h>
 #include <stdio.h>
 #include <string.h>
 #include <cstring>
@@ -18,25 +18,25 @@
 #define FRAMES_PER_SECOND 10 
 
 //Pressure Plate related variable
-#define CLK 4
-#define CLK2 5
+#define CLK 0
+#define CLK2 1
 //--first group of clock time hook to CLK1 
-#define DOUT1 22
-#define DOUT2 21
-#define DOUT3 20
-#define DOUT4 19
+#define DOUT1 2
+#define DOUT2 3
+#define DOUT3 4
+#define DOUT4 5
 //--second group of clock time hook to CLK2
-#define DOUT5 18
-#define DOUT6 17
-#define DOUT7 16
+#define DOUT5 6
+#define DOUT6 7
+#define DOUT7 9
 //time out of the tare function ?is it use?
 #define TARE_TIMEOUT_SECONDS 4 
 
-//byte DOUTS1[4] = {DOUT1,DOUT2,DOUT3,DOUT4};
-//byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
+byte DOUTS1[4] = {DOUT1,DOUT2,DOUT3,DOUT4};
+byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
 
-byte DOUTS1[0] = {};
-byte DOUTS2[0] = {};
+//byte DOUTS1[0] = {};
+//byte DOUTS2[0] = {};
 //--array of all the index that are going to be send, needed for unity to understand if we dont have all the tiles
 int indexs[7] = {0,1,2,3,4,5,6};
 
@@ -97,13 +97,13 @@ void setup() {
   }
 
   // Settings up the led strips
-  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<CHIPSET, 16, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
 
   FastLED.setBrightness( BRIGHTNESS );
 
@@ -156,11 +156,15 @@ void readTheData() {  // *note the & before msg
   int hexStatus = dataState;
 
   switch (hexStatus) {
-    case 0: colorWipe(CRGB(50,0,80));    // Black/off
+    case 0: colorWipe(CRGB(0,0,0));    // Black/off
       break;
     case 1: colorWipe(CRGB(75,75,0)); 
       break;
-    case 2: colorWipe(CRGB::Red);
+    case 2: colorWipe(CRGB(50,0,80));
+      break;
+    case 3: colorWipe(CRGB(155,25,25));
+      break;
+    case 4: colorWipe(CRGB(0,85,112));
       break;
   }
 }
@@ -183,7 +187,6 @@ void decipherPacket(){
       int bufferId = String((char*)dataArray1).toInt();
       memcpy (&id, &bufferId, sizeof(bufferId));
       dataId = id;
-      Serial.println("bufferId" + String(id));
       //Serial.println("id: " + String(id));
       
       for(int i = 0; i<dataArray1[3]; i++){
@@ -195,7 +198,6 @@ void decipherPacket(){
       Serial.println("packet end");
       int bufferState = String((char*)dataArray2).toInt();
       memcpy (&state, &bufferState, sizeof(bufferState));
-      Serial.println("bufferState" + String(state));
       dataState = state;
       for(int i = 0; i<dataArray2[3]; i++){
         dataArray2[i] = NULL;
@@ -207,18 +209,14 @@ void decipherPacket(){
       dataBufferIndex = 0;
     }
     else if(record != 0){
-      Serial.println("character read: " + String(c));
-      Serial.println("index of buffer : " + String(dataBufferIndex));
       byte theValue;
       if(dataBufferIndex == 1){
         dataArray1[lengthOfNbr1] = c;
         lengthOfNbr1 = lengthOfNbr1 + 1;
-        Serial.println("character id: " + String(c));
       }
       else if(dataBufferIndex == 2){
         dataArray2[lengthOfNbr2] = c;
         lengthOfNbr2 = lengthOfNbr2 + 1;
-        Serial.println("character state: " + String(c));
       }
     }
 
@@ -252,37 +250,36 @@ void sendHexStatus(int ID, int state){
 
 void readPressurePlate(){
   //combine the two analogue pin result state into one array
-  long int buffer1[CHANNEL1];
-  long int buffer2[CHANNEL2];
-  scales.read(results);
-  scales2.read(results2);
-  for(int u=0; u<CHANNEL_COUNT; u++){
-    Serial.println(results[u]);
-  }
-  //Serial.println("size of results:");
-  int chn2Index = 0;
-  uint32_t value;
-  for (int i=0; i<CHANNEL_COUNT; i++) {
-      int theIndex = indexs[i];
-      if(i < CHANNEL1){
-        value = abs(results[i]) * 0.0001; // can we do something more clear and unforgetable then this division
-      }else{
-        value = abs(results2[chn2Index]) * 0.0001; // can we do something more clear and unforgetable then this division  
-        chn2Index = chn2Index + 1;
-      }
-      if(value < maxReadableValue && value >= 0){
-        int32_t delta =value - prevValues[i];
-        tileStatus[i] = (delta > threshold) ? 1 :0;
-        
-        if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
-          sendHexStatus(theIndex,tileStatus[i]);
+  if(scales.is_ready()) {
+    //Serial.println("read pressure plate:");
+    scales.read(results);
+    scales2.read(results2);
+    //Serial.println("size of results:");
+    int chn2Index = 0;
+    uint32_t value;
+    for (int i=0; i<CHANNEL_COUNT; i++) {
+        int theIndex = indexs[i];
+        if(i < CHANNEL1){
+          value = abs(results[i]) * 0.0001; // can we do something more clear and unforgetable then this division
+        }else{
+          value = abs(results2[chn2Index]) * 0.0001; // can we do something more clear and unforgetable then this division  
+          chn2Index = chn2Index + 1;
         }
-        
-        prevValues[i] = value; 
-        prevStatus[i] = tileStatus[i];
-        
-      }
-  }   
+        if(value < maxReadableValue && value >= 0){
+          int32_t delta =value - prevValues[i];
+          tileStatus[i] = (delta > threshold) ? 1 :0;
+          
+          if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
+            Serial.println("data send from duino: " + String(indexs[theIndex]));
+            sendHexStatus(indexs[theIndex],tileStatus[i]);
+          }
+          
+          prevValues[i] = value;
+          prevStatus[i] = tileStatus[i];
+          
+        }
+    }   
+  }
 }
 
 void testPattern() {
