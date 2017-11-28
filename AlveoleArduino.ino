@@ -1,5 +1,6 @@
 // hardware libraries to access use the shield
 
+#define FASTLED_ALLOW_INTERRUPTS 0
 #include "FastLED.h"
 //#include <HX711.h>
 #include <stdio.h>
@@ -15,7 +16,6 @@
 #define NUM_LEDS    84
 #define NUM_STRIPS 7
 #define BRIGHTNESS  255
-#define FRAMES_PER_SECOND 10 
 
 //Pressure Plate related variable
 #define CLK 0
@@ -48,14 +48,13 @@ int indexs[7] = {0,1,2,3,4,5,6};
 //--serial communication related variable
 byte dataArray1[3] = {NULL, NULL, NULL};//the bigest number we will receive is in the 3 number;
 byte dataArray2[3] = {NULL, NULL, NULL};//the bigest number we will receive is in the 3 number;
-bool record =0;
+bool record = 0;
 int dataBufferIndex = 0;
 int lengthOfNbr1 = 0;
 int lengthOfNbr2 = 0;
 
 long int results[CHANNEL1];
 long int results2[CHANNEL2];
-//int channelCount = CHANNEL1 + CHANNEL2;
 
 //--define the channels
 HX711MULTITEENSY scales(CHANNEL1, DOUTS1, CLK);
@@ -67,10 +66,18 @@ bool prevStatus[CHANNEL_COUNT];
 bool hasChanged[CHANNEL_COUNT];
 bool tileStatus[CHANNEL_COUNT];
 uint32_t prevValues[CHANNEL_COUNT];
-int dataId = 420;
-int dataState = 420;
+int dataId = 419;
+int dataState = 419;
+int receiveState[7];
 
-CRGB leds[NUM_STRIPS][NUM_LEDS];
+//variable related to the behavior of the different state receive
+int state1Color[3] = {0,0,0};
+int state2Color[3] = {75,75,0};
+int state3Color[3] = {50,0,80};
+int state4Color[3] = {155,25,25};
+int state5Color[3] = {0,85,112};
+int colorArray[5][3] = { {25,25,25}, {75,75,0}, {50,0,80}, {155,25,25}, {0,85,112} };
+CRGB leds[NUM_LEDS];
 int currentId = 0;
 
 unsigned int intervalRead = 25 ;
@@ -80,9 +87,9 @@ unsigned int prevRead = 0;
 uint32_t maxReadableValue = 70000;
 
 void setup() {
-  //Serial.begin(115200);
+  Serial.begin(115200);
   //setup ethernet part
-  //delay(3000); // sanity delay
+  delay(3000); // sanity delay
   //Serial.println("serial begin");
   
   
@@ -93,16 +100,18 @@ void setup() {
     prevValues[i] = 0;
   }
 
-  // Settings up the led strips
-  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds[0], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[1], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds[2], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 16, COLOR_ORDER>(leds[3], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[4], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[5], NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[6], NUM_LEDS).setCorrection( TypicalLEDStrip );
+  for(int i = 0; i < 7; i++){
+    receiveState[i] = 0;  
+  }
 
-  FastLED.setBrightness( BRIGHTNESS );
+  // Settings up the led strips
+  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 16, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
 
   //tare();
   //testPattern();
@@ -112,12 +121,30 @@ void setup() {
 //int tick = 0;
 void loop() {
   // important! non-blocking listen routine
-  //Serial.println("loop");
+  Serial.println("loop");
+  if(receiveState[dataId] < 0 || receiveState[dataId] > 35){
+    Serial.println("wrong value");
+    receiveState[dataId] = 0;
+  }
   readTheData();
   if(mustReadPressure){
     //Serial.println("mustReadPressure");
     readPressurePlate();
   }
+  for(int i = 0; i < NUM_STRIPS; i++){
+    int stripState = receiveState[i];
+    //Serial.println("receiveState: " + String(receiveState[i]));
+    int r = colorArray[stripState][0];
+    int g = colorArray[stripState][1];
+    int b = colorArray[stripState][2];
+    //Serial.println("receiveState[i] : " + String(receiveState[i]));
+    if(r != 0 || g != 0 || b != 0){
+      //Serial.println("red: " + String(r) + "green: " + String(g) + "blue: " + String(b));
+    }
+    fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
+    FastLED[i].showLeds(BRIGHTNESS);
+  }
+  //while(Serial.available() > 0) {Serial.read();}
 }
 
 
@@ -144,30 +171,31 @@ void readTheData() {  // *note the & before msg
       currentId = indexs[i]; 
     } 
   }
-  int hexStatus = dataState;
-
-  switch (hexStatus) {
-    case 0: colorWipe(CRGB(0,0,0));    // Black/off
+  int hexStatus = receiveState[dataId];
+  //Serial.println("receiveState: " + String(receiveState[dataId]));
+  //if you add more state to this switch/case go update the variable nbrOfState and add the color in the colorArray
+  /*switch (hexStatus) {
+    case 0: colorWipe(CRGB(0,0,0),dataId);    // Black/off
       break;
-    case 1: colorWipe(CRGB(75,75,0));  //yellow/on
+    case 1: colorWipe(CRGB(75,75,0),dataId);  //yellow/on
       break;
-    case 2: colorWipe(CRGB(50,0,80));  //purple/corruption
+    case 2: colorWipe(CRGB(50,0,80),dataId);  //purple/corruption
       break;
-    case 3: colorWipe(CRGB(155,25,25));//red/ultra-corrupted
+    case 3: colorWipe(CRGB(155,25,25),dataId);//red/ultra-corrupted
       break;
-    case 4: colorWipe(CRGB(0,85,112)); //blue/cleanse
+    case 4: colorWipe(CRGB(0,85,112),dataId); //blue/cleanse
       break;
-  }
+  }*/
 }
 
 void decipherPacket(){
-  int id;
+  Serial.println("decipher");
   int state;
   while (Serial.available() > 0) {
     byte c = Serial.read();
     //if we catch the ascii code for "a" character aka 97
     if(c == 97){
-      //Serial.println("packet start");
+      Serial.println("packet start");
       record = 1;
       dataBufferIndex = 1;
       //reset the nbrArray array to null element
@@ -176,9 +204,8 @@ void decipherPacket(){
       //Serial.println("finish id go to state");
       //Serial.println("reading id");
       int bufferId = String((char*)dataArray1).toInt();
-      memcpy (&id, &bufferId, sizeof(bufferId));
-      dataId = id;
-      Serial.println("id receive from python: " + String(id));
+      memcpy (&dataId, &bufferId, sizeof(bufferId));
+      Serial.println("id receive from python: " + String(dataId));
       for(int i = 0; i<dataArray1[3]; i++){
         dataArray1[i] = NULL;
       }
@@ -187,9 +214,10 @@ void decipherPacket(){
     else if(c == 122){
       //Serial.println("packet end");
       int bufferState = String((char*)dataArray2).toInt();
-      memcpy (&state, &bufferState, sizeof(bufferState));
-      dataState = state;
-      Serial.println("state receive from python: " + String(state));
+      Serial.println("packetEnd value of buffer: " + bufferState);
+      memcpy (&receiveState[dataId], &bufferState, sizeof(bufferState));
+      Serial.println("printing led #: " + String(dataId)+ " giving state " + String(receiveState[dataId]));
+      Serial.println("state receive from python: " + String(receiveState[dataId]));
       for(int i = 0; i<dataArray2[3]; i++){
         dataArray2[i] = NULL;
       }
@@ -257,7 +285,7 @@ void readPressurePlate(){
   }   
 }
 
-void testPattern() {
+/*void testPattern() {
   for (int i = 0; i < 6; i ++) {
     currentId = i;
     colorWipe(CRGB::White);
@@ -307,13 +335,13 @@ void testPattern() {
     colorWipe(CRGB::Black);
   }
 
-}
+}*/
 
 
 // Fill the dots one after the other with a color
-void colorWipe(CRGB color) {
+void colorWipe(CRGB color, int id) {
   for (uint16_t i = 0; i < NUM_LEDS; i++) {
-    leds[dataId][i] = color;
+    leds[id][i] = color;
   }
   FastLED.show();
 }
