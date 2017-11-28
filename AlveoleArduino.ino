@@ -53,8 +53,8 @@ int dataBufferIndex = 0;
 int lengthOfNbr1 = 0;
 int lengthOfNbr2 = 0;
 
-long int results[CHANNEL_COUNT];
-long int results2[CHANNEL_COUNT];
+long int results[CHANNEL1];
+long int results2[CHANNEL2];
 //int channelCount = CHANNEL1 + CHANNEL2;
 
 //--define the channels
@@ -79,14 +79,11 @@ unsigned int prevRead = 0;
 
 uint32_t maxReadableValue = 70000;
 
-int idSensor = 4;
-int stateSensor = 1;
-
 void setup() {
-  Serial.begin(115200);
+  //Serial.begin(115200);
   //setup ethernet part
   //delay(3000); // sanity delay
-  Serial.println("serial begin");
+  //Serial.println("serial begin");
   
   
   for(int i = 0; i < CHANNEL_COUNT; i++){
@@ -117,15 +114,10 @@ void loop() {
   // important! non-blocking listen routine
   //Serial.println("loop");
   readTheData();
-  //if(tick == 500){
-  //  sendHexStatus(6, 3);
-  //  tick = 0;
-  //}
   if(mustReadPressure){
     //Serial.println("mustReadPressure");
     readPressurePlate();
   }
-  //tick++;
 }
 
 
@@ -140,7 +132,6 @@ bool mustReadPressure (){
   }
   
 }
-//----!!!!!finish this function and call the other one with array in arg!----
 void readTheData() {  // *note the & before msg
   decipherPacket();
   //Serial.println(dataId);
@@ -158,13 +149,13 @@ void readTheData() {  // *note the & before msg
   switch (hexStatus) {
     case 0: colorWipe(CRGB(0,0,0));    // Black/off
       break;
-    case 1: colorWipe(CRGB(75,75,0)); 
+    case 1: colorWipe(CRGB(75,75,0));  //yellow/on
       break;
-    case 2: colorWipe(CRGB(50,0,80));
+    case 2: colorWipe(CRGB(50,0,80));  //purple/corruption
       break;
-    case 3: colorWipe(CRGB(155,25,25));
+    case 3: colorWipe(CRGB(155,25,25));//red/ultra-corrupted
       break;
-    case 4: colorWipe(CRGB(0,85,112));
+    case 4: colorWipe(CRGB(0,85,112)); //blue/cleanse
       break;
   }
 }
@@ -176,29 +167,29 @@ void decipherPacket(){
     byte c = Serial.read();
     //if we catch the ascii code for "a" character aka 97
     if(c == 97){
-      Serial.println("packet start");
+      //Serial.println("packet start");
       record = 1;
       dataBufferIndex = 1;
       //reset the nbrArray array to null element
     }
     else if(c == 99){
-      Serial.println("finish id go to state");
+      //Serial.println("finish id go to state");
       //Serial.println("reading id");
       int bufferId = String((char*)dataArray1).toInt();
       memcpy (&id, &bufferId, sizeof(bufferId));
       dataId = id;
-      //Serial.println("id: " + String(id));
-      
+      Serial.println("id receive from python: " + String(id));
       for(int i = 0; i<dataArray1[3]; i++){
         dataArray1[i] = NULL;
       }
       dataBufferIndex = 2;
     }
     else if(c == 122){
-      Serial.println("packet end");
+      //Serial.println("packet end");
       int bufferState = String((char*)dataArray2).toInt();
       memcpy (&state, &bufferState, sizeof(bufferState));
       dataState = state;
+      Serial.println("state receive from python: " + String(state));
       for(int i = 0; i<dataArray2[3]; i++){
         dataArray2[i] = NULL;
       }
@@ -220,8 +211,8 @@ void decipherPacket(){
       }
     }
 
-    Serial.println("dataId : " + String(dataId));
-    Serial.println("dataState : " + String(dataState));
+    //Serial.println("dataId : " + String(dataId));
+    //Serial.println("dataState : " + String(dataState));
   }
 }
 
@@ -231,55 +222,39 @@ void sendHexStatus(int ID, int state){
   Serial.println((String)hexId + "," + hexState + "e/hexData");  
 }
 
-/*void sendData(int ID, int state) {
-    int hexId = ID;
-    int hexState = indexs[state];
-    OSCMessage msg("/hex");
-    msg.add((int32_t)hexId);
-    msg.add((int32_t)hexState);
-
-    Udp.beginPacket(outIp, outPort);
-      msg.send(Udp); // send the bytes to the SLIP stream
-    Udp.endPacket(); // mark the end of the OSC Packet
-    msg.empty(); // free space occupied by message
-
-    //delay(20);
-    //currentId = hexId;
-}*/
-
-
 void readPressurePlate(){
   //combine the two analogue pin result state into one array
-  if(scales.is_ready()) {
-    //Serial.println("read pressure plate:");
-    scales.read(results);
-    scales2.read(results2);
-    //Serial.println("size of results:");
-    int chn2Index = 0;
-    uint32_t value;
-    for (int i=0; i<CHANNEL_COUNT; i++) {
-        int theIndex = indexs[i];
-        if(i < CHANNEL1){
-          value = abs(results[i]) * 0.0001; // can we do something more clear and unforgetable then this division
-        }else{
-          value = abs(results2[chn2Index]) * 0.0001; // can we do something more clear and unforgetable then this division  
-          chn2Index = chn2Index + 1;
+  //Serial.println("read pressure plate:");
+  scales.read(results);
+  //Serial.println("size of results:");
+  int chn2Index = 0;
+  uint32_t value;
+  for (int i=0; i<CHANNEL_COUNT; i++) {
+      int theIndex = indexs[i];
+      if(i < CHANNEL1){
+        //Serial.println("channel1 iteration : " + i);
+        value = abs(results[i]) * 0.0001; // can we do something more clear and unforgetable then this division
+      }else{
+        
+        scales2.read(results2);
+        //Serial.println("channel2 iteration : " + chn2Index);
+        value = abs(results2[chn2Index]) * 0.0001; // can we do something more clear and unforgetable then this division  
+        chn2Index = chn2Index + 1;
+      }
+      if(value < maxReadableValue && value >= 0){
+        int32_t delta =value - prevValues[i];
+        tileStatus[i] = (delta > threshold) ? 1 :0;
+        
+        if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
+          //Serial.println("data send from duino: " + String(indexs[theIndex]));
+          sendHexStatus(indexs[theIndex],tileStatus[i]);
         }
-        if(value < maxReadableValue && value >= 0){
-          int32_t delta =value - prevValues[i];
-          tileStatus[i] = (delta > threshold) ? 1 :0;
-          
-          if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
-            Serial.println("data send from duino: " + String(indexs[theIndex]));
-            sendHexStatus(indexs[theIndex],tileStatus[i]);
-          }
-          
-          prevValues[i] = value;
-          prevStatus[i] = tileStatus[i];
-          
-        }
-    }   
-  }
+        
+        prevValues[i] = value;
+        prevStatus[i] = tileStatus[i];
+        
+      }
+  }   
 }
 
 void testPattern() {
