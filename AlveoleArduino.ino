@@ -69,6 +69,7 @@ uint32_t prevValues[CHANNEL_COUNT];
 int dataId = 419;
 int dataState = 419;
 int receiveState[7];
+int prevReceiveState[7];
 
 //variable related to the behavior of the different state receive
 int state1Color[3] = {0,0,0};
@@ -101,7 +102,8 @@ void setup() {
   }
 
   for(int i = 0; i < 7; i++){
-    receiveState[i] = 0;  
+    receiveState[i] = 0; 
+    prevReceiveState[i] = 0;   
   }
 
   // Settings up the led strips
@@ -121,9 +123,7 @@ void setup() {
 //int tick = 0;
 void loop() {
   // important! non-blocking listen routine
-  Serial.println("loop");
   if(receiveState[dataId] < 0 || receiveState[dataId] > 35){
-    Serial.println("wrong value");
     receiveState[dataId] = 0;
   }
   readTheData();
@@ -132,19 +132,22 @@ void loop() {
     readPressurePlate();
   }
   for(int i = 0; i < NUM_STRIPS; i++){
-    int stripState = receiveState[i];
-    //Serial.println("receiveState: " + String(receiveState[i]));
-    int r = colorArray[stripState][0];
-    int g = colorArray[stripState][1];
-    int b = colorArray[stripState][2];
-    //Serial.println("receiveState[i] : " + String(receiveState[i]));
-    if(r != 0 || g != 0 || b != 0){
-      //Serial.println("red: " + String(r) + "green: " + String(g) + "blue: " + String(b));
+    if(receiveState[i] != prevReceiveState[i]){
+      int stripState = receiveState[i];
+      Serial.println("update led: " + String(receiveState[i]));
+      int r = colorArray[stripState][0];
+      int g = colorArray[stripState][1];
+      int b = colorArray[stripState][2];
+      //Serial.println("receiveState[i] : " + String(receiveState[i]));
+      if(r != 0 || g != 0 || b != 0){
+        //Serial.println("red: " + String(r) + "green: " + String(g) + "blue: " + String(b));
+      }
+      fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
+      FastLED[i].showLeds(BRIGHTNESS);
     }
-    fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
-    FastLED[i].showLeds(BRIGHTNESS);
+    
+    prevReceiveState[i] = receiveState[i];
   }
-  //while(Serial.available() > 0) {Serial.read();}
 }
 
 
@@ -189,13 +192,12 @@ void readTheData() {  // *note the & before msg
 }
 
 void decipherPacket(){
-  Serial.println("decipher");
   int state;
   while (Serial.available() > 0) {
     byte c = Serial.read();
     //if we catch the ascii code for "a" character aka 97
     if(c == 97){
-      Serial.println("packet start");
+      //Serial.println("packet start");
       record = 1;
       dataBufferIndex = 1;
       //reset the nbrArray array to null element
@@ -205,7 +207,7 @@ void decipherPacket(){
       //Serial.println("reading id");
       int bufferId = String((char*)dataArray1).toInt();
       memcpy (&dataId, &bufferId, sizeof(bufferId));
-      Serial.println("id receive from python: " + String(dataId));
+      //Serial.println("id receive from python: " + String(dataId));
       for(int i = 0; i<dataArray1[3]; i++){
         dataArray1[i] = NULL;
       }
@@ -214,10 +216,10 @@ void decipherPacket(){
     else if(c == 122){
       //Serial.println("packet end");
       int bufferState = String((char*)dataArray2).toInt();
-      Serial.println("packetEnd value of buffer: " + bufferState);
+      //Serial.println("packetEnd value of buffer: " + bufferState);
       memcpy (&receiveState[dataId], &bufferState, sizeof(bufferState));
-      Serial.println("printing led #: " + String(dataId)+ " giving state " + String(receiveState[dataId]));
-      Serial.println("state receive from python: " + String(receiveState[dataId]));
+      //Serial.println("printing led #: " + String(dataId)+ " giving state " + String(receiveState[dataId]));
+      //Serial.println("state receive from python: " + String(receiveState[dataId]));
       for(int i = 0; i<dataArray2[3]; i++){
         dataArray2[i] = NULL;
       }
@@ -226,6 +228,13 @@ void decipherPacket(){
       lengthOfNbr2 = 0;
       record = 0;
       dataBufferIndex = 0;
+      int stripState = receiveState[dataId];
+      int r = colorArray[stripState][0];
+      int g = colorArray[stripState][1];
+      int b = colorArray[stripState][2];
+      //fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
+      //FastLED[dataId].showLeds(BRIGHTNESS);
+      //prevReceiveState[dataId] = receiveState[dataId];
     }
     else if(record != 0){
       byte theValue;
@@ -238,7 +247,23 @@ void decipherPacket(){
         lengthOfNbr2 = lengthOfNbr2 + 1;
       }
     }
-
+    for(int i = 0; i < NUM_STRIPS; i++){
+      if(receiveState[i] != prevReceiveState[i]){
+        int stripState = receiveState[i];
+        Serial.println("update led: " + String(receiveState[i]));
+        int r = colorArray[stripState][0];
+        int g = colorArray[stripState][1];
+        int b = colorArray[stripState][2];
+        //Serial.println("receiveState[i] : " + String(receiveState[i]));
+        if(r != 0 || g != 0 || b != 0){
+          //Serial.println("red: " + String(r) + "green: " + String(g) + "blue: " + String(b));
+        }
+        fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
+        FastLED[i].showLeds(BRIGHTNESS);
+      }
+      
+      prevReceiveState[i] = receiveState[i];
+    }
     //Serial.println("dataId : " + String(dataId));
     //Serial.println("dataState : " + String(dataState));
   }
@@ -284,7 +309,6 @@ void readPressurePlate(){
       }
   }   
 }
-
 /*void testPattern() {
   for (int i = 0; i < 6; i ++) {
     currentId = i;
@@ -339,10 +363,10 @@ void readPressurePlate(){
 
 
 // Fill the dots one after the other with a color
-void colorWipe(CRGB color, int id) {
+/*void colorWipe(CRGB color, int id) {
   for (uint16_t i = 0; i < NUM_LEDS; i++) {
     leds[id][i] = color;
   }
   FastLED.show();
-}
+}*/
 
