@@ -29,9 +29,10 @@
 #define DOUT5 6
 #define DOUT6 7
 #define DOUT7 9
-//time out of the tare function ?is it use?
+//--time out of the tare function ?is it use?
 #define TARE_TIMEOUT_SECONDS 4 
 
+//--declare sensor pin and index for unity comprehension of received data
 byte DOUTS1[4] = {DOUT1,DOUT2,DOUT3,DOUT4};
 byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
 
@@ -72,11 +73,6 @@ int receiveState[7];
 int prevReceiveState[7];
 
 //variable related to the behavior of the different state receive
-int state1Color[3] = {0,0,0};
-int state2Color[3] = {75,75,0};
-int state3Color[3] = {50,0,80};
-int state4Color[3] = {155,25,25};
-int state5Color[3] = {0,85,112};
 int colorArray[5][3] = { {25,25,25}, {75,75,0}, {50,0,80}, {155,25,25}, {0,85,112} };
 CRGB leds[NUM_LEDS];
 int currentId = 0;
@@ -129,7 +125,7 @@ void loop() {
   readTheData();
   if(mustReadPressure){
     //Serial.println("mustReadPressure");
-    readPressurePlate();
+    readPressurePlate(); // test without
   }
   for(int i = 0; i < NUM_STRIPS; i++){
     if(receiveState[i] != prevReceiveState[i]){
@@ -139,9 +135,6 @@ void loop() {
       int g = colorArray[stripState][1];
       int b = colorArray[stripState][2];
       //Serial.println("receiveState[i] : " + String(receiveState[i]));
-      if(r != 0 || g != 0 || b != 0){
-        //Serial.println("red: " + String(r) + "green: " + String(g) + "blue: " + String(b));
-      }
       fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
       FastLED[i].showLeds(BRIGHTNESS);
     }
@@ -167,6 +160,7 @@ void readTheData() {  // *note the & before msg
   //Serial.println(dataId);
   //Serial.println(dataState);
   int theIndex = dataId;
+  //---- a verifier -----
   for(int i = 0; i < CHANNEL_COUNT; i++){
     int indexReceive = theIndex;
     int indexToSend = indexs[i];
@@ -176,35 +170,20 @@ void readTheData() {  // *note the & before msg
   }
   int hexStatus = receiveState[dataId];
   //Serial.println("receiveState: " + String(receiveState[dataId]));
-  //if you add more state to this switch/case go update the variable nbrOfState and add the color in the colorArray
-  /*switch (hexStatus) {
-    case 0: colorWipe(CRGB(0,0,0),dataId);    // Black/off
-      break;
-    case 1: colorWipe(CRGB(75,75,0),dataId);  //yellow/on
-      break;
-    case 2: colorWipe(CRGB(50,0,80),dataId);  //purple/corruption
-      break;
-    case 3: colorWipe(CRGB(155,25,25),dataId);//red/ultra-corrupted
-      break;
-    case 4: colorWipe(CRGB(0,85,112),dataId); //blue/cleanse
-      break;
-  }*/
 }
 
 void decipherPacket(){
   int state;
   while (Serial.available() > 0) {
     byte c = Serial.read();
-    //if we catch the ascii code for "a" character aka 97
-    if(c == 97){
+    if(c == 97){  //97 ascii = a
       //Serial.println("packet start");
       record = 1;
       dataBufferIndex = 1;
-      //reset the nbrArray array to null element
     }
-    else if(c == 99){
+    else if(c == 99){  //99 ascii = c
       //Serial.println("finish id go to state");
-      //Serial.println("reading id");
+      //Serial.println("reading state");
       int bufferId = String((char*)dataArray1).toInt();
       memcpy (&dataId, &bufferId, sizeof(bufferId));
       //Serial.println("id receive from python: " + String(dataId));
@@ -213,13 +192,12 @@ void decipherPacket(){
       }
       dataBufferIndex = 2;
     }
-    else if(c == 122){
+    else if(c == 122){  //122 ascii = z
       //Serial.println("packet end");
       int bufferState = String((char*)dataArray2).toInt();
       //Serial.println("packetEnd value of buffer: " + bufferState);
       memcpy (&receiveState[dataId], &bufferState, sizeof(bufferState));
-      //Serial.println("printing led #: " + String(dataId)+ " giving state " + String(receiveState[dataId]));
-      //Serial.println("state receive from python: " + String(receiveState[dataId]));
+      
       for(int i = 0; i<dataArray2[3]; i++){
         dataArray2[i] = NULL;
       }
@@ -361,8 +339,6 @@ void readPressurePlate(){
 
 }*/
 
-
-// Fill the dots one after the other with a color
 /*void colorWipe(CRGB color, int id) {
   for (uint16_t i = 0; i < NUM_LEDS; i++) {
     leds[id][i] = color;
