@@ -138,10 +138,16 @@ float delayBrightness_Ultracorrupt = 0.75;
 int dashLenght_Ultracorrupt = 4;
 
 /*==== ultracorruptPressed() Variables ===*/
-//Chrono myChrono_UltracorruptPressed;
-//int ledIndex_UltracorruptPressed[7] = {0, 0, 0, 0, 0, 0, 0};
-//int ledIndexGlitch1_UltracorruptPressed[7];
-//int state_UltracorruptPressed;
+Chrono myChrono0_UltracorruptPressed;
+Chrono myChrono1_UltracorruptPressed;
+Chrono myChrono2_UltracorruptPressed;
+Chrono myChrono3_UltracorruptPressed;
+Chrono myChrono4_UltracorruptPressed;
+Chrono myChrono5_UltracorruptPressed;
+Chrono myChrono6_UltracorruptPressed;
+Chrono myChrono_UltracorruptPressed[7] = {myChrono0_UltracorruptPressed, myChrono1_UltracorruptPressed, myChrono2_UltracorruptPressed, myChrono3_UltracorruptPressed, myChrono4_UltracorruptPressed, myChrono5_UltracorruptPressed, myChrono6_UltracorruptPressed};
+float val_UltracorruptPressed[7] = {255, 255, 255, 255, 255, 255, 255};
+//float brightness_Ultracorrupt[7] = {0, 0, 0, 0, 0, 0, 0};
 
 /*==== cleanser() Variables ===*/
 Chrono myChrono0_Cleanser;
@@ -652,7 +658,34 @@ void ultracorrupt(){
 
 void ultracorruptPressed(){
   
-    red_Ultracorrupt = CRGB::White;
+    //Writing BLACK for the 5 Dashes
+    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      leds[dataId][ledIndexGlitch1_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
+      leds[dataId][ledIndexGlitch2_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
+      leds[dataId][ledIndexGlitch3_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
+      leds[dataId][ledIndexGlitch4_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
+      leds[dataId][ledIndexGlitch5_Ultracorrupt[dataId] + x].setHSV(0, 255, 0);
+    }
+
+    //Changing 5 Dashes starting index
+    if(myChrono_UltracorruptPressed[dataId].hasPassed(delayIndex_UltracorruptPressed)){
+      ledIndexGlitch1_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+      ledIndexGlitch2_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+      ledIndexGlitch3_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+      ledIndexGlitch4_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+      ledIndexGlitch5_Ultracorrupt[dataId] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+      myChrono_Ultracorrupt[dataId].restart();
+    }
+
+    //Writing RED for the 5 Dashes
+    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      leds[dataId][ledIndexGlitch1_Ultracorrupt[dataId] + x] = white_Ultracorrupt;
+      leds[dataId][ledIndexGlitch2_Ultracorrupt[dataId] + x] = white_Ultracorrupt;
+      leds[dataId][ledIndexGlitch3_Ultracorrupt[dataId] + x] = white_Ultracorrupt;
+      leds[dataId][ledIndexGlitch4_Ultracorrupt[dataId] + x] = white_Ultracorrupt;
+      leds[dataId][ledIndexGlitch5_Ultracorrupt[dataId] + x] = white_Ultracorrupt;
+      //FastLED.show();
+    }
     
 }
 
