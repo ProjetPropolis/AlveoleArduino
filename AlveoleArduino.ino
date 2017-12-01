@@ -294,7 +294,8 @@ void loop() {
       Serial.println("receiveState[i] : " + String(receiveState[i]));
       fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
       FastLED[i].showLeds(BRIGHTNESS);*/
-      FastLED[i].showLeds();
+      animCtrl(i, receiveState[dataId], prevReceiveState[dataId]);
+      FastLED[i].showLeds(BRIGHTNESS);
     }
     
     prevReceiveState[i] = receiveState[i];
@@ -388,6 +389,7 @@ void decipherPacket(){
       //FastLED[dataId].showLeds(BRIGHTNESS);
       //prevReceiveState[dataId] = receiveState[dataId];
       animCtrl(dataId, receiveState[dataId], prevReceiveState[dataId]);
+      FastLED[dataId].showLeds(BRIGHTNESS);
     }
     else if(record != 0){
       byte theValue;
