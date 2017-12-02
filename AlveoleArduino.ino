@@ -294,10 +294,9 @@ void loop() {
       Serial.println("receiveState[i] : " + String(receiveState[i]));
       fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
       FastLED[i].showLeds(BRIGHTNESS);*/
-      animCtrl(i, receiveState[dataId], prevReceiveState[dataId]);
-      FastLED[i].showLeds(BRIGHTNESS);
     }
-    
+    animCtrl(i, receiveState[dataId], prevReceiveState[dataId]);
+    FastLED[i].showLeds(BRIGHTNESS);
     prevReceiveState[i] = receiveState[i];
   }
   
