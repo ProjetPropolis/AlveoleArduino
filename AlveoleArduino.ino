@@ -73,7 +73,14 @@ int receiveState[7];
 int prevReceiveState[7];
 
 //variable related to the behavior of the different state receive
-int colorArray[5][3] = { {25,25,25}, {75,75,0}, {50,0,80}, {155,25,25}, {0,85,112} };
+
+int colorArray[5][3] = { {25,25,25}, {75,75,0}, {50,0,80}, {155,25,25}, {0,85,112} };/*
+index 1: off state
+index 2: on state
+index 3: corrupted state
+index 4: ultra corrupted state 
+index 5: cleanse state
+*/
 CRGB leds[NUM_LEDS];
 int currentId = 0;
 
@@ -131,15 +138,8 @@ void loop() {
     if(receiveState[i] != prevReceiveState[i]){
       int stripState = receiveState[i];
       Serial.println("update led: " + String(receiveState[i]));
-      int r = colorArray[stripState][0];
-      int g = colorArray[stripState][1];
-      int b = colorArray[stripState][2];
-      //Serial.println("receiveState[i] : " + String(receiveState[i]));
-      fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
-      FastLED[i].showLeds(BRIGHTNESS);
+      updateLed(i,stripState);
     }
-    
-    prevReceiveState[i] = receiveState[i];
   }
 }
 
@@ -206,13 +206,13 @@ void decipherPacket(){
       lengthOfNbr2 = 0;
       record = 0;
       dataBufferIndex = 0;
-      int stripState = receiveState[dataId];
+      /*int stripState = receiveState[dataId];
       int r = colorArray[stripState][0];
       int g = colorArray[stripState][1];
       int b = colorArray[stripState][2];
-      //fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
-      //FastLED[dataId].showLeds(BRIGHTNESS);
-      //prevReceiveState[dataId] = receiveState[dataId];
+      fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
+      FastLED[dataId].showLeds(BRIGHTNESS);
+      prevReceiveState[dataId] = receiveState[dataId];*/
     }
     else if(record != 0){
       byte theValue;
@@ -229,22 +229,25 @@ void decipherPacket(){
       if(receiveState[i] != prevReceiveState[i]){
         int stripState = receiveState[i];
         Serial.println("update led: " + String(receiveState[i]));
-        int r = colorArray[stripState][0];
-        int g = colorArray[stripState][1];
-        int b = colorArray[stripState][2];
-        //Serial.println("receiveState[i] : " + String(receiveState[i]));
-        if(r != 0 || g != 0 || b != 0){
-          //Serial.println("red: " + String(r) + "green: " + String(g) + "blue: " + String(b));
-        }
-        fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
-        FastLED[i].showLeds(BRIGHTNESS);
+        updateLed(i, stripState);
       }
       
-      prevReceiveState[i] = receiveState[i];
+      //prevReceiveState[i] = receiveState[i];
     }
     //Serial.println("dataId : " + String(dataId));
     //Serial.println("dataState : " + String(dataState));
   }
+}
+
+void updateLed(int strip, int state){
+  //strip = id of the strip that need update 
+  //state = the state that we need to change the led strip to
+  int r = colorArray[state][0];
+  int g = colorArray[state][1];
+  int b = colorArray[state][2];
+  fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
+  FastLED[strip].showLeds(BRIGHTNESS);  
+  prevReceiveState[strip] = receiveState[strip];
 }
 
 void sendHexStatus(int ID, int state){
@@ -278,6 +281,8 @@ void readPressurePlate(){
         
         if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
           //Serial.println("data send from duino: " + String(indexs[theIndex]));
+          stateCtrl(indexs[theIndex], prevReceiveState[i]);
+          //call the function that will send data with id and class as parameter
           sendHexStatus(indexs[theIndex],tileStatus[i]);
         }
         
@@ -287,62 +292,43 @@ void readPressurePlate(){
       }
   }   
 }
-/*void testPattern() {
-  for (int i = 0; i < 6; i ++) {
-    currentId = i;
-    colorWipe(CRGB::White);
+
+void stateCtrl(int id, int prevState){
+  switch( prevState ) {
+  case 1:
+    //off state
+    off_state(id);
+  case 2:
+    //on state
+    on_state(id);
+  case 3:
+    //corrupted state
+    corrupted_state(id);
+  case 4:
+    //ultra corrupted state
+    ultra_corrupted_state(id);
+  case 5:
+    //cleanse state
+    cleanse_state(id);
   }
+}
 
+void off_state(int id){
+  updateLed(id,1);
+}
 
-  delay(500);
+void on_state(int id){
+  updateLed(id,1);
+}
 
-  for (int i = 0; i < 6; i ++) {
-    currentId = i;
-    colorWipe(CRGB::Black);
-  }
+void corrupted_state(int id){
+ //do nothing for now
+}
 
-  currentId = 0;
-  colorWipe(CRGB::Red);
+void ultra_corrupted_state(int id){
+ //do nothing for now
+}
 
-
-  delay(500);
-  currentId = 1;
-  colorWipe(CRGB::Blue);
-
-
-  delay(500);
-  currentId = 2;
-  colorWipe(CRGB::Red);
-
-   delay(500);
-  currentId = 3;
-  colorWipe(CRGB::Blue);
-
-   delay(500);
-  currentId = 4;
-  colorWipe(CRGB::Red);
-
-  delay(500);
-  currentId = 5;
-  colorWipe(CRGB::Blue);
-
-  
-   delay(500);
-  currentId = 6;
-  colorWipe(CRGB::Red);
-
-  delay(500);
-  for (int i = 0; i < 6; i ++) {
-    currentId = i;
-    colorWipe(CRGB::Black);
-  }
-
-}*/
-
-/*void colorWipe(CRGB color, int id) {
-  for (uint16_t i = 0; i < NUM_LEDS; i++) {
-    leds[id][i] = color;
-  }
-  FastLED.show();
-}*/
-
+void cleanse_state(int id){
+  //do nothing for now
+}
