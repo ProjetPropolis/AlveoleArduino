@@ -1,13 +1,12 @@
 // hardware libraries to access use the shield
-
-#define FASTLED_ALLOW_INTERRUPTS 0
 #include "FastLED.h"
-//#include <HX711.h>
 #include <stdio.h>
 #include <string.h>
 #include <cstring>
 #include <stdlib.h>
 #include "HX711-multi-teensy.h"
+#include <Chrono.h>
+#include <LightChrono.h>
 
 //LED related variables
 #define LED_PIN    22
@@ -16,6 +15,9 @@
 #define NUM_LEDS    84
 #define NUM_STRIPS 7
 #define BRIGHTNESS  255
+#define FASTLED_ALLOW_INTERRUPTS 0
+#define LATENCY_DELAY 400
+
 
 //Pressure Plate related variable
 #define CLK 0
@@ -35,9 +37,9 @@
 //--declare sensor pin and index for unity comprehension of received data
 byte DOUTS1[4] = {DOUT1,DOUT2,DOUT3,DOUT4};
 byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
-
 //byte DOUTS1[0] = {};
 //byte DOUTS2[0] = {};
+
 //--array of all the index that are going to be send, needed for unity to understand if we dont have all the tiles
 int indexs[7] = {0,1,2,3,4,5,6};
 
@@ -74,21 +76,26 @@ int prevReceiveState[7];
 
 //variable related to the behavior of the different state receive
 
-int colorArray[5][3] = { {25,25,25}, {75,75,0}, {50,0,80}, {155,25,25}, {0,85,112} };/*
-index 1: off state
-index 2: on state
-index 3: corrupted state
-index 4: ultra corrupted state 
-index 5: cleanse state
+/*
+color array index signification: 
+---index 1: off state
+---index 2: on state
+---index 3: corrupted state
+---index 4: ultra corrupted state 
+---index 5: cleanse state
 */
+int colorArray[5][3] = { {25,25,25}, {75,75,0}, {50,0,80}, {155,25,25}, {0,85,112} };
+
 CRGB leds[NUM_LEDS];
 int currentId = 0;
 
+//variable related to the sensor data analyse
+
 unsigned int intervalRead = 25 ;
-
 unsigned int prevRead = 0;
-
 uint32_t maxReadableValue = 70000;
+int sensorRawValue[7];
+int pressureState[7]
 
 void setup() {
   Serial.begin(115200);
@@ -155,10 +162,8 @@ bool mustReadPressure (){
   }
   
 }
-void readTheData() {  // *note the & before msg
+void readTheData() {
   decipherPacket();
-  //Serial.println(dataId);
-  //Serial.println(dataState);
   int theIndex = dataId;
   //---- a verifier -----
   for(int i = 0; i < CHANNEL_COUNT; i++){
@@ -169,7 +174,6 @@ void readTheData() {  // *note the & before msg
     } 
   }
   int hexStatus = receiveState[dataId];
-  //Serial.println("receiveState: " + String(receiveState[dataId]));
 }
 
 void decipherPacket(){
@@ -182,11 +186,8 @@ void decipherPacket(){
       dataBufferIndex = 1;
     }
     else if(c == 99){  //99 ascii = c
-      //Serial.println("finish id go to state");
-      //Serial.println("reading state");
       int bufferId = String((char*)dataArray1).toInt();
       memcpy (&dataId, &bufferId, sizeof(bufferId));
-      //Serial.println("id receive from python: " + String(dataId));
       for(int i = 0; i<dataArray1[3]; i++){
         dataArray1[i] = NULL;
       }
@@ -206,13 +207,6 @@ void decipherPacket(){
       lengthOfNbr2 = 0;
       record = 0;
       dataBufferIndex = 0;
-      /*int stripState = receiveState[dataId];
-      int r = colorArray[stripState][0];
-      int g = colorArray[stripState][1];
-      int b = colorArray[stripState][2];
-      fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
-      FastLED[dataId].showLeds(BRIGHTNESS);
-      prevReceiveState[dataId] = receiveState[dataId];*/
     }
     else if(record != 0){
       byte theValue;
@@ -239,15 +233,15 @@ void decipherPacket(){
   }
 }
 
-void updateLed(int strip, int state){
+void updateLed(int stripId, int state){
   //strip = id of the strip that need update 
   //state = the state that we need to change the led strip to
   int r = colorArray[state][0];
   int g = colorArray[state][1];
   int b = colorArray[state][2];
   fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
-  FastLED[strip].showLeds(BRIGHTNESS);  
-  prevReceiveState[strip] = receiveState[strip];
+  FastLED[stripId].showLeds(BRIGHTNESS);  
+  prevReceiveState[stripId] = receiveState[stripId];
 }
 
 void sendHexStatus(int ID, int state){
@@ -264,32 +258,31 @@ void readPressurePlate(){
   int chn2Index = 0;
   uint32_t value;
   for (int i=0; i<CHANNEL_COUNT; i++) {
-      int theIndex = indexs[i];
-      if(i < CHANNEL1){
-        //Serial.println("channel1 iteration : " + i);
-        value = abs(results[i]) * 0.0001; // can we do something more clear and unforgetable then this division
-      }else{
-        
-        scales2.read(results2);
-        //Serial.println("channel2 iteration : " + chn2Index);
-        value = abs(results2[chn2Index]) * 0.0001; // can we do something more clear and unforgetable then this division  
-        chn2Index = chn2Index + 1;
+    int theIndex = indexs[i];
+    if(i < CHANNEL1){
+      //Serial.println("channel1 iteration : " + i);
+      value = abs(results[i]) * 0.0001;
+    }else{
+      
+      scales2.read(results2);
+      //Serial.println("channel2 iteration : " + chn2Index);
+      value = abs(results2[chn2Index]) * 0.0001; 
+      chn2Index = chn2Index + 1;
+    }
+    if(value < maxReadableValue && value >= 0){
+      int32_t delta =value - prevValues[i];
+      tileStatus[i] = (delta > threshold) ? 1 :0;
+      Serial.println("id of the sensor: " + String(i) + " data received by sensor: " + String(value));
+      if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i]){
+        Serial.println("pressure is active : " + String(delta) + ", " + String(value));
+        stateCtrl(indexs[theIndex], prevReceiveState[i]);
+        //call the function that will send data with id and class as parameter
+        sendHexStatus(indexs[theIndex],tileStatus[i]);
+        sensorRawValue[i] = value;
       }
-      if(value < maxReadableValue && value >= 0){
-        int32_t delta =value - prevValues[i];
-        tileStatus[i] = (delta > threshold) ? 1 :0;
-        
-        if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
-          //Serial.println("data send from duino: " + String(indexs[theIndex]));
-          stateCtrl(indexs[theIndex], prevReceiveState[i]);
-          //call the function that will send data with id and class as parameter
-          sendHexStatus(indexs[theIndex],tileStatus[i]);
-        }
-        
-        prevValues[i] = value;
-        prevStatus[i] = tileStatus[i];
-        
-      }
+      prevValues[i] = value;
+      prevStatus[i] = tileStatus[i];
+    }
   }   
 }
 
@@ -318,17 +311,17 @@ void off_state(int id){
 }
 
 void on_state(int id){
-  updateLed(id,1);
+  //do nothing for now
 }
 
 void corrupted_state(int id){
- //do nothing for now
+  updateLed(id,1);
 }
 
 void ultra_corrupted_state(int id){
- //do nothing for now
+ //do nothing for now 
 }
 
 void cleanse_state(int id){
-  //do nothing for now
+  //TODO update central tile to white and then wait for unity for the status change of surrounding tiles
 }
