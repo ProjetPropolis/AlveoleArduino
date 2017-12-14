@@ -8,13 +8,15 @@
 #include <cstring>
 #include <stdlib.h>
 #include "HX711-multi-teensy.h"
+#include <Chrono.h>
+#include <LightChrono.h>
 
 //LED related variables
 #define LED_PIN    22
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2811
-#define NUM_LEDS    84
-#define NUM_STRIPS 7
+#define NUM_LEDS    41
+#define NUM_STRIPS 9
 #define BRIGHTNESS  255
 
 //Pressure Plate related variable
@@ -65,7 +67,8 @@ HX711MULTITEENSY scales2(CHANNEL2, DOUTS2, CLK2);
 int threshold = 7;
 bool prevStatus[CHANNEL_COUNT];
 bool hasChanged[CHANNEL_COUNT];
-bool tileStatus[CHANNEL_COUNT];
+//changed tileStatus for moleculeStatus and the array is defined by NUM_STRIPS instead of Channel_Count
+bool moleculeStatus[NUM_STRIPS];
 uint32_t prevValues[CHANNEL_COUNT];
 int dataId = 419;
 int dataState = 419;
@@ -73,7 +76,7 @@ int receiveState[7];
 int prevReceiveState[7];
 
 //variable related to the behavior of the different state receive
-int colorArray[5][3] = { {25,25,25}, {75,75,0}, {50,0,80}, {155,25,25}, {0,85,112} };
+int colorArray[5][3] = { {0,0,0}, {200, 100, 15}, {0, 150, 255}, {0, 255, 0}, {50,0,80} };
 CRGB leds[NUM_LEDS];
 int currentId = 0;
 
@@ -83,6 +86,41 @@ unsigned int prevRead = 0;
 
 uint32_t maxReadableValue = 70000;
 
+/*==== purple molecules Variables ====*/
+Chrono myChrono_Purple;
+int receiveInfectId = 0;
+
+/*==== buttons Variables ====*/
+Chrono buttonChrono0;
+Chrono buttonChrono1;
+Chrono buttonChrono2;
+Chrono buttonChrono3;
+Chrono buttonChrono4;
+Chrono buttonChrono5;
+Chrono buttonChrono6;
+Chrono buttonChrono[7] = {buttonChrono0, buttonChrono1, buttonChrono2, buttonChrono3, buttonChrono4, buttonChrono5, buttonChrono6};
+int digitalPin0 = 0;
+int digitalPin1 = 1;
+int digitalPin2 = 2;
+int digitalPin3 = 3;
+int digitalPin4 = 4;
+int digitalPin5 = 5;
+int digitalPin6 = 6;
+int digitalPin7 = 7;
+int digitalPin8 = 8;
+int digitalPin[9] = {digitalPin0 ,digitalPin1 ,digitalPin2 ,digitalPin3 ,digitalPin4 ,digitalPin5 ,digitalPin6, digitalPin7, digitalPin8};
+bool moleculeStatus[9];
+int stateColorMolecule[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+bool boolStateMolecule[9] = {false, false, false, false, false, false, false, false, false};
+
+
+CRGB blue_Recette(0, 0, 255);
+CRGB orange_Recette(200, 50, 0);
+CRGB pink_Recette(255, 35, 40);
+CRGB palePurple_Recette(100, 0, 255);
+CRGB darkPurple_Recette(50, 0, 80);
+CRGB cyan_Recette(0, 150, 255);
+
 void setup() {
   Serial.begin(115200);
   //setup ethernet part
@@ -91,7 +129,7 @@ void setup() {
   
   
   for(int i = 0; i < CHANNEL_COUNT; i++){
-    tileStatus[i] = 0; //Initialise status to 0
+    moleculeStatus[i] = 0; //Initialise status to 0
     prevStatus[i] = 0; //Initialise previous status to 0
     hasChanged[i] = 0; //Initialise the hasChange states
     prevValues[i] = 0;
@@ -110,6 +148,24 @@ void setup() {
   FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 20, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 21, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+
+  // Setting up the buttons
+  pinMode(digitalPin[0], INPUT_PULLUP);
+  pinMode(digitalPin[1], INPUT_PULLUP);
+  pinMode(digitalPin[2], INPUT_PULLUP);
+  pinMode(digitalPin[3], INPUT_PULLUP);
+  pinMode(digitalPin[4], INPUT_PULLUP);
+  pinMode(digitalPin[5], INPUT_PULLUP);
+  pinMode(digitalPin[6], INPUT_PULLUP);
+  pinMode(digitalPin[7], INPUT_PULLUP);
+  pinMode(digitalPin[8], INPUT_PULLUP);
+
+  for(int i = 0; i < NUM_STRIPS; i++){
+    //stateColorMolecule[i] = 0;
+    animCtrlMolecules(i, 0);
+  }
 
   //tare();
   //testPattern();
@@ -118,15 +174,20 @@ void setup() {
 
 //int tick = 0;
 void loop() {
+  
   // important! non-blocking listen routine
   if(receiveState[dataId] < 0 || receiveState[dataId] > 35){
     receiveState[dataId] = 0;
   }
   readTheData();
+  readButtonStatus();
+  /*
   if(mustReadPressure){
     //Serial.println("mustReadPressure");
-    readPressurePlate(); // test without
+    readButtonStatus();
+    //readPressurePlate(); // test without
   }
+  */
   for(int i = 0; i < NUM_STRIPS; i++){
     if(receiveState[i] != prevReceiveState[i]){
       int stripState = receiveState[i];
@@ -138,12 +199,13 @@ void loop() {
       fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
       FastLED[i].showLeds(BRIGHTNESS);
     }
-    
-    prevReceiveState[i] = receiveState[i];
+    /*animCtrlMolecules(i, receiveState[dataId]);
+    FastLED[i].showLeds(BRIGHTNESS);
+    prevReceiveState[i] = receiveState[i];*/
   }
 }
 
-
+/*
 bool mustReadPressure (){
   unsigned int currentMillis = millis();
 
@@ -155,6 +217,7 @@ bool mustReadPressure (){
   }
   
 }
+*/
 void readTheData() {  // *note the & before msg
   decipherPacket();
   //Serial.println(dataId);
@@ -213,6 +276,8 @@ void decipherPacket(){
       //fill_solid(leds, NUM_LEDS,CRGB(r,g,b));
       //FastLED[dataId].showLeds(BRIGHTNESS);
       //prevReceiveState[dataId] = receiveState[dataId];
+      //animCtrlMolecules(dataId, receiveState[dataId], prevReceiveState[dataId]);
+      FastLED[dataId].showLeds(BRIGHTNESS);
     }
     else if(record != 0){
       byte theValue;
@@ -246,7 +311,7 @@ void decipherPacket(){
     //Serial.println("dataState : " + String(dataState));
   }
 }
-
+/*
 void sendHexStatus(int ID, int state){
   int hexId = ID;
   int hexState = indexs[state];
@@ -276,68 +341,18 @@ void readPressurePlate(){
         int32_t delta =value - prevValues[i];
         tileStatus[i] = (delta > threshold) ? 1 :0;
         
-        if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i] ){
+        if(delta < maxReadableValue && abs(delta) >= threshold && moleculeStatus[i] != prevStatus[i] ){
           //Serial.println("data send from duino: " + String(indexs[theIndex]));
           sendHexStatus(indexs[theIndex],tileStatus[i]);
         }
         
         prevValues[i] = value;
-        prevStatus[i] = tileStatus[i];
+        prevStatus[i] = moleculeStatus[i];
         
       }
   }   
 }
-/*void testPattern() {
-  for (int i = 0; i < 6; i ++) {
-    currentId = i;
-    colorWipe(CRGB::White);
-  }
-
-
-  delay(500);
-
-  for (int i = 0; i < 6; i ++) {
-    currentId = i;
-    colorWipe(CRGB::Black);
-  }
-
-  currentId = 0;
-  colorWipe(CRGB::Red);
-
-
-  delay(500);
-  currentId = 1;
-  colorWipe(CRGB::Blue);
-
-
-  delay(500);
-  currentId = 2;
-  colorWipe(CRGB::Red);
-
-   delay(500);
-  currentId = 3;
-  colorWipe(CRGB::Blue);
-
-   delay(500);
-  currentId = 4;
-  colorWipe(CRGB::Red);
-
-  delay(500);
-  currentId = 5;
-  colorWipe(CRGB::Blue);
-
-  
-   delay(500);
-  currentId = 6;
-  colorWipe(CRGB::Red);
-
-  delay(500);
-  for (int i = 0; i < 6; i ++) {
-    currentId = i;
-    colorWipe(CRGB::Black);
-  }
-
-}*/
+*/
 
 /*void colorWipe(CRGB color, int id) {
   for (uint16_t i = 0; i < NUM_LEDS; i++) {
@@ -346,3 +361,102 @@ void readPressurePlate(){
   FastLED.show();
 }*/
 
+void sendMoleculeStatus(int ID, int state){
+  int moleculeId = ID;
+  int moleculeState = indexs[state];
+  Serial.println((String)moleculeId + "," + moleculeState + "e/hexData");  
+}
+
+void readButtonStatus(){
+  for(int i = 0; i < NUM_STRIPS; i++){
+    
+    moleculeStatus[i] = digitalRead(digitalPin[i]);
+    
+    if(moleculeStatus[i] == LOW){
+      if(boolStateMolecule[i] == false && stateColorMolecule[i] < 3 && buttonChrono[i].hasPassed(500)){
+        buttonChrono[i].restart();
+        boolStateMolecule[i] = true;
+        stateColorMolecule[i]++;
+        Serial.println(stateColorMolecule[0]);
+        
+      }else if(boolStateMolecule[i] == false && buttonChrono[i].hasPassed(500)){
+        buttonChrono[i].restart();
+        boolStateMolecule[i] = true;
+        stateColorMolecule[i] = 1;
+        Serial.println("BackTo1");
+        Serial.println(stateColorMolecule[0]);
+        //animCtrlMolecules(i, stateColorMolecule[i]);
+      }
+      animCtrlMolecules(i, stateColorMolecule[i]);
+    }else if (moleculeStatus[i] == HIGH) {
+      boolStateMolecule[i] = false;
+    }
+  }
+}
+
+void animCtrlMolecules(int id, int state){
+     switch (state) {
+     case 0: off(id);
+            break;
+     case 1: blue(id);
+            break;
+     case 2: orange(id);
+            break;
+     case 3: pink(id);
+            break;
+     case 4: purple(id);
+            break;
+     case 5: cyan(id);
+            break;
+  }
+}
+
+void off(int id){
+     for(int i = 0; i < NUM_LEDS; i++){
+      leds[i] = CRGB::Black;
+     }
+     FastLED[id].showLeds();
+}
+
+void blue(int id){
+     for(int i = 0; i < NUM_LEDS; i++){
+      leds[i] = blue_Recette;
+     }
+     FastLED[id].showLeds();
+}
+
+void orange(int id){
+     for(int i = 0; i < NUM_LEDS; i++){
+      leds[i] = orange_Recette;
+     }
+     FastLED[id].showLeds();
+}
+
+void pink(int id){
+     for(int i = 0; i < NUM_LEDS; i++){
+      leds[i] = pink_Recette;
+     }
+     FastLED[id].showLeds();
+}
+
+void cyan(int id){
+     for(int i = 0; i < NUM_LEDS; i++){
+      leds[i] = cyan_Recette;
+     }
+     FastLED[id].showLeds();
+}
+
+void purple(int id){
+     if(!myChrono_Purple.hasPassed(1000)){
+       for(int i = 0; i < NUM_LEDS; i++){
+        leds[i] = palePurple_Recette;
+       }
+     }else if(!myChrono_Purple.hasPassed(2000)){
+       for(int i = 0; i < NUM_LEDS; i++){
+        leds[i] = darkPurple_Recette;
+       }
+     }else{
+       myChrono_Purple.restart();
+     }
+     FastLED[id].showLeds();
+}
