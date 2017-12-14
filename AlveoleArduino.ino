@@ -4,7 +4,7 @@
 #include <string.h>
 #include <cstring>
 #include <stdlib.h>
-#include "HX711-multi-teensy.h"
+#include "HX711.h"
 #include <Chrono.h>
 #include <LightChrono.h>
 
@@ -18,25 +18,11 @@
 #define FASTLED_ALLOW_INTERRUPTS 0
 #define LATENCY_DELAY 400
 
-
-//Pressure Plate related variable
-#define CLK 0
-#define CLK2 1
-//--first group of clock time hook to CLK1 
-#define DOUT1 2
-#define DOUT2 3
-#define DOUT3 4
-#define DOUT4 5
-//--second group of clock time hook to CLK2
-#define DOUT5 6
-#define DOUT6 7
-#define DOUT7 9
 //--time out of the tare function ?is it use?
 #define TARE_TIMEOUT_SECONDS 4 
 
 //--declare sensor pin and index for unity comprehension of received data
-byte DOUTS1[4] = {DOUT1,DOUT2,DOUT3,DOUT4};
-byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
+
 //byte DOUTS1[0] = {};
 //byte DOUTS2[0] = {};
 
@@ -44,9 +30,6 @@ byte DOUTS2[3] = {DOUT5,DOUT6,DOUT7};
 int indexs[7] = {0,1,2,3,4,5,6};
 
 //--pre calculate the different buffer needed
-#define CHANNEL1 sizeof(DOUTS1) /sizeof(byte)
-#define CHANNEL2 sizeof(DOUTS2) /sizeof(byte)
-#define CHANNEL_COUNT CHANNEL1 + CHANNEL2
 
 //--serial communication related variable
 byte dataArray1[3] = {NULL, NULL, NULL};//the bigest number we will receive is in the 3 number;
@@ -56,23 +39,35 @@ int dataBufferIndex = 0;
 int lengthOfNbr1 = 0;
 int lengthOfNbr2 = 0;
 
-long int results[CHANNEL1];
-long int results2[CHANNEL2];
+int receiveState[NUM_STRIPS];
+int prevReceiveState[NUM_STRIPS];
 
 //--define the channels
-HX711MULTITEENSY scales(CHANNEL1, DOUTS1, CLK);
-HX711MULTITEENSY scales2(CHANNEL2, DOUTS2, CLK2);
+HX711 scale0(0,1);
+HX711 scale1(3,4);
+HX711 scale2(9,10);
+HX711 scale3(11,12);
+HX711 scale4(15,16);
+HX711 scale5(17,18);
+HX711 scale6(19,22);
 
 //datas array use for calculating the outcome of the receive data
-int threshold = 7;
-bool prevStatus[CHANNEL_COUNT];
-bool hasChanged[CHANNEL_COUNT];
-bool tileStatus[CHANNEL_COUNT];
-uint32_t prevValues[CHANNEL_COUNT];
+int threshold = 10000;
+uint32_t prevValues[NUM_STRIPS];
 int dataId = 419;
 int dataState = 419;
-int receiveState[7];
-int prevReceiveState[7];
+
+bool sensorOrientation[NUM_STRIPS]; //IF TRUE = pressure plate is positive and go negative. IF FALSE = pressure plate is negative and go positive
+long int sensorStartValue[NUM_STRIPS];
+long int sensorThreshold[NUM_STRIPS]; //originaly not an array and has 10 000 has value
+
+int resistance = 2; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
+int currentSensor = 0;
+
+int prevTileStatus[7];
+int tileStatus[7];
+int prevTilePressure[NUM_STRIPS];
+int tilePressure[NUM_STRIPS];
 
 //variable related to the behavior of the different state receive
 
@@ -91,40 +86,50 @@ int currentId = 0;
 
 //variable related to the sensor data analyse
 
-unsigned int intervalRead = 25 ;
-unsigned int prevRead = 0;
-uint32_t maxReadableValue = 70000;
+uint32_t maxReadableValue = 2000000; // value to be change need testing
 int sensorRawValue[7];
-int pressureState[7]
+int pressureState[7];
 
 void setup() {
   Serial.begin(115200);
   //setup ethernet part
   delay(3000); // sanity delay
   //Serial.println("serial begin");
-  
-  
-  for(int i = 0; i < CHANNEL_COUNT; i++){
-    tileStatus[i] = 0; //Initialise status to 0
-    prevStatus[i] = 0; //Initialise previous status to 0
-    hasChanged[i] = 0; //Initialise the hasChange states
+  calibrateHex();
+  for(int i = 0; i < NUM_STRIPS; i++){
+    //Initialise array of value
+    tileStatus[i] = 0;
+    prevTileStatus[i] = 0;
     prevValues[i] = 0;
-  }
+    prevTilePressure[i] = 0;
+    tilePressure[i] = 0;
 
+    //print the calibration stats
+    Serial.print("value #");
+    Serial.print(i);
+    Serial.print(" is set as : ");
+    Serial.print(sensorStartValue[i]);
+    Serial.print(" , while go in the direction: ");
+    Serial.print(int(sensorOrientation[i]));
+    Serial.print(" and while have a threshold of: ");
+    Serial.println(sensorThreshold[i]);
+  }
+  Serial.flush();
+  
   for(int i = 0; i < 7; i++){
     receiveState[i] = 0; 
     prevReceiveState[i] = 0;   
   }
 
   // Settings up the led strips
-  FastLED.addLeds<CHIPSET, 13, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 2, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 15, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 16, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-
+  FastLED.addLeds<CHIPSET, 7, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 8, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 20, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 6, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 21, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  
   //tare();
   //testPattern();
 
@@ -136,11 +141,9 @@ void loop() {
   if(receiveState[dataId] < 0 || receiveState[dataId] > 35){
     receiveState[dataId] = 0;
   }
+  mustReadPressure(currentSensor);
+  currentSensor = (currentSensor + 1) % NUM_STRIPS;
   readTheData();
-  if(mustReadPressure){
-    //Serial.println("mustReadPressure");
-    readPressurePlate(); // test without
-  }
   for(int i = 0; i < NUM_STRIPS; i++){
     if(receiveState[i] != prevReceiveState[i]){
       int stripState = receiveState[i];
@@ -148,25 +151,101 @@ void loop() {
       updateLed(i,stripState);
     }
   }
+  
+  delay(2); 
 }
 
-
-bool mustReadPressure (){
-  unsigned int currentMillis = millis();
-
-  if(currentMillis - prevRead > intervalRead){
-    prevRead = currentMillis;
-    return true;
-  }else{
-    return false;  
+void calibrateHex(){
+for(int i = 0; i< NUM_STRIPS; i++){
+    long int sensorValue;
+    switch(i){
+      case 0:
+        sensorValue = scale0.read();
+        calibrateSensor(sensorValue,i);
+        break;
+      case 1:
+        sensorValue = scale1.read();
+        calibrateSensor(sensorValue,i);
+        break;
+      case 2:
+        sensorValue = scale2.read();
+        calibrateSensor(sensorValue,i);
+        break;
+      case 3:
+        sensorValue = scale3.read();
+        calibrateSensor(sensorValue,i);
+        break;
+      case 4:
+        sensorValue = scale4.read();
+        calibrateSensor(sensorValue,i);
+        break;
+      case 5:
+        sensorValue = scale5.read();
+        calibrateSensor(sensorValue,i);
+        break;
+      case 6:
+        sensorValue = scale6.read();
+        calibrateSensor(sensorValue,i);
+        break;
+    }
   }
-  
+}
+
+void calibrateSensor(long int value, int id) {
+  long int sensorValue = value;
+  long int theThreshold;
+  long int toRemove;
+  int sensorId = id;
+  if(sensorValue > 0){
+    theThreshold = (sensorValue * 0.1) * resistance ;
+    theThreshold = abs(theThreshold);
+    sensorOrientation[sensorId] = true;
+    sensorThreshold[sensorId] = theThreshold;
+  }else{
+    
+    theThreshold = (sensorValue * 0.1) * resistance ;
+    theThreshold = abs(theThreshold);
+    sensorOrientation[sensorId] = false;
+    sensorThreshold[sensorId] = theThreshold;
+  }
+  sensorStartValue[sensorId] = sensorValue;
+}
+
+bool mustReadPressure (int sensorId){
+  long int value;
+  bool valid = false;
+  switch(sensorId){
+      case 0:
+        valid = scale0.readNonBlocking(&value);
+        break;
+      case 1:
+        valid = scale1.readNonBlocking(&value);
+        break;
+      case 2:
+        valid = scale2.readNonBlocking(&value);
+        break;
+      case 3:
+        valid = scale3.readNonBlocking(&value);
+        break;
+      case 4:
+        valid = scale4.readNonBlocking(&value);
+        break;
+      case 5:
+        valid = scale5.readNonBlocking(&value);
+        break;
+      case 6:
+        valid = scale6.readNonBlocking(&value);
+        break;
+  }
+  if (valid){
+    readPressurePlate(value, sensorId);
+  }
 }
 void readTheData() {
   decipherPacket();
   int theIndex = dataId;
   //---- a verifier -----
-  for(int i = 0; i < CHANNEL_COUNT; i++){
+  for(int i = 0; i < NUM_STRIPS; i++){
     int indexReceive = theIndex;
     int indexToSend = indexs[i];
     if(indexReceive == indexToSend){
@@ -250,43 +329,60 @@ void sendHexStatus(int ID, int state){
   Serial.println((String)hexId + "," + hexState + "e/hexData");  
 }
 
-void readPressurePlate(){
-  //combine the two analogue pin result state into one array
-  //Serial.println("read pressure plate:");
-  scales.read(results);
-  //Serial.println("size of results:");
-  int chn2Index = 0;
-  uint32_t value;
-  for (int i=0; i<CHANNEL_COUNT; i++) {
-    int theIndex = indexs[i];
-    if(i < CHANNEL1){
-      //Serial.println("channel1 iteration : " + i);
-      value = abs(results[i]) * 0.0001;
+void readPressurePlate(long int val, int id){
+  int index = id;
+  long int currentValue = val;
+  long int difference;
+  
+  if(sensorOrientation[index]){
+    difference = sensorStartValue[index] - currentValue;
+    if(difference > sensorThreshold[index]){
+      tilePressure[index] = true;
+    }
+    else{ 
+      tilePressure[index] = false; 
+    }
+  }else{
+    long int startValue = abs(sensorStartValue[index]);
+    difference =  currentValue + startValue ;
+    if(difference > sensorThreshold[index]){
+      tilePressure[index] = true;
+    }
+    else{ 
+      tilePressure[index] = false; 
+    }
+  }
+  
+  if(tilePressure[index] != prevTilePressure[index]){
+    if(tilePressure[index]){
+      Serial.print("sensor #");
+      Serial.print(index);
+      Serial.print("is trigger with difference of : ");
+      Serial.print(difference);
+      Serial.print(" > then the threshold of: ");
+      Serial.println(sensorThreshold[index]);
+      tileStatus[index] = 1;
+      stateCtrl(index,tileStatus[index]);
+      sendHexStatus(indexs[index],tileStatus[index]);
     }else{
-      
-      scales2.read(results2);
-      //Serial.println("channel2 iteration : " + chn2Index);
-      value = abs(results2[chn2Index]) * 0.0001; 
-      chn2Index = chn2Index + 1;
+      Serial.print("sensor #");
+      Serial.print(index);
+      Serial.print("is no longer trigger with difference of : ");
+      Serial.print(difference);
+      Serial.print(" > then the threshold of: ");
+      Serial.println(sensorThreshold[index]);
+      tileStatus[index] = 0;
+      stateCtrl(index,tileStatus[index]);
+      sendHexStatus(indexs[index],tileStatus[index]);
     }
-    if(value < maxReadableValue && value >= 0){
-      int32_t delta =value - prevValues[i];
-      tileStatus[i] = (delta > threshold) ? 1 :0;
-      Serial.println("id of the sensor: " + String(i) + " data received by sensor: " + String(value));
-      if(delta < maxReadableValue && abs(delta) >= threshold && tileStatus[i] != prevStatus[i]){
-        Serial.println("pressure is active : " + String(delta) + ", " + String(value));
-        stateCtrl(indexs[theIndex], prevReceiveState[i]);
-        //call the function that will send data with id and class as parameter
-        sendHexStatus(indexs[theIndex],tileStatus[i]);
-        sensorRawValue[i] = value;
-      }
-      prevValues[i] = value;
-      prevStatus[i] = tileStatus[i];
-    }
-  }   
+  }
+  prevTileStatus[index] = tileStatus[index];
+  prevTilePressure[index] = tilePressure[index];
 }
 
 void stateCtrl(int id, int prevState){
+  Serial.print("stateCtrl has ben call on id: ");
+  Serial.println(id);
   switch( prevState ) {
   case 1:
     //off state
