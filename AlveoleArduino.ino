@@ -52,7 +52,7 @@ HX711 scale5(17,18);
 HX711 scale6(19,22);
 
 //datas array use for calculating the outcome of the receive data
-int threshold = 60000;
+int threshold = 70000;
 uint32_t prevValues[NUM_STRIPS];
 int dataId = 419;
 int dataState = 419;
@@ -61,7 +61,7 @@ bool sensorOrientation[NUM_STRIPS]; //IF TRUE = pressure plate is positive and g
 long int sensorStartValue[NUM_STRIPS];
 long int sensorThreshold[NUM_STRIPS]; //originaly not an array and has 10 000 has value
 
-int resistance = 4; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
+int resistance = 5; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
 int currentSensor = 0;
 
 int prevTileStatus[NUM_STRIPS];
@@ -457,7 +457,11 @@ void readPressurePlate(long int val, int id){
   long int difference;
   
   if(sensorOrientation[index]){
-    difference = sensorStartValue[index] - currentValue;
+    if(currentValue > 0){
+      difference = sensorStartValue[index] - currentValue;
+    }else{
+      difference = sensorStartValue[index] + abs(currentValue);
+    }
     if(difference > sensorThreshold[index]){
       tilePressure[index] = true;
     }
@@ -466,6 +470,11 @@ void readPressurePlate(long int val, int id){
     }
   }else{
     long int startValue = abs(sensorStartValue[index]);
+    if(currentValue > 0){
+      difference =  currentValue + startValue ;
+    }else{
+      difference = sensorStartValue[index] - currentValue;
+    }
     difference =  currentValue + startValue ;
     if(difference > sensorThreshold[index]){
       tilePressure[index] = true;
@@ -500,6 +509,11 @@ void readPressurePlate(long int val, int id){
   }
   prevTileStatus[index] = tileStatus[index];
   prevTilePressure[index] = tilePressure[index];
+
+  if(tileStatus[index] == 1 && tilePressure[index] != 1){
+    Serial.println("entering error catcher returning 0 to unity");
+    sendHexStatus(index,0);
+  }
 }
 
 void predictGameplay(int id, int prevState){
