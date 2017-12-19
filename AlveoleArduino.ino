@@ -52,7 +52,7 @@ HX711 scale5(17,18);
 HX711 scale6(19,22);
 
 //datas array use for calculating the outcome of the receive data
-int threshold = 15000;
+int threshold = 60000;
 uint32_t prevValues[NUM_STRIPS];
 int dataId = 419;
 int dataState = 419;
@@ -61,7 +61,7 @@ bool sensorOrientation[NUM_STRIPS]; //IF TRUE = pressure plate is positive and g
 long int sensorStartValue[NUM_STRIPS];
 long int sensorThreshold[NUM_STRIPS]; //originaly not an array and has 10 000 has value
 
-int resistance = 2; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
+int resistance = 4; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
 int currentSensor = 0;
 
 int prevTileStatus[NUM_STRIPS];
@@ -275,9 +275,11 @@ void loop() {
       //stateCtrl(i,stripState, prevReceiveState[i]);
     }
     stateCtrl(i,receiveState[i], prevReceiveState[i]);
-    FastLED[i].showLeds();
+    if(receiveState[i] != prevReceiveState[i]){
+      prevReceiveState[i] = receiveState[i];
+    }
   }
-  
+  FastLED.show();
   delay(2); 
 }
 
@@ -430,14 +432,14 @@ void decipherPacket(){
     }
     for(int i = 0; i < NUM_STRIPS; i++){
       if(receiveState[i] != prevReceiveState[i]){
+        resetTile(i);  
         int stripState = receiveState[i];
-        Serial.println("update led: " + String(receiveState[i]));
+        Serial.println("update led: " + String(stripState));
         stateCtrl(i, stripState, prevReceiveState[i]);
-        FastLED[i].showLeds();
       }
-      
       //prevReceiveState[i] = receiveState[i];
     }
+    FastLED.show();
     //Serial.println("dataId : " + String(dataId));
     //Serial.println("dataState : " + String(dataState));
   }
@@ -559,7 +561,7 @@ void stateCtrl(int id, int state, int prevState){
         needReset[id] = 1;
       }
       if(masterChrono_Corrupt[id].isRunning( )){
-        if(!masterChrono_Corrupt[id].hasPassed(6000)){
+        if(!masterChrono_Corrupt[id].hasPassed(2000)){
           on(id);
           corrupt(id);
         }else{
@@ -593,7 +595,6 @@ void stateCtrl(int id, int state, int prevState){
       cleansing(id);
       break;
   }
-  prevReceiveState[id] = receiveState[id];
 }
 
 void resetTile(int id){
