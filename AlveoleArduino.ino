@@ -71,6 +71,7 @@ int referenceDigitalPin[] = {0,1,2,9};
 
 bool moleculeStatus[10];
 int stateColorMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+bool isPressedMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 bool boolStateMolecule[] = {false, false, false, false, false, false, false, false, false, false};
 int indexState[NUM_STRIPS];
 int referenceState[] = {5, 6, 7};
@@ -271,7 +272,6 @@ void sendHexStatus(int ID, int state){
 
 void readButtonStatus(){
   for(int i = 0; i < NUM_AVAILABLE; i++){
-
     int index = referenceDigitalPin[i];
     
     moleculeStatus[index] = digitalRead(digitalPin[index]);
@@ -284,7 +284,8 @@ void readButtonStatus(){
         boolStateMolecule[index] = true;
         indexState[index]++;
         receiveState[index] = referenceState[indexState[index]];
-        sendHexStatus(index, receiveState[index]);
+        isPressedMolecule[referenceState[i]] = 1;
+        sendHexStatus(index, 1);
         //Serial.println(receiveState[0]);
       }else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(500)){
         Serial.print("Enter else if:");
@@ -293,12 +294,17 @@ void readButtonStatus(){
         boolStateMolecule[index] = true;
         indexState[index] = 0;
         receiveState[index] = referenceState[indexState[index]];
+        isPressedMolecule[referenceState[i]] = 1;
         
-        sendHexStatus(index, receiveState[index]);
+        sendHexStatus(index, 1);
       }
       stateCtrl(index, receiveState[index], prevReceiveState[index]);
     }else if (moleculeStatus[index] == HIGH) {
       boolStateMolecule[index] = false;
+      if(isPressedMolecule[referenceState[i]] == 1){
+        sendHexStatus(index, 0);
+        isPressedMolecule[referenceState[i]] = 0;
+      }
     }
 
   }
@@ -306,14 +312,7 @@ void readButtonStatus(){
 }
 
 void stateCtrl(int id, int state, int prevState){
-  Serial.print("entering stateCtrl with id: ");
-  Serial.print(id);
-  Serial.print(" , state of: ");
-  Serial.print(state);
-  Serial.print(" and prevState of: ");
-  Serial.print(prevState);
   if(state < 15 && state >= 0){
-    Serial.print("/ enter if");
     switch (state) {
       case 0: off(id);
             break;
@@ -328,14 +327,11 @@ void stateCtrl(int id, int state, int prevState){
       case 9: waveCorrupted(id);
             break;
       case 13: shield_On(id);
-            Serial.print("/ enter on");
             break;
       case 14: shield_Off(id);
-            Serial.print("/ enter of");
             break;
     }
   }
-  Serial.println(" --------end of stateCTRL");
 }
 
 void off(int id){
