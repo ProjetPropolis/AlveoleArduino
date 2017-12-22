@@ -73,8 +73,10 @@ bool moleculeStatus[10];
 int stateColorMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 bool isPressedMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 bool boolStateMolecule[] = {false, false, false, false, false, false, false, false, false, false};
+bool prevStateMolecule[] = {false, false, false, false, false, false, false, false, false, false};
 int indexState[NUM_STRIPS];
 int referenceState[] = {5, 6, 7};
+int indexShield = NUM_STRIPS-1;
 
 unsigned int intervalRead = 25 ;
 
@@ -90,8 +92,8 @@ CRGB orange_Recette(200, 50, 0);
 CRGB pink_Recette(255, 35, 40);
 CRGB palePurple_Recette(100, 0, 255);
 CRGB darkPurple_Recette(50, 0, 80);
-CRGB cyan_ShieldOff(0, 100, 170);
-CRGB cyan_ShieldOn(0, 150, 255);
+CRGB cyan_ShieldOff(0, 24, 40);
+CRGB cyan_ShieldOn(0, 50, 170);
 CRGB red_waveCorrupted(255, 0, 0);
 
 
@@ -248,11 +250,15 @@ void decipherPacket(){
         lengthOfNbr2 = lengthOfNbr2 + 1;
       }
     }
-    for(int i = 0; i < NUM_STRIPS; i++){
+    for(int i = 0; i < NUM_AVAILABLE; i++){
       if(receiveState[i] != prevReceiveState[i]){
         int stripState = receiveState[i];
         //Serial.println("update led: " + String(receiveState[i]));
-        stateCtrl(i, stripState, prevReceiveState[i]);
+        if(i != indexShield){
+          stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
+        }else if(stripState != 2){
+          stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
+        }
         
       }
       
@@ -278,15 +284,22 @@ void readButtonStatus(){
     
     if(moleculeStatus[index] == LOW){
       if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500)){
-        Serial.print("Enter if:");
-        Serial.println(receiveState[index]);
-        buttonChrono[index].restart();
-        boolStateMolecule[index] = true;
-        indexState[index]++;
-        receiveState[index] = referenceState[indexState[index]];
-        isPressedMolecule[referenceState[i]] = 1;
-        sendHexStatus(index, 1);
-        //Serial.println(receiveState[0]);
+        if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
+          boolStateMolecule[index] = true;
+          receiveState[index] = 13;
+          sendHexStatus(index, 1);
+        }else{
+          Serial.print("Enter if:");
+          Serial.println(receiveState[index]);
+          buttonChrono[index].restart();
+          boolStateMolecule[index] = true;
+          indexState[index]++;
+          receiveState[index] = referenceState[indexState[index]];
+          isPressedMolecule[referenceState[i]] = 1;
+          sendHexStatus(index, 1);
+          //Serial.println(receiveState[0]);
+        }
+        
       }else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(500)){
         Serial.print("Enter else if:");
         Serial.println(receiveState[index]);
@@ -300,13 +313,19 @@ void readButtonStatus(){
       }
       stateCtrl(index, receiveState[index], prevReceiveState[index]);
     }else if (moleculeStatus[index] == HIGH) {
-      boolStateMolecule[index] = false;
-      if(isPressedMolecule[referenceState[i]] == 1){
+      if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
+        boolStateMolecule[index] = false;
+        receiveState[index] = 14;
         sendHexStatus(index, 0);
-        isPressedMolecule[referenceState[i]] = 0;
+      }else{
+        boolStateMolecule[index] = false;
+        if(isPressedMolecule[referenceState[i]] == 1){
+          sendHexStatus(index, 0);
+          isPressedMolecule[referenceState[i]] = 0;
+        }
       }
     }
-
+    prevStateMolecule[index] = moleculeStatus[index];
   }
   FastLED.show();
 }
