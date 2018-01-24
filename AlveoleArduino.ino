@@ -18,7 +18,7 @@
 #define CHIPSET             WS2811
 #define NUM_LEDS_PER_STRIP  30
 #define NUM_STRIPS          10
-#define NUM_AVAILABLE       4
+#define NUM_AVAILABLE       10
 #define BRIGHTNESS          255
 
 CRGB leds[NUM_STRIPS][NUM_LEDS_PER_STRIP];
@@ -56,22 +56,22 @@ Chrono buttonChrono7;
 Chrono buttonChrono8;
 Chrono buttonChrono9;
 Chrono buttonChrono[] = {buttonChrono0, buttonChrono1, buttonChrono2, buttonChrono3, buttonChrono4, buttonChrono5, buttonChrono6, buttonChrono7, buttonChrono8, buttonChrono9};
-int digitalPin0 = 1;
-int digitalPin1 = 4;
-int digitalPin2 = 10;
-int digitalPin3 = 3;
-int digitalPin4 = 4;
-int digitalPin5 = 5;
-int digitalPin6 = 6;
-int digitalPin7 = 7;
-int digitalPin8 = 8;
-int digitalPin9 = 12;
+int digitalPin0 = 0;
+int digitalPin1 = 3;
+int digitalPin2 = 1;
+int digitalPin3 = 9;
+int digitalPin4 = 11;
+int digitalPin5 = 10;
+int digitalPin6 = 15;
+int digitalPin7 = 17;
+int digitalPin8 = 19;
+int digitalPin9 = 23;
 int digitalPin[] = {digitalPin0 ,digitalPin1 ,digitalPin2 ,digitalPin3 ,digitalPin4 ,digitalPin5 ,digitalPin6, digitalPin7, digitalPin8, digitalPin9};
-int referenceDigitalPin[] = {0,1,2,9};
+int referenceDigitalPin[] = {0,1,2,3,4,5,6,7,8,9};
 
 bool moleculeStatus[10];
-int stateColorMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-bool isPressedMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+int stateColorMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+bool isPressedMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 bool boolStateMolecule[] = {false, false, false, false, false, false, false, false, false, false};
 bool prevStateMolecule[] = {false, false, false, false, false, false, false, false, false, false};
 int indexState[NUM_STRIPS];
@@ -104,28 +104,27 @@ void setup() {
   // Settings up the led strips
   FastLED.addLeds<CHIPSET, 2, COLOR_ORDER>(leds[0], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<CHIPSET, 14, COLOR_ORDER>(leds[1], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 7, COLOR_ORDER>(leds[2], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 8, COLOR_ORDER>(leds[9], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 17, COLOR_ORDER>(leds[4], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 18, COLOR_ORDER>(leds[5], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 19, COLOR_ORDER>(leds[6], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 20, COLOR_ORDER>(leds[7], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 4, COLOR_ORDER>(leds[2], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 7, COLOR_ORDER>(leds[3], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 8, COLOR_ORDER>(leds[4], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 12, COLOR_ORDER>(leds[5], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 20, COLOR_ORDER>(leds[6], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 6, COLOR_ORDER>(leds[7], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<CHIPSET, 21, COLOR_ORDER>(leds[8], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<CHIPSET, 22, COLOR_ORDER>(leds[9], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, 5, COLOR_ORDER>(leds[9], NUM_LEDS_PER_STRIP).setCorrection( TypicalLEDStrip );
 
   // Setting up the buttons
   pinMode(digitalPin[0], INPUT_PULLUP);
   pinMode(digitalPin[1], INPUT_PULLUP);
   pinMode(digitalPin[2], INPUT_PULLUP);
-  pinMode(digitalPin[9], INPUT_PULLUP);
-  /*
+  pinMode(digitalPin[3], INPUT_PULLUP);
   pinMode(digitalPin[4], INPUT_PULLUP);
   pinMode(digitalPin[5], INPUT_PULLUP);
   pinMode(digitalPin[6], INPUT_PULLUP);
   pinMode(digitalPin[7], INPUT_PULLUP);
   pinMode(digitalPin[8], INPUT_PULLUP);
   pinMode(digitalPin[9], INPUT_PULLUP);
-*/
+  
   for(int i = 0; i < NUM_STRIPS; i++){
     moleculeStatus[i] = digitalRead(digitalPin[i]);
     stateCtrl(i, 0, 0);
@@ -256,7 +255,8 @@ void decipherPacket(){
         //Serial.println("update led: " + String(receiveState[i]));
         if(i != indexShield){
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
-        }else if(stripState != 2){
+        }else{
+          // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
         
@@ -283,7 +283,7 @@ void readButtonStatus(){
     moleculeStatus[index] = digitalRead(digitalPin[index]);
     
     if(moleculeStatus[index] == LOW){
-      if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500)){
+      if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500) && receiveState[index] != 2 && receiveState[index] != 9){
         if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
           boolStateMolecule[index] = true;
           receiveState[index] = 13;
