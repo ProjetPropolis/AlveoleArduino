@@ -171,6 +171,7 @@ Chrono myChrono_UltracorruptPressed[NUM_STRIPS] = {myChrono0_UltracorruptPressed
 float val_UltracorruptPressed[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
 //float brightness_Ultracorrupt[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 int delayIndex_UltracorruptPressed = 50;
+int isPressed_UltracorruptPressed[] = {0, 0, 0, 0, 0, 0, 0};
 
 /*==== cleanser() Variables ===*/
 Chrono myChrono0_Cleanser;
@@ -493,6 +494,7 @@ void readPressurePlate(long int val, int id){
       Serial.print(" > then the threshold of: ");
       Serial.println(sensorThreshold[index]);
       tileStatus[index] = 1;
+      isPressed_UltracorruptPressed[index] = 1;
       sendHexStatus(index,1);
       predictGameplay(index,prevReceiveState[index]);
     }else{
@@ -503,6 +505,7 @@ void readPressurePlate(long int val, int id){
       Serial.print(" > then the threshold of: ");
       Serial.println(sensorThreshold[index]);
       tileStatus[index] = 0;
+      isPressed_UltracorruptPressed[index] = 0;
       sendHexStatus(index,0);
       predictGameplay(index,prevReceiveState[index]);
     }
@@ -545,7 +548,9 @@ void predictGameplay(int id, int prevState){
       FastLED.show();
       return;
     case 3:
-      Serial.println("enter case3");
+      Serial.print("enter case3: ");
+      Serial.println(id);
+      //ultracorruptPressed(id);
       return;
     case 4:
       Serial.println("enter case4");
@@ -563,10 +568,10 @@ void stateCtrl(int id, int state, int prevState){
       off(id);    
       break;
     case 1: 
-      if(prevState == 3){
-        masterChrono_Ultracorrupt[id].restart();
+      //if(prevState == 3){
+        //masterChrono_Ultracorrupt[id].restart();
         needReset[id] = 1;
-      }
+      //}
       on(id);    
       break;
     case 2:  
@@ -574,31 +579,31 @@ void stateCtrl(int id, int state, int prevState){
         masterChrono_Corrupt[id].restart();
         needReset[id] = 1;
       }
-      if(masterChrono_Corrupt[id].isRunning( )){
-        if(!masterChrono_Corrupt[id].hasPassed(2000)){
-          on(id);
-          corrupt(id);
-        }else{
-          if(needReset[id] != 0){
-            resetTile(id);
-            needReset[id] = 0;
-          }else{
-            corrupt(id);
-          }
-        }
-      }else{
+      //if(masterChrono_Corrupt[id].isRunning( )){
+      if(!masterChrono_Corrupt[id].hasPassed(2000)){
+        on(id);
         corrupt(id);
-      }
-      break;
-    case 3:
-      if(!masterChrono_Ultracorrupt[id].hasPassed(3000)){
-        ultracorruptPressed(id); 
       }else{
         if(needReset[id] != 0){
           resetTile(id);
           needReset[id] = 0;
+        }else{
+          corrupt(id);
         }
+      }
+      /*}else{
+        corrupt(id);
+      }*/
+      break;
+    case 3:
+      if(needReset[id] != 0){
+        resetTile(id);
+        needReset[id] = 0;
+      }
+      if(isPressed_UltracorruptPressed[id] == 0){
         ultracorrupt(id);
+      }else{
+        ultracorruptPressed(id);
       }
       break;
     case 4: 
@@ -764,28 +769,33 @@ void ultracorrupt(int id){
 
 
 void ultracorruptPressed(int id){
-  
+
+    Serial.print("Enter ultracorruptPressed: ");
+    Serial.println(id);
     //Writing BLACK for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      Serial.println("loop 1");
       leds[id][ledIndexGlitch1_Ultracorrupt[id] + x].setHSV(0, 255, 0);
       leds[id][ledIndexGlitch2_Ultracorrupt[id] + x].setHSV(0, 255, 0);
       leds[id][ledIndexGlitch3_Ultracorrupt[id] + x].setHSV(0, 255, 0);
       leds[id][ledIndexGlitch4_Ultracorrupt[id] + x].setHSV(0, 255, 0);
       leds[id][ledIndexGlitch5_Ultracorrupt[id] + x].setHSV(0, 255, 0);
     }
+    Serial.println("after loop 1");
 
     //Changing 5 Dashes starting index
-    if(myChrono_UltracorruptPressed[id].hasPassed(delayIndex_UltracorruptPressed)){
-      ledIndexGlitch1_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-      ledIndexGlitch2_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-      ledIndexGlitch3_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-      ledIndexGlitch4_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-      ledIndexGlitch5_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-      myChrono_Ultracorrupt[id].restart();
-    }
+    //if(myChrono_UltracorruptPressed[id].hasPassed(delayIndex_UltracorruptPressed)){
+    ledIndexGlitch1_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch2_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch3_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch4_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch5_Ultracorrupt[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+      //myChrono_Ultracorrupt[id].restart();
+    //}
 
     //Writing RED for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      Serial.println("loop 2");
       leds[id][ledIndexGlitch1_Ultracorrupt[id] + x] = white_Ultracorrupt;
       leds[id][ledIndexGlitch2_Ultracorrupt[id] + x] = white_Ultracorrupt;
       leds[id][ledIndexGlitch3_Ultracorrupt[id] + x] = white_Ultracorrupt;
@@ -793,6 +803,7 @@ void ultracorruptPressed(int id){
       leds[id][ledIndexGlitch5_Ultracorrupt[id] + x] = white_Ultracorrupt;
       //FastLED.show();
     }
+    Serial.println("after loop 2");
     
 }
 
