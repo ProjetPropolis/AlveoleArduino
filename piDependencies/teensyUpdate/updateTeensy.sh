@@ -1,10 +1,8 @@
 #!/bin/bash
 # Update teensy code for the propolis project
 
+gitToken=$GIT_KEY
 sketch=$1
-
-##uncomment to fetch precompile hex file
-#curl -H "Authorization: token $gitToken" -o sourceToUpload/AlveoleArduino.ino.TEENSY31.HEX https://raw.githubusercontent.com/ProjetPropolis/AlveoleArduino/migrationSensor/HEX/AlveoleArduino.ino.TEENSY31.hex
 
 rm -r src/*
 

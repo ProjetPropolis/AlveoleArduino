@@ -1,6 +1,7 @@
 #!/bin/bash
 # Update teensy dependencies for the propolis project
 
+gitToken=$GIT_KEY
 zLib=$1
 
 echo "asking github for zip file: $zLib"
