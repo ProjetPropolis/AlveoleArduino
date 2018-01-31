@@ -210,13 +210,27 @@ bool state2Second_Cleansing = true;
 bool state3Second_Cleansing = true;
 bool state4Second_Cleansing = true;
 
-/*==== fullColor() Variables ===*/
+/*
+//==== fullColor() Variables ===
 int ledIndex_fullColor[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 
-/*==== fullColor() Variables ===*/
+//==== snake() Variables ===
 int ledIndex_Snake[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 float val_Snake[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
 float delayBrightness_Snake = 1.5;
+*/
+
+/*==== ANIM_TURQUOISE_FADE() Variables ===*/
+float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210};
+float delayHue_TURQUOISE_FADE = 3;
+
+/*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
+float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
+float delayBrightness_SNAKE_TURQUOISE = 1.5;
+
+/*==== ANIM_SNAKE_YELLOW() Variables ===*/
+float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64};
+float delayHue_SNAKE_YELLOW = 3;
 
 /*==== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
@@ -230,6 +244,9 @@ CRGB red_Ultracorrupt(255, 0, 0);
 CRGB white_Ultracorrupt(255, 255, 255);
 CHSV blue_Cleanser(140, 255, 255);
 CHSV paleBlue_Cleansing(140, 200, 255);
+CRGB orange_ANIM(200, 80, 0);
+CRGB green_ANIM(0, 220, 100);
+CRGB greenTurquoise_ANIM(0, 200, 125);
 
 void setup() {
   Serial.begin(115200);
@@ -427,11 +444,16 @@ void decipherPacket(){
       int bufferState = String((char*)dataArray2).toInt();
       //Serial.println("packetEnd value of buffer: " + bufferState);
       memcpy (&receiveState[dataId], &bufferState, sizeof(bufferState));
-      
+
+      for(int i = 0; i<sizeof(dataArray2); i++){
+        dataArray2[i] = NULL;
+      }
+      /*
+      //TODO Confirm Ok : changed this loop for above
       for(int i = 0; i<dataArray2[3]; i++){
         dataArray2[i] = NULL;
       }
-      
+      */
       lengthOfNbr1 = 0;
       lengthOfNbr2 = 0;
       record = 0;
@@ -623,11 +645,35 @@ void stateCtrl(int id, int state, int prevState){
       //Serial.print("call on id: "); Serial.print(id); Serial.print(" with state: "); Serial.print(state); Serial.print(" and prevState of: "); Serial.print(prevState); Serial.println(" in case 5");
       cleansing(id);
       break;
-    case 6: 
-      fullColor(id);
+    case 17: 
+      ANIM_TURQUOISE(id);
       break;
-    case 7: 
-      snake(id);
+    case 18: 
+      ANIM_PURPLE(id);
+      break;
+    case 19: 
+      ANIM_YELLOW(id);
+      break;
+    case 20: 
+      ANIM_ORANGE(id);
+      break;
+    case 21: 
+      ANIM_GREEN(id);
+      break;
+    case 22: 
+      ANIM_BLACK(id);
+      break;
+    case 23: 
+      ANIM_TURQUOISE(id);
+      break;
+    case 24: 
+      ANIM_SNAKE_TURQUOISE(id);
+      break;
+    case 25: 
+      ANIM_SNAKE_YELLOW(id);
+      break;
+    case 26: 
+      ANIM_GREEN_TURQUOISE(id);
       break;
   }
 }
@@ -655,7 +701,7 @@ void off(int id){
 void on(int id){
 
      //Writes yellow 1 LED after the other and 1 orange LED every 2 LEDs
-     val_Snake[id] = 255;
+     //val_SNAKE_TURQUOISE[id] = 255;
      
      if(ledIndex_On[id] < NUM_LEDS){
       leds[id][ledIndex_On[id]] = yellow_On;
@@ -1004,6 +1050,7 @@ void cleansing(int id){
 
 }
 
+/*
 void fullColor(int id){
 
    //Writes a Full Green Strip 
@@ -1026,7 +1073,6 @@ void snake(int id){
     receiveState[id] = 1;
   }
 
-  /*
   //Layer transition with teensy's loop
   if(ledIndex_Snake[id] < NUM_LEDS){
     leds[id][ledIndex_Snake[id]].setHSV(160, 255, val_Snake[id]);
@@ -1034,12 +1080,118 @@ void snake(int id){
   }else{
     ledIndex_Snake[id] = 0;
   }
-  */
+  
 
   //Clean version but with a loop
   for(int i = 0; i < NUM_LEDS; i++){
     leds[id][i].setHSV(160, 255, val_Snake[id]);
   }
     
+}
+*/
+
+void ANIM_TURQUOISE(int id){
+  //17
+  for(int i=0; i<NUM_LEDS; i++){
+    leds[id][i] = paleBlue_Cleansing;
+  }
+}
+
+void ANIM_PURPLE(int id){
+  //18
+  //reset to purple
+  hue_TURQUOISE_FADE[id] = 210;
+  hue_SNAKE_YELLOW[id] = 64;
+  
+  for(int i=0; i<NUM_LEDS; i++){
+    leds[id][i] = purple_Corrupt;
+  }
+}
+
+void ANIM_YELLOW(int id){
+  //19
+  for(int i=0; i<NUM_LEDS; i++){
+    leds[id][i] = yellow_On;
+  }
+}
+
+void ANIM_ORANGE(int id){
+  //20
+  for(int i=0; i<NUM_LEDS; i++){
+    leds[id][i] = orange_ANIM;
+  }
+}
+
+void ANIM_GREEN(int id){
+  //21
+  for(int i=0; i<NUM_LEDS; i++){
+    leds[id][i] = green_ANIM;
+  }
+}
+
+void ANIM_BLACK(int id){
+  //22
+  //reset to blue
+  val_SNAKE_TURQUOISE[id] = 255;
+  
+  for(int i=0; i<NUM_LEDS; i++){
+    leds[id][i] = empty_off;
+  }
+}
+
+void ANIM_TURQUOISE_FADE(int id){
+  //23 : fade PURPLE to BLUE .3 sec. 
+
+  //Brightness Manager
+  if(hue_TURQUOISE_FADE[id] >= 140){
+    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
+  }else{
+    //change stateCtrl's state
+    //receiveState[id] = 18;
+  }
+
+  for(int i = 0; i < NUM_LEDS; i++){
+    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
+  }
+}
+
+void ANIM_SNAKE_TURQUOISE(int id){
+  
+  //24 : .6 sec. BLUE to BLACK
+  
+  //Brightness Manager
+  if(val_SNAKE_TURQUOISE[id] > 0){
+    val_SNAKE_TURQUOISE[id]-=delayBrightness_SNAKE_TURQUOISE;
+  }else{
+    //change stateCtrl's state
+    //receiveState[id] = 22;
+  }
+
+  for(int i = 0; i < NUM_LEDS; i++){
+    leds[id][i].setHSV(140, 200, val_SNAKE_TURQUOISE[id]);
+  }
+}
+
+void ANIM_SNAKE_YELLOW(int id){
+  //25 : 1 sec. YELLOW to PURPLE
+
+  //Brightness Manager
+  if(hue_SNAKE_YELLOW[id] <= 210){
+    hue_SNAKE_YELLOW[id]+=delayHue_SNAKE_YELLOW;
+  }else{
+    //change stateCtrl's state
+    //receiveState[id] = 18;
+  }
+
+  for(int i = 0; i < NUM_LEDS; i++){
+    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
+  }
+}
+
+void ANIM_GREEN_TURQUOISE(int id){
+  //26
+  for(int i=0; i<NUM_LEDS; i++){
+    leds[id][i] = greenTurquoise_ANIM;
+  }
 }
 
