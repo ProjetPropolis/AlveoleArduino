@@ -77,6 +77,7 @@ bool prevStateMolecule[] = {false, false, false, false, false, false, false, fal
 int indexState[NUM_STRIPS];
 int referenceState[] = {5, 6, 7};
 int indexShield = NUM_STRIPS-1;
+bool unlocked[] = {true, true, true, true, true, true, true, true, true, true};
 
 unsigned int intervalRead = 25 ;
 
@@ -87,15 +88,35 @@ uint32_t maxReadableValue = 70000;
 int colorArray[7][3] = { {0,0,0}, {0, 0, 255}, {200, 50, 0}, {255, 35, 40}, {0,150,255}, {100,0,255}, {50,0,80} };
 int stripState = 0;
 
+/*==== ANIM_TURQUOISE_FADE() Variables ===
+float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210};
+float delayHue_TURQUOISE_FADE = 3;
+
+/*==== ANIM_SNAKE_TURQUOISE() Variables ===
+float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
+float delayBrightness_SNAKE_TURQUOISE = 1.5;
+
+/*==== ANIM_SNAKE_YELLOW() Variables ===
+float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64};
+float delayHue_SNAKE_YELLOW = 3;
+
+/*==== colors Variables ===*/
+CRGB empty_off(0, 0, 0);
 CRGB blue_Recette(0, 0, 255);
 CRGB orange_Recette(200, 50, 0);
 CRGB pink_Recette(255, 35, 40);
+CHSV purple_Corrupt(210, 255, 255);
 CRGB palePurple_Recette(100, 0, 255);
 CRGB darkPurple_Recette(50, 0, 80);
 CRGB cyan_ShieldOff(0, 24, 40);
 CRGB cyan_ShieldOn(0, 50, 170);
 CRGB red_waveCorrupted(255, 0, 0);
-
+CHSV blue_Cleanser(140, 255, 255);
+CHSV paleBlue_Cleansing(140, 200, 255);
+CRGB yellow_On(200, 110, 15);
+CRGB orange_ANIM(200, 80, 0);
+CRGB green_ANIM(0, 220, 100);
+CRGB greenTurquoise_ANIM(0, 200, 125);
 
 void setup() {
   // put your setup code here, to run once:
@@ -135,7 +156,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  readButtonStatus();
+  readButtonStatus();  
 
   readTheData();
   for(int i = 0; i < NUM_STRIPS; i++){
@@ -250,19 +271,27 @@ void decipherPacket(){
       }
     }
     for(int i = 0; i < NUM_AVAILABLE; i++){
+      //Writes unity's states in indexState[] and manages readButtonStatus' locking
       if(receiveState[i] == 5){
         indexState[i] = 0;  
       }else if(receiveState[i] == 6){
         indexState[i] = 1;
       }else if(receiveState[i] == 7){
         indexState[i] = 2;
+      }else if(receiveState[i] == 15){
+        //DETECTION_OFF
+        unlocked[i] = false;
+      }else if(receiveState[i] == 16){
+        //DETECTION_ON
+        unlocked[i] = true;
       }
+
       if(receiveState[i] != prevReceiveState[i]){
         int stripState = receiveState[i];
         //Serial.println("update led: " + String(receiveState[i]));
-        if(i != indexShield){
+        if(i != indexShield && stripState != 15 && stripState != 16){
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
-        }else{
+        }else if(stripState != 15 && stripState != 16){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
@@ -285,54 +314,56 @@ void sendHexStatus(int ID, int state){
 
 void readButtonStatus(){
   for(int i = 0; i < NUM_AVAILABLE; i++){
-    int index = referenceDigitalPin[i];
-    
-    moleculeStatus[index] = digitalRead(digitalPin[index]);
-    
-    if(moleculeStatus[index] == LOW){
-      if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500) && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9){
-        if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
-          boolStateMolecule[index] = true;
-          receiveState[index] = 13;
-          sendHexStatus(index, 1);
-        }else{
-          Serial.print("Enter if:");
+    if(unlocked[i]){
+      int index = referenceDigitalPin[i];
+      
+      moleculeStatus[index] = digitalRead(digitalPin[index]);
+      
+      if(moleculeStatus[index] == LOW){
+        if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500) && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9){
+          if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
+            boolStateMolecule[index] = true;
+            receiveState[index] = 13;
+            sendHexStatus(index, 1);
+          }else{
+            Serial.print("Enter if:");
+            Serial.println(receiveState[index]);
+            buttonChrono[index].restart();
+            boolStateMolecule[index] = true;
+            indexState[index]++;
+            receiveState[index] = referenceState[indexState[index]];
+            isPressedMolecule[referenceState[i]] = 1;
+            sendHexStatus(index, 1);
+            //Serial.println(receiveState[0]);
+          }
+          
+        }else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(500)){
+          Serial.print("Enter else if:");
           Serial.println(receiveState[index]);
           buttonChrono[index].restart();
           boolStateMolecule[index] = true;
-          indexState[index]++;
+          indexState[index] = 0;
           receiveState[index] = referenceState[indexState[index]];
           isPressedMolecule[referenceState[i]] = 1;
+          
           sendHexStatus(index, 1);
-          //Serial.println(receiveState[0]);
         }
-        
-      }else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(500)){
-        Serial.print("Enter else if:");
-        Serial.println(receiveState[index]);
-        buttonChrono[index].restart();
-        boolStateMolecule[index] = true;
-        indexState[index] = 0;
-        receiveState[index] = referenceState[indexState[index]];
-        isPressedMolecule[referenceState[i]] = 1;
-        
-        sendHexStatus(index, 1);
-      }
-      stateCtrl(index, receiveState[index], prevReceiveState[index]);
-    }else if (moleculeStatus[index] == HIGH) {
-      if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
-        boolStateMolecule[index] = false;
-        receiveState[index] = 14;
-        sendHexStatus(index, 0);
-      }else{
-        boolStateMolecule[index] = false;
-        if(isPressedMolecule[referenceState[i]] == 1){
+        stateCtrl(index, receiveState[index], prevReceiveState[index]);
+      }else if (moleculeStatus[index] == HIGH) {
+        if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
+          boolStateMolecule[index] = false;
+          receiveState[index] = 14;
           sendHexStatus(index, 0);
-          isPressedMolecule[referenceState[i]] = 0;
+        }else{
+          boolStateMolecule[index] = false;
+          if(isPressedMolecule[referenceState[i]] == 1){
+            sendHexStatus(index, 0);
+            isPressedMolecule[referenceState[i]] = 0;
+          }
         }
       }
+      prevStateMolecule[index] = moleculeStatus[index];
     }
-    prevStateMolecule[index] = moleculeStatus[index];
   }
   FastLED.show();
 }
@@ -364,6 +395,28 @@ void stateCtrl(int id, int state, int prevState){
             break;
       case 14: shield_Off(id);
             break;
+            /*
+      case 17: ANIM_TURQUOISE(id);
+            break;
+      case 18: ANIM_PURPLE(id);
+            break;
+      case 19: ANIM_YELLOW(id);
+            break;
+      case 20: ANIM_ORANGE(id);
+            break;
+      case 21: ANIM_GREEN(id);
+            break;
+      case 22: ANIM_BLACK(id);
+            break;
+      case 23: ANIM_TURQUOISE(id);
+            break;
+      case 24: ANIM_SNAKE_TURQUOISE(id);
+            break;
+      case 25: ANIM_SNAKE_YELLOW(id);
+            break;
+      case 26: ANIM_GREEN_TURQUOISE(id);
+            break;
+            */
     }
   }
 }
@@ -429,3 +482,109 @@ void shield_On(int id){
       leds[id][i] = cyan_ShieldOn;
      }
 }
+/*
+void ANIM_TURQUOISE(int id){
+  //17
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = paleBlue_Cleansing;
+  }
+}
+
+void ANIM_PURPLE(int id){
+  //18
+  //reset to purple
+  hue_TURQUOISE_FADE[id] = 210;
+  hue_SNAKE_YELLOW[id] = 64;
+  
+  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = purple_Corrupt;
+  }
+}
+
+void ANIM_YELLOW(int id){
+  //19
+  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = yellow_On;
+  }
+}
+
+void ANIM_ORANGE(int id){
+  //20
+  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = orange_ANIM;
+  }
+}
+
+void ANIM_GREEN(int id){
+  //21
+  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = green_ANIM;
+  }
+}
+
+void ANIM_BLACK(int id){
+  //22
+  //reset to blue
+  val_SNAKE_TURQUOISE[id] = 255;
+  
+  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = empty_off;
+  }
+}
+
+void ANIM_TURQUOISE_FADE(int id){
+  //23 : fade PURPLE to BLUE .3 sec. 
+
+  //Brightness Manager
+  if(hue_TURQUOISE_FADE[id] >= 140){
+    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
+  }else{
+    //change stateCtrl's state
+    //receiveState[id] = 18;
+  }
+
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
+  }
+}
+
+void ANIM_SNAKE_TURQUOISE(int id){
+  
+  //24 : .6 sec. BLUE to BLACK
+  
+  //Brightness Manager
+  if(val_SNAKE_TURQUOISE[id] > 0){
+    val_SNAKE_TURQUOISE[id]-=delayBrightness_SNAKE_TURQUOISE;
+  }else{
+    //change stateCtrl's state
+    //receiveState[id] = 22;
+  }
+
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setHSV(140, 200, val_SNAKE_TURQUOISE[id]);
+  }
+}
+
+void ANIM_SNAKE_YELLOW(int id){
+  //25 : 1 sec. YELLOW to PURPLE
+
+  //Brightness Manager
+  if(hue_SNAKE_YELLOW[id] <= 210){
+    hue_SNAKE_YELLOW[id]+=delayHue_SNAKE_YELLOW;
+  }else{
+    //change stateCtrl's state
+    //receiveState[id] = 18;
+  }
+
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
+  }
+}
+
+void ANIM_GREEN_TURQUOISE(int id){
+  //26
+  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = greenTurquoise_ANIM;
+  }
+}
+*/
