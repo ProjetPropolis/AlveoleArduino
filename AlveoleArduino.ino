@@ -12,7 +12,7 @@
 #define LED_PIN    22
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2811
-#define NUM_LEDS    84
+#define NUM_LEDS    80
 #define NUM_STRIPS 7
 #define BRIGHTNESS  255
 #define FASTLED_ALLOW_INTERRUPTS 0
@@ -109,6 +109,7 @@ Chrono masterChrono6_Ultracorrupt;
 Chrono masterChrono_Ultracorrupt[NUM_STRIPS] = {masterChrono0_Ultracorrupt, masterChrono1_Ultracorrupt, masterChrono2_Ultracorrupt, masterChrono3_Ultracorrupt, masterChrono4_Ultracorrupt, masterChrono5_Ultracorrupt, masterChrono6_Ultracorrupt};
 int pastHexStatus = 0;
 bool needReset[NUM_STRIPS] = {0,0,0,0,0,0,0};
+bool unlocked[] = {true, true, true, true, true, true, true, true, true, true};
 
 /*==== on() Variables ===*/
 int ledIndex_On[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
@@ -220,6 +221,17 @@ float val_Snake[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
 float delayBrightness_Snake = 1.5;
 */
 
+int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_YELLOW[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_ORANGE[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_GREEN[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_BLACK[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_TURQUOISE_FADE[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_SNAKE_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_SNAKE_YELLOW[] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndex_ANIM_GREEN_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
+
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
 float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210};
 float delayHue_TURQUOISE_FADE = 3;
@@ -243,6 +255,7 @@ CHSV palePurple_Corrupt(210, 50, 255);
 CRGB red_Ultracorrupt(255, 0, 0);
 CRGB white_Ultracorrupt(255, 255, 255);
 CHSV blue_Cleanser(140, 255, 255);
+CRGB cyan_ShieldOn(0, 50, 170);
 CHSV paleBlue_Cleansing(140, 200, 255);
 CRGB orange_ANIM(200, 80, 0);
 CRGB green_ANIM(0, 220, 100);
@@ -404,7 +417,7 @@ bool mustReadPressure (int sensorId){
         valid = scale6.readNonBlocking(&value);
         break;
   }
-  if (valid){
+  if (valid && unlocked[sensorId]){
     readPressurePlate(value, sensorId);
   }
 }
@@ -470,12 +483,24 @@ void decipherPacket(){
         lengthOfNbr2 = lengthOfNbr2 + 1;
       }
     }
+    
     for(int i = 0; i < NUM_STRIPS; i++){
+      
       if(receiveState[i] != prevReceiveState[i]){
+        //Check if locked
+        if(receiveState[i] == 15){
+          //DETECTION_OFF
+          unlocked[i] = false;
+        }else if(receiveState[i] == 16){
+          //DETECTION_ON
+          unlocked[i] = true;
+        }
         resetTile(i);  
         int stripState = receiveState[i];
         Serial.println("update led: " + String(stripState));
-        stateCtrl(i, stripState, prevReceiveState[i]);
+        if(stripState != 15 && stripState != 16){
+          stateCtrl(i, stripState, prevReceiveState[i]);
+        }
       }
       //prevReceiveState[i] = receiveState[i];
     }
@@ -664,7 +689,7 @@ void stateCtrl(int id, int state, int prevState){
       ANIM_BLACK(id);
       break;
     case 23: 
-      ANIM_TURQUOISE(id);
+      ANIM_TURQUOISE_FADE(id);
       break;
     case 24: 
       ANIM_SNAKE_TURQUOISE(id);
@@ -1050,51 +1075,20 @@ void cleansing(int id){
 
 }
 
-/*
-void fullColor(int id){
-
-   //Writes a Full Green Strip 
-   if(ledIndex_fullColor[id] < NUM_LEDS){
-    leds[id][ledIndex_fullColor[id]].setRGB(0, 255, 0);
-    ledIndex_fullColor[id]++;
-   }else{
-    ledIndex_fullColor[id] = 0;
-   }
-     
-}
-
-void snake(int id){
-
-  //Brightness Manager
-  if(val_Snake[id] > 0){
-    val_Snake[id]-=delayBrightness_Snake;
-  }else{
-    //change stateCtrl's state
-    receiveState[id] = 1;
-  }
-
-  //Layer transition with teensy's loop
-  if(ledIndex_Snake[id] < NUM_LEDS){
-    leds[id][ledIndex_Snake[id]].setHSV(160, 255, val_Snake[id]);
-    ledIndex_Snake[id]++;
-  }else{
-    ledIndex_Snake[id] = 0;
-  }
-  
-
-  //Clean version but with a loop
-  for(int i = 0; i < NUM_LEDS; i++){
-    leds[id][i].setHSV(160, 255, val_Snake[id]);
-  }
-    
-}
-*/
-
 void ANIM_TURQUOISE(int id){
   //17
+  
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = paleBlue_Cleansing;
   }
+  /*
+  if(ledIndex_ANIM_TURQUOISE[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_TURQUOISE[id]].setHSV(130, 255, 255);
+    ledIndex_ANIM_TURQUOISE[id]++;
+  }else{
+    ledIndex_ANIM_TURQUOISE[id] = 0;
+  }
+  */
 }
 
 void ANIM_PURPLE(int id){
@@ -1102,48 +1096,96 @@ void ANIM_PURPLE(int id){
   //reset to purple
   hue_TURQUOISE_FADE[id] = 210;
   hue_SNAKE_YELLOW[id] = 64;
-  
+
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = purple_Corrupt;
   }
+
+  /*
+  if(ledIndex_ANIM_PURPLE[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_PURPLE[id]] = purple_Corrupt;
+    ledIndex_ANIM_PURPLE[id]++;
+  }else{
+    ledIndex_ANIM_PURPLE[id] = 0;
+  }
+  */
 }
 
 void ANIM_YELLOW(int id){
   //19
+  
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = yellow_On;
   }
+
+  /*
+  if(ledIndex_ANIM_YELLOW[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_YELLOW[id]] = yellow_On;
+    ledIndex_ANIM_YELLOW[id]++;
+  }else{
+    ledIndex_ANIM_YELLOW[id] = 0;
+  }
+  */
 }
 
 void ANIM_ORANGE(int id){
   //20
+  
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = orange_ANIM;
   }
+
+  /*
+  if(ledIndex_ANIM_ORANGE[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_ORANGE[id]] = orange_ANIM;
+    ledIndex_ANIM_ORANGE[id]++;
+  }else{
+    ledIndex_ANIM_ORANGE[id] = 0;
+  }
+  */
 }
 
 void ANIM_GREEN(int id){
   //21
+  
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = green_ANIM;
   }
+
+  /*
+  if(ledIndex_ANIM_GREEN[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_GREEN[id]] = green_ANIM;
+    ledIndex_ANIM_GREEN[id]++;
+  }else{
+    ledIndex_ANIM_GREEN[id] = 0;
+  }
+  */
 }
 
 void ANIM_BLACK(int id){
   //22
   //reset to blue
   val_SNAKE_TURQUOISE[id] = 255;
-  
+
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = empty_off;
   }
+  
+  /*
+  if(ledIndex_ANIM_BLACK[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_BLACK[id]] = empty_off;
+    ledIndex_ANIM_BLACK[id]++;
+  }else{
+    ledIndex_ANIM_BLACK[id] = 0;
+  }
+  */
 }
 
 void ANIM_TURQUOISE_FADE(int id){
-  //23 : fade PURPLE to BLUE .3 sec. 
+  //23 : fade PURPLE to CYAN .3 sec. 
 
   //Brightness Manager
-  if(hue_TURQUOISE_FADE[id] >= 140){
+  if(hue_TURQUOISE_FADE[id] >= 120){
     hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
   }else{
     //change stateCtrl's state
@@ -1153,11 +1195,20 @@ void ANIM_TURQUOISE_FADE(int id){
   for(int i = 0; i < NUM_LEDS; i++){
     leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
   }
+  
+  /*
+  if(ledIndex_ANIM_TURQUOISE_FADE[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_TURQUOISE_FADE[id]].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
+    ledIndex_ANIM_TURQUOISE_FADE[id]++;
+  }else{
+    ledIndex_ANIM_TURQUOISE_FADE[id] = 0;
+  }
+  */
 }
 
 void ANIM_SNAKE_TURQUOISE(int id){
   
-  //24 : .6 sec. BLUE to BLACK
+  //24 : .6 sec. CYAN to BLACK
   
   //Brightness Manager
   if(val_SNAKE_TURQUOISE[id] > 0){
@@ -1166,10 +1217,19 @@ void ANIM_SNAKE_TURQUOISE(int id){
     //change stateCtrl's state
     //receiveState[id] = 22;
   }
-
+  
   for(int i = 0; i < NUM_LEDS; i++){
-    leds[id][i].setHSV(140, 200, val_SNAKE_TURQUOISE[id]);
+    leds[id][i].setHSV(120, 200, val_SNAKE_TURQUOISE[id]);
   }
+
+  /*
+  if(ledIndex_ANIM_SNAKE_TURQUOISE[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_SNAKE_TURQUOISE[id]].setHSV(130, 255, val_SNAKE_TURQUOISE[id]);
+    ledIndex_ANIM_SNAKE_TURQUOISE[id]++;
+  }else{
+    ledIndex_ANIM_TURQUOISE_FADE[id] = 0;
+  }
+  */
 }
 
 void ANIM_SNAKE_YELLOW(int id){
@@ -1186,12 +1246,31 @@ void ANIM_SNAKE_YELLOW(int id){
   for(int i = 0; i < NUM_LEDS; i++){
     leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
   }
+
+  /*
+  if(ledIndex_ANIM_SNAKE_YELLOW[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_SNAKE_YELLOW[id]].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
+    ledIndex_ANIM_SNAKE_YELLOW[id]++;
+  }else{
+    ledIndex_ANIM_SNAKE_YELLOW[id] = 0;
+  }
+  */
 }
 
 void ANIM_GREEN_TURQUOISE(int id){
   //26
+  
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = greenTurquoise_ANIM;
   }
+
+  /*
+  if(ledIndex_ANIM_GREEN_TURQUOISE[id] < NUM_LEDS){
+    leds[id][ledIndex_ANIM_GREEN_TURQUOISE[id]] = greenTurquoise_ANIM;
+    ledIndex_ANIM_GREEN_TURQUOISE[id]++;
+  }else{
+    ledIndex_ANIM_GREEN_TURQUOISE[id] = 0;
+  }
+  */
 }
 
