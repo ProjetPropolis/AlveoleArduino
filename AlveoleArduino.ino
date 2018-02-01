@@ -250,6 +250,13 @@ void decipherPacket(){
       }
     }
     for(int i = 0; i < NUM_AVAILABLE; i++){
+      if(receiveState[i] == 5){
+        indexState[i] = 0;  
+      }else if(receiveState[i] == 6){
+        indexState[i] = 1;
+      }else if(receiveState[i] == 7){
+        indexState[i] = 2;
+      }
       if(receiveState[i] != prevReceiveState[i]){
         int stripState = receiveState[i];
         //Serial.println("update led: " + String(receiveState[i]));
@@ -283,7 +290,7 @@ void readButtonStatus(){
     moleculeStatus[index] = digitalRead(digitalPin[index]);
     
     if(moleculeStatus[index] == LOW){
-      if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500) && receiveState[index] != 2 && receiveState[index] != 9){
+      if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500) && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9){
         if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
           boolStateMolecule[index] = true;
           receiveState[index] = 13;
@@ -335,13 +342,21 @@ void stateCtrl(int id, int state, int prevState){
     switch (state) {
       case 0: off(id);
             break;
+      case 1: on(id);
+            break;
       case 2: corrupted(id);
+            break;
+      case 4: shield_On(id);
+            //cleanser
             break;
       case 5: orange(id);
             break;
       case 6: pink(id);
             break;
       case 7: blue(id);
+            break;
+      case 8: shield_On(id);
+            //cleansing
             break;
       case 9: waveCorrupted(id);
             break;
@@ -356,6 +371,12 @@ void stateCtrl(int id, int state, int prevState){
 void off(int id){
      for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = CRGB::Black;
+     }
+}
+
+void on(int id){
+     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+      leds[id][i] = CRGB::White;
      }
 }
 
