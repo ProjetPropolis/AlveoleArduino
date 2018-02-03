@@ -234,7 +234,7 @@ int ledIndex_ANIM_GREEN_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
 float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210};
-float delayHue_TURQUOISE_FADE = 3;
+float delayHue_TURQUOISE_FADE = 1;
 
 /*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
 float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
@@ -627,6 +627,18 @@ void predictGameplay(int id, int prevState){
 }
 
 void stateCtrl(int id, int state, int prevState){
+
+  //Resets climax's anim when it's the alveole's prevState
+  if(prevState == 23){
+    hue_TURQUOISE_FADE[id] = 210;  
+  }
+  if(prevState == 24){
+    val_SNAKE_TURQUOISE[id] = 255;
+  }
+  if(prevState == 25){
+    hue_SNAKE_YELLOW[id] = 64;
+  }
+  
   switch( state ) {
     case 0: 
       off(id);
@@ -1094,21 +1106,10 @@ void ANIM_TURQUOISE(int id){
 void ANIM_PURPLE(int id){
   //18
   //reset to purple
-  hue_TURQUOISE_FADE[id] = 210;
-  hue_SNAKE_YELLOW[id] = 64;
 
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = purple_Corrupt;
   }
-
-  /*
-  if(ledIndex_ANIM_PURPLE[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_PURPLE[id]] = purple_Corrupt;
-    ledIndex_ANIM_PURPLE[id]++;
-  }else{
-    ledIndex_ANIM_PURPLE[id] = 0;
-  }
-  */
 }
 
 void ANIM_YELLOW(int id){
@@ -1117,15 +1118,7 @@ void ANIM_YELLOW(int id){
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = yellow_On;
   }
-
-  /*
-  if(ledIndex_ANIM_YELLOW[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_YELLOW[id]] = yellow_On;
-    ledIndex_ANIM_YELLOW[id]++;
-  }else{
-    ledIndex_ANIM_YELLOW[id] = 0;
-  }
-  */
+  
 }
 
 void ANIM_ORANGE(int id){
@@ -1135,14 +1128,6 @@ void ANIM_ORANGE(int id){
     leds[id][i] = orange_ANIM;
   }
 
-  /*
-  if(ledIndex_ANIM_ORANGE[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_ORANGE[id]] = orange_ANIM;
-    ledIndex_ANIM_ORANGE[id]++;
-  }else{
-    ledIndex_ANIM_ORANGE[id] = 0;
-  }
-  */
 }
 
 void ANIM_GREEN(int id){
@@ -1152,33 +1137,15 @@ void ANIM_GREEN(int id){
     leds[id][i] = green_ANIM;
   }
 
-  /*
-  if(ledIndex_ANIM_GREEN[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_GREEN[id]] = green_ANIM;
-    ledIndex_ANIM_GREEN[id]++;
-  }else{
-    ledIndex_ANIM_GREEN[id] = 0;
-  }
-  */
 }
 
 void ANIM_BLACK(int id){
   //22
-  //reset to blue
-  val_SNAKE_TURQUOISE[id] = 255;
-
+  
   for(int i=0; i<NUM_LEDS; i++){
     leds[id][i] = empty_off;
   }
   
-  /*
-  if(ledIndex_ANIM_BLACK[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_BLACK[id]] = empty_off;
-    ledIndex_ANIM_BLACK[id]++;
-  }else{
-    ledIndex_ANIM_BLACK[id] = 0;
-  }
-  */
 }
 
 void ANIM_TURQUOISE_FADE(int id){
@@ -1187,49 +1154,26 @@ void ANIM_TURQUOISE_FADE(int id){
   //Brightness Manager
   if(hue_TURQUOISE_FADE[id] >= 120){
     hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
-  }else{
-    //change stateCtrl's state
-    //receiveState[id] = 18;
   }
 
   for(int i = 0; i < NUM_LEDS; i++){
     leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
   }
   
-  /*
-  if(ledIndex_ANIM_TURQUOISE_FADE[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_TURQUOISE_FADE[id]].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
-    ledIndex_ANIM_TURQUOISE_FADE[id]++;
-  }else{
-    ledIndex_ANIM_TURQUOISE_FADE[id] = 0;
-  }
-  */
 }
 
 void ANIM_SNAKE_TURQUOISE(int id){
-  
   //24 : .6 sec. CYAN to BLACK
   
   //Brightness Manager
   if(val_SNAKE_TURQUOISE[id] > 0){
     val_SNAKE_TURQUOISE[id]-=delayBrightness_SNAKE_TURQUOISE;
-  }else{
-    //change stateCtrl's state
-    //receiveState[id] = 22;
   }
   
   for(int i = 0; i < NUM_LEDS; i++){
     leds[id][i].setHSV(120, 200, val_SNAKE_TURQUOISE[id]);
   }
 
-  /*
-  if(ledIndex_ANIM_SNAKE_TURQUOISE[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_SNAKE_TURQUOISE[id]].setHSV(130, 255, val_SNAKE_TURQUOISE[id]);
-    ledIndex_ANIM_SNAKE_TURQUOISE[id]++;
-  }else{
-    ledIndex_ANIM_TURQUOISE_FADE[id] = 0;
-  }
-  */
 }
 
 void ANIM_SNAKE_YELLOW(int id){
@@ -1238,23 +1182,12 @@ void ANIM_SNAKE_YELLOW(int id){
   //Brightness Manager
   if(hue_SNAKE_YELLOW[id] <= 210){
     hue_SNAKE_YELLOW[id]+=delayHue_SNAKE_YELLOW;
-  }else{
-    //change stateCtrl's state
-    //receiveState[id] = 18;
   }
 
   for(int i = 0; i < NUM_LEDS; i++){
     leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
   }
 
-  /*
-  if(ledIndex_ANIM_SNAKE_YELLOW[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_SNAKE_YELLOW[id]].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
-    ledIndex_ANIM_SNAKE_YELLOW[id]++;
-  }else{
-    ledIndex_ANIM_SNAKE_YELLOW[id] = 0;
-  }
-  */
 }
 
 void ANIM_GREEN_TURQUOISE(int id){
@@ -1264,13 +1197,5 @@ void ANIM_GREEN_TURQUOISE(int id){
     leds[id][i] = greenTurquoise_ANIM;
   }
 
-  /*
-  if(ledIndex_ANIM_GREEN_TURQUOISE[id] < NUM_LEDS){
-    leds[id][ledIndex_ANIM_GREEN_TURQUOISE[id]] = greenTurquoise_ANIM;
-    ledIndex_ANIM_GREEN_TURQUOISE[id]++;
-  }else{
-    ledIndex_ANIM_GREEN_TURQUOISE[id] = 0;
-  }
-  */
 }
 
