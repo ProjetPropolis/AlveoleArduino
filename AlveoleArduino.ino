@@ -16,7 +16,7 @@
 #define LED_PIN             22
 #define COLOR_ORDER         GRB
 #define CHIPSET             WS2811
-#define NUM_LEDS_PER_STRIP  30
+#define NUM_LEDS_PER_STRIP  40
 #define NUM_STRIPS          10
 #define NUM_AVAILABLE       10
 #define BRIGHTNESS          255
@@ -39,10 +39,55 @@ int dataBufferIndex = 0;
 int lengthOfNbr1 = 0;
 int lengthOfNbr2 = 0;
 
-
 /*==== purple molecules Variables ====*/
-Chrono myChrono_Purple;
-int receiveInfectId = 0;
+//Chrono myChrono_Purple;
+//int receiveInfectId = 0;
+/*==== corrupt() Variables ===*/
+Chrono myChrono0_Corrupt;
+Chrono myChrono1_Corrupt;
+Chrono myChrono2_Corrupt;
+Chrono myChrono3_Corrupt;
+Chrono myChrono4_Corrupt;
+Chrono myChrono5_Corrupt;
+Chrono myChrono6_Corrupt;
+Chrono myChrono_Corrupt[NUM_STRIPS] = {myChrono0_Corrupt, myChrono1_Corrupt, myChrono2_Corrupt, myChrono3_Corrupt, myChrono4_Corrupt, myChrono5_Corrupt, myChrono6_Corrupt};
+float val_Corrupt[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
+int stateBrightness_Corrupt[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndexGlitch1_Corrupt[NUM_STRIPS];
+int ledIndexGlitch2_Corrupt[NUM_STRIPS];
+int ledIndexGlitch3_Corrupt[NUM_STRIPS];
+int ledIndexGlitch4_Corrupt[NUM_STRIPS];
+int ledIndexGlitch5_Corrupt[NUM_STRIPS];
+float delayBrightness_Corrupt = 0.3;
+int delayIndex_Corrupt = 30;
+int dashLenght_Corrupt = 5;
+int stepRandom_Corrupt = 1;
+
+/*==== ultracorrupt() Variables ===*/
+Chrono myChrono0_Ultracorrupt;
+Chrono myChrono1_Ultracorrupt;
+Chrono myChrono2_Ultracorrupt;
+Chrono myChrono3_Ultracorrupt;
+Chrono myChrono4_Ultracorrupt;
+Chrono myChrono5_Ultracorrupt;
+Chrono myChrono6_Ultracorrupt;
+Chrono myChrono_Ultracorrupt[NUM_STRIPS] = {myChrono0_Ultracorrupt, myChrono1_Ultracorrupt, myChrono2_Ultracorrupt, myChrono3_Ultracorrupt, myChrono4_Ultracorrupt, myChrono5_Ultracorrupt, myChrono6_Ultracorrupt};
+float val_Ultracorrupt[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
+//float brightness_Ultracorrupt[7] = {0, 0, 0, 0, 0, 0, 0};
+int stateBrightness_Ultracorrupt[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
+int ledIndexGlitch1_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch2_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch3_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch4_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch5_Ultracorrupt[NUM_STRIPS];
+int delayIndex_Ultracorrupt = 750;
+float delayBrightness_Ultracorrupt = 0.75;
+int dashLenght_Ultracorrupt = 4;
+
+/*==== shield_Off Variables ====*/
+float g_ShieldOff[] = {50, 50, 50, 50, 50, 50, 50, 50, 50, 50};
+float b_ShieldOff[] = {170, 170, 170, 170, 170, 170, 170, 170, 170, 170};
+float delayBrightness_ShieldOff = 1.5;
 
 /*==== buttons Variables ====*/
 Chrono buttonChrono0;
@@ -106,6 +151,7 @@ CRGB blue_Recette(0, 0, 255);
 CRGB orange_Recette(200, 50, 0);
 CRGB pink_Recette(255, 35, 40);
 CHSV purple_Corrupt(210, 255, 255);
+CHSV palePurple_Corrupt(210, 50, 255);
 CRGB palePurple_Recette(100, 0, 255);
 CRGB darkPurple_Recette(50, 0, 80);
 CRGB cyan_ShieldOff(0, 24, 40);
@@ -375,7 +421,7 @@ void stateCtrl(int id, int state, int prevState){
             break;
       case 1: on(id);
             break;
-      case 2: corrupted(id);
+      case 2: corrupt(id);
             break;
       case 4: shield_On(id);
             //cleanser
@@ -451,7 +497,8 @@ void pink(int id){
      }
 }
 
-void corrupted(int id){
+void corrupt(int id){
+     /*
      if(!myChrono_Purple.hasPassed(1000)){
        for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
         leds[id][i] = palePurple_Recette;
@@ -463,24 +510,103 @@ void corrupted(int id){
      }else{
        myChrono_Purple.restart();
      }
+     */
+
+     //Writing BLACK for the 5 Dashes
+    for(int x = 0; x < dashLenght_Corrupt; x++){
+      leds[id][ledIndexGlitch1_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch2_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch3_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch4_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch5_Corrupt[id] + x].setHSV(210, 255, 0);
+    }
+    leds[id][ledIndexGlitch1_Corrupt[id]+2].setHSV(210, 255, 0);
+    leds[id][ledIndexGlitch2_Corrupt[id]+2].setHSV(210, 255, 0);
+    
+    //Changing 5 Dashes starting index
+    if(myChrono_Corrupt[dataId].hasPassed(delayIndex_Corrupt)){
+      ledIndexGlitch1_Corrupt[id] = constrain(random8(ledIndexGlitch1_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch1_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
+      ledIndexGlitch2_Corrupt[id] = constrain(random8(ledIndexGlitch2_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch2_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
+      ledIndexGlitch3_Corrupt[id] = constrain(random8(ledIndexGlitch3_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch3_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
+      ledIndexGlitch4_Corrupt[id] = constrain(random8(ledIndexGlitch4_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch4_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
+      ledIndexGlitch5_Corrupt[id] = constrain(random8(ledIndexGlitch5_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch5_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
+      myChrono_Corrupt[id].restart();
+    }
+
+    //Writing PURPLE for the 5 Dashes
+    for(int x = 0; x < dashLenght_Corrupt; x++){
+      leds[id][ledIndexGlitch1_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch2_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch3_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch4_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch5_Corrupt[id] + x] = purple_Corrupt;
+    }
+    leds[id][ledIndexGlitch1_Corrupt[id]+2] = palePurple_Corrupt;
+    leds[id][ledIndexGlitch2_Corrupt[id]+2] = palePurple_Corrupt;
 }
 
 void waveCorrupted(int id){
+     /*
      for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = red_waveCorrupted;
      }
+     */
+
+    //Writes 5 dashes of red in the strip, 5 index are generated(with random) to change the dashes' positions
+    
+    //Writing BLACK for the 5 Dashes
+    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      leds[id][ledIndexGlitch1_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch2_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch3_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch4_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch5_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+    }
+
+    //Changing 5 Dashes starting index
+    if(myChrono_Ultracorrupt[id].hasPassed(delayIndex_Ultracorrupt)){
+      ledIndexGlitch1_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+4));
+      ledIndexGlitch2_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
+      ledIndexGlitch3_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
+      ledIndexGlitch4_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
+      ledIndexGlitch5_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
+      myChrono_Ultracorrupt[id].restart();
+    }
+
+    //Writing RED for the 5 Dashes
+    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      leds[id][ledIndexGlitch1_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch2_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch3_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch4_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch5_Ultracorrupt[id] + x] = red_waveCorrupted;
+      //FastLED.show();
+    }
+    
 }
 
+
 void shield_Off(int id){
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = cyan_ShieldOff;
-     }
+    if(g_ShieldOff[id] >= 24){
+      g_ShieldOff[id]-=delayBrightness_ShieldOff;
+    }
+
+    if(b_ShieldOff[id] >= 40){
+      b_ShieldOff[id]-=delayBrightness_ShieldOff;
+    }
+    
+    for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setHSV(0, g_ShieldOff[id], b_ShieldOff[id]);
+    }
 }
 
 void shield_On(int id){
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    g_ShieldOff[id] = 50;
+    b_ShieldOff[id] = 170;
+    
+    for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = cyan_ShieldOn;
-     }
+    }
 }
 /*
 void ANIM_TURQUOISE(int id){
