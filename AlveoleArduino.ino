@@ -242,7 +242,7 @@ float delayBrightness_SNAKE_TURQUOISE = 1.5;
 
 /*==== ANIM_SNAKE_YELLOW() Variables ===*/
 float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64};
-float delayHue_SNAKE_YELLOW = 3;
+float delayHue_SNAKE_YELLOW = 1;
 
 /*==== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
@@ -629,13 +629,13 @@ void predictGameplay(int id, int prevState){
 void stateCtrl(int id, int state, int prevState){
 
   //Resets climax's anim when it's the alveole's prevState
-  if(prevState == 23){
+  if(prevState == 23 && state != 23){
     hue_TURQUOISE_FADE[id] = 210;  
   }
-  if(prevState == 24){
+  if(prevState == 24 && state != 24){
     val_SNAKE_TURQUOISE[id] = 255;
   }
-  if(prevState == 25){
+  if(prevState == 25 && state != 25){
     hue_SNAKE_YELLOW[id] = 64;
   }
   
