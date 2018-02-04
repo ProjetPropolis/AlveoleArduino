@@ -85,7 +85,7 @@ int ledIndexGlitch5_Corrupt[NUM_STRIPS];
 int delayIndex_Corrupt = 30;
 int dashLenght_Corrupt = 3;
 int stepRandom_Corrupt = 1;
-bool reset_Corrupt[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+//bool reset_Corrupt[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 /*==== ultracorrupt() Variables ===
 Chrono myChrono0_Ultracorrupt;
@@ -415,7 +415,7 @@ void readButtonStatus(){
 
 void stateCtrl(int id, int state, int prevState){
   if(prevState == 2 && state != 2){
-    reset_Corrupt[id] = 1;
+    //reset_Corrupt[id] = 1;
   }
   if(state < 15 && state >= 0){
     switch (state) {
@@ -531,7 +531,7 @@ void corrupt(int id){
      */
 
      //Writing BLACK for the 5 Dashes
-    if(!reset_Corrupt[id]){
+    //if(!reset_Corrupt[id]){
       for(int x = 0; x < dashLenght_Corrupt; x++){
         leds[id][ledIndexGlitch1_Corrupt[id] + x].setHSV(210, 255, 0);
         leds[id][ledIndexGlitch2_Corrupt[id] + x].setHSV(210, 255, 0);
@@ -541,7 +541,7 @@ void corrupt(int id){
       }
       leds[id][ledIndexGlitch1_Corrupt[id]+2].setHSV(210, 255, 0);
       leds[id][ledIndexGlitch2_Corrupt[id]+2].setHSV(210, 255, 0);
-    }
+    //}
     
     //Changing 5 Dashes starting index
     if(myChrono_Corrupt[dataId].hasPassed(delayIndex_Corrupt)){
@@ -551,7 +551,7 @@ void corrupt(int id){
       ledIndexGlitch4_Corrupt[id] = constrain(random8(ledIndexGlitch4_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch4_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
       ledIndexGlitch5_Corrupt[id] = constrain(random8(ledIndexGlitch5_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch5_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
       myChrono_Corrupt[id].restart();
-      reset_Corrupt[id] = false;
+      //reset_Corrupt[id] = false;
     }
 
     //Writing PURPLE for the 5 Dashes
