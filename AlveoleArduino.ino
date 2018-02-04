@@ -209,6 +209,7 @@ void loop() {
       //Serial.println("update led: " + String(receiveState[i]));
       stateCtrl(i,stripState, prevReceiveState[i]);
     }else{
+      int stripState = receiveState[i];
       stateCtrl(i,stripState, prevReceiveState[i]);
     }
   }
