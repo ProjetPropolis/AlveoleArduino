@@ -12,7 +12,7 @@
 #define LED_PIN    22
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2811
-#define NUM_LEDS    80
+#define NUM_LEDS    84
 #define NUM_STRIPS 7
 #define BRIGHTNESS  255
 #define FASTLED_ALLOW_INTERRUPTS 0
@@ -500,6 +500,8 @@ void decipherPacket(){
         Serial.println("update led: " + String(stripState));
         if(stripState != 15 && stripState != 16){
           stateCtrl(i, stripState, prevReceiveState[i]);
+        }else{
+          stateCtrl(i, 2, prevReceiveState[i]);
         }
       }
       //prevReceiveState[i] = receiveState[i];
