@@ -204,11 +204,11 @@ void loop() {
 
   readTheData();
   for(int i = 0; i < NUM_STRIPS; i++){
-    if(receiveState[i] != prevReceiveState[i]){
-      int stripState = receiveState[i];
-      //Serial.println("update led: " + String(receiveState[i]));
-      //stateCtrl(i,stripState, prevReceiveState[i]);
-    }
+    //if(receiveState[i] != prevReceiveState[i]){
+    int stripState = receiveState[i];
+    //Serial.println("update led: " + String(receiveState[i]));
+    stateCtrl(i,stripState, prevReceiveState[i]);
+    //}
   }
 
   FastLED.show();
