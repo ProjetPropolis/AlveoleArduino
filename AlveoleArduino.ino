@@ -208,8 +208,9 @@ void loop() {
       int stripState = receiveState[i];
       //Serial.println("update led: " + String(receiveState[i]));
       stateCtrl(i,stripState, prevReceiveState[i]);
+    }else{
+      stateCtrl(i,stripState, prevReceiveState[i]);
     }
-    //stateCtrl(i,receiveState[i], prevReceiveState[i]);
   }
 
   FastLED.show();
