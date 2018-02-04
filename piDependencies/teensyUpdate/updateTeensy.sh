@@ -16,7 +16,7 @@ elif [ "$1" = "atomgroup" ]; then
 	curl -H "Authorization: token $gitToken" -o src/AlveoleArduino.ino https://raw.githubusercontent.com/ProjetPropolis/AlveoleArduino/molecules/AlveoleArduino.ino
 	echo "script MoleculeArduino has been update"
 
-elif [ "$1" = "default"]; then
+elif [ "$1" = "default" ]; then
 	if [ defaultValue = "hexgroup" ]; then
 		curl -H "Authorization: token $gitToken" -o src/AlveoleArduino.ino https://raw.githubusercontent.com/ProjetPropolis/AlveoleArduino/migrationSensor/AlveoleArduino.ino
 		echo "script AlveoleArduino has been update"
