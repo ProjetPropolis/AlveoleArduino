@@ -31,8 +31,12 @@ fi
 
 rm -rf src/__MACOSX
 
+screen -X -S "propolis" quit
+
 cd /home/pi/Documents/teensyUpdate
 sudo platformio run -t upload &&
+
+screen -dmS propolis python3 /home/pi/Desktop/python_server/serialTestVF.py
 
 echo "project has been compiled"
 
