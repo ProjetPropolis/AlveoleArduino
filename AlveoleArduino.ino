@@ -530,17 +530,19 @@ void corrupt(int id){
      }
      */
 
-     //Writing BLACK for the 5 Dashes
+    //Writing BLACK for the 5 Dashes
     //if(!reset_Corrupt[id]){
-      for(int x = 0; x < dashLenght_Corrupt; x++){
+    for(int x = 0; x < dashLenght_Corrupt; x++){
+      if(x != 2){
         leds[id][ledIndexGlitch1_Corrupt[id] + x].setHSV(210, 255, 0);
         leds[id][ledIndexGlitch2_Corrupt[id] + x].setHSV(210, 255, 0);
-        leds[id][ledIndexGlitch3_Corrupt[id] + x].setHSV(210, 255, 0);
-        leds[id][ledIndexGlitch4_Corrupt[id] + x].setHSV(210, 255, 0);
-        leds[id][ledIndexGlitch5_Corrupt[id] + x].setHSV(210, 255, 0);
       }
-      leds[id][ledIndexGlitch1_Corrupt[id]+2].setHSV(210, 255, 0);
-      leds[id][ledIndexGlitch2_Corrupt[id]+2].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch3_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch4_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch5_Corrupt[id] + x].setHSV(210, 255, 0);
+    }
+    leds[id][ledIndexGlitch1_Corrupt[id]+2].setHSV(210, 255, 0);
+    leds[id][ledIndexGlitch2_Corrupt[id]+2].setHSV(210, 255, 0);
     //}
     
     //Changing 5 Dashes starting index
@@ -556,8 +558,10 @@ void corrupt(int id){
 
     //Writing PURPLE for the 5 Dashes
     for(int x = 0; x < dashLenght_Corrupt; x++){
-      leds[id][ledIndexGlitch1_Corrupt[id] + x] = purple_Corrupt;
-      leds[id][ledIndexGlitch2_Corrupt[id] + x] = purple_Corrupt;
+      if(x != 2){
+        leds[id][ledIndexGlitch1_Corrupt[id] + x] = purple_Corrupt;
+        leds[id][ledIndexGlitch2_Corrupt[id] + x] = purple_Corrupt;
+      }
       leds[id][ledIndexGlitch3_Corrupt[id] + x] = purple_Corrupt;
       leds[id][ledIndexGlitch4_Corrupt[id] + x] = purple_Corrupt;
       leds[id][ledIndexGlitch5_Corrupt[id] + x] = purple_Corrupt;
