@@ -11,7 +11,7 @@
 //LED related variables
 #define LED_PIN    22
 #define COLOR_ORDER GRB
-#define CHIPSET     WS2811
+#define CHIPSET     WS2812B
 #define NUM_LEDS    80
 #define NUM_STRIPS 7
 #define BRIGHTNESS  255
