@@ -515,7 +515,7 @@ void pink(int id){
 }
 
 void corrupt(int id){
-     /*
+     
      if(!myChrono_Purple.hasPassed(1000)){
        for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
         leds[id][i] = palePurple_Recette;
@@ -527,7 +527,7 @@ void corrupt(int id){
      }else{
        myChrono_Purple.restart();
      }
-     */
+     /*
 
     //Writing BLACK for the 5 Dashes
     //if(!reset_Corrupt[id]){
@@ -567,7 +567,7 @@ void corrupt(int id){
     }
     leds[id][ledIndexGlitch1_Corrupt[id]+2] = palePurple_Corrupt;
     leds[id][ledIndexGlitch2_Corrupt[id]+2] = palePurple_Corrupt;
-    
+    */
 }
 
 void waveCorrupted(int id){
