@@ -1,4 +1,4 @@
-// hardware libraries to access use the shield
+// hardware libraries to access use the shields
 
 #define FASTLED_ALLOW_INTERRUPTS 0
 #include "FastLED.h"
@@ -16,7 +16,7 @@
 #define LED_PIN             22
 #define COLOR_ORDER         GRB
 #define CHIPSET             WS2811
-#define NUM_LEDS_PER_STRIP  40
+#define NUM_LEDS_PER_STRIP  60
 #define NUM_STRIPS          10
 #define NUM_AVAILABLE       10
 #define BRIGHTNESS          255
