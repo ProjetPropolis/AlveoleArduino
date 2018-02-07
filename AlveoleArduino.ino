@@ -214,7 +214,6 @@ bool state4Second_Cleansing = true;
 /*
 //==== fullColor() Variables ===
 int ledIndex_fullColor[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
-
 //==== snake() Variables ===
 int ledIndex_Snake[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 float val_Snake[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
@@ -1198,4 +1197,3 @@ void ANIM_GREEN_TURQUOISE(int id){
   }
 
 }
-
