@@ -68,6 +68,9 @@ int prevTileStatus[NUM_STRIPS];
 int tileStatus[NUM_STRIPS];
 int prevTilePressure[NUM_STRIPS];
 int tilePressure[NUM_STRIPS];
+//TODO approuve these 2 variables
+int calibrationState = 0;
+int countCalibrated = 0;
 
 //variable related to the behavior of the different state receive
 
