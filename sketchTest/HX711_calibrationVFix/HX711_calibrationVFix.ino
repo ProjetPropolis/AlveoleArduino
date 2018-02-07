@@ -61,7 +61,7 @@ int currentSensor = 0;
 
 void loop() {
 
-  Serial.println("reading sensor:" + String(currentSensor));
+  //Serial.println("reading sensor:" + String(currentSensor));
   readSensor(currentSensor);
   currentSensor = (currentSensor + 1) % NUMCHANNEL;
   //Serial.println(calibrationState);
