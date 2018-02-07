@@ -68,7 +68,6 @@ void loop() {
   
   if(calibrationState == 0){
     calibrateHex();
-    Serial.println("some sensor are not calibrated");
   }
   if(currentSensor == (NUMCHANNEL - 1)){
     Serial.println("loop  ---------------------------------------------------");
