@@ -64,7 +64,7 @@ void loop() {
   Serial.println("reading sensor:" + String(currentSensor));
   readSensor(currentSensor);
   currentSensor = (currentSensor + 1) % NUMCHANNEL;
-  Serial.println(calibrationState);
+  //Serial.println(calibrationState);
   
   if(calibrationState == 0){
     calibrateHex();
@@ -76,11 +76,9 @@ void loop() {
 }
 
 void calibrateHex() {
-  Serial.println("enter calibrate");
   for (int i = 0; i < 7; i++) {
     long int sensorValue = 0;
     switch (i) {
-      Serial.println("enter switch");
       case 0:
         if ( scale0.is_ready() == false ) break;
         sensorValue = scale0.read();
@@ -122,6 +120,7 @@ void calibrateHex() {
     }
   }
   if(countCalibrated == 7){
+    Serial.println("all calibrated");
     calibrationState = 1;
   } else{
     countCalibrated = 0;
