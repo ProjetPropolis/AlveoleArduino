@@ -61,6 +61,7 @@ bool sensorOrientation[NUM_STRIPS]; //IF TRUE = pressure plate is positive and g
 long int sensorStartValue[NUM_STRIPS];
 long int sensorThreshold[NUM_STRIPS]; //originaly not an array and has 10 000 has value
 bool calibrationState = 0;
+int countCalibrated = 0;
 
 int resistance = 5; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
 int currentSensor = 0;
