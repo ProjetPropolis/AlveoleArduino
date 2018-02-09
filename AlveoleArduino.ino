@@ -82,12 +82,17 @@ int ledIndexGlitch2_Corrupt[NUM_STRIPS];
 int ledIndexGlitch3_Corrupt[NUM_STRIPS];
 int ledIndexGlitch4_Corrupt[NUM_STRIPS];
 int ledIndexGlitch5_Corrupt[NUM_STRIPS];
+int ledIndexGlitch6_Corrupt[NUM_STRIPS];
+int ledIndexGlitch7_Corrupt[NUM_STRIPS];
+int ledIndexGlitch8_Corrupt[NUM_STRIPS];
+int ledIndexGlitch9_Corrupt[NUM_STRIPS];
+int ledIndexGlitch10_Corrupt[NUM_STRIPS];
 int delayIndex_Corrupt = 30;
 int dashLenght_Corrupt = 3;
 int stepRandom_Corrupt = 1;
-//bool reset_Corrupt[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+int maxCorruptLenght = dashLenght_Corrupt+30;
 
-/*==== ultracorrupt() Variables ===
+/*==== ultracorrupt() Variables ===*/
 Chrono myChrono0_Ultracorrupt;
 Chrono myChrono1_Ultracorrupt;
 Chrono myChrono2_Ultracorrupt;
@@ -101,29 +106,36 @@ int ledIndexGlitch2_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch3_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch4_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch5_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch6_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch7_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch8_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch9_Ultracorrupt[NUM_STRIPS];
+int ledIndexGlitch10_Ultracorrupt[NUM_STRIPS];
 int delayIndex_Ultracorrupt = 750;
 int dashLenght_Ultracorrupt = 4;
-*/
+int maxUltracorruptLenght = dashLenght_Ultracorrupt+30;
 
-/*==== shield_Off Variables ====
-float g_ShieldOff[] = {50, 50, 50, 50, 50, 50, 50, 50, 50, 50};
-float b_ShieldOff[] = {170, 170, 170, 170, 170, 170, 170, 170, 170, 170};
-float delayBrightness_ShieldOff = 1.5;
-*/
+/*==== shield_Off Variables ====*/
+//int g_ShieldOff[] = {14, 14, 14, 14, 14, 14, 14, 14, 14, 14};
+//int b_ShieldOff[] = {30, 30, 30, 30, 30, 30, 30, 30, 30, 30};
+int sat_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+int a_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+int delayBrightness_ShieldOff = 2;
 
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
-float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210};
+float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210, 210, 210, 210};
 float delayHue_TURQUOISE_FADE = 3;
 
 /*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
-float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
+float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 float delayBrightness_SNAKE_TURQUOISE = 1.5;
 
 /*==== ANIM_SNAKE_YELLOW() Variables ===*/
-float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64};
+float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
 float delayHue_SNAKE_YELLOW = 3;
 
 bool moleculeStatus[10];
+int delayMoleculeStatus = 100;
 int stateColorMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 bool isPressedMolecule[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 bool boolStateMolecule[] = {false, false, false, false, false, false, false, false, false, false};
@@ -131,7 +143,7 @@ bool prevStateMolecule[] = {false, false, false, false, false, false, false, fal
 int indexState[NUM_STRIPS];
 int referenceState[] = {5, 6, 7};
 int indexShield = NUM_STRIPS-1;
-bool needReset[NUM_STRIPS] = {0,0,0,0,0,0,0};
+bool needReset[NUM_STRIPS] = {0,0,0,0,0,0,0,0,0,0};
 bool unlocked[] = {true, true, true, true, true, true, true, true, true, true};
 
 unsigned int intervalRead = 25 ;
@@ -145,7 +157,7 @@ int stripState = 0;
 
 /*==== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
-CRGB blue_Recette(0, 0, 255);
+CHSV blue_Recette(135, 200, 190);
 CRGB orange_Recette(200, 50, 0);
 CRGB pink_Recette(255, 35, 40);
 CHSV purple_Corrupt(210, 255, 255);
@@ -153,7 +165,8 @@ CHSV palePurple_Corrupt(210, 50, 255);
 CRGB palePurple_Recette(100, 0, 255);
 CRGB darkPurple_Recette(50, 0, 80);
 CRGB cyan_ShieldOff(0, 24, 40);
-CRGB cyan_ShieldOn(0, 50, 170);
+//CRGB cyan_ShieldOn(0, 50, 170);
+CHSV cyan_ShieldOn(125, 255, 255);
 CRGB red_waveCorrupted(255, 0, 0);
 CHSV blue_Cleanser(140, 255, 255);
 CHSV paleBlue_Cleansing(140, 200, 255);
@@ -212,16 +225,6 @@ void loop() {
   }
 
   FastLED.show();
-
-/*
-  if(mustReadPressure){
-    //Serial.println("mustReadPressure");
-    readButtonStatus();
-    //readPressurePlate(); // test without
-  }
-*/
-
-
   
   /*
   //Testing teensy
@@ -364,7 +367,7 @@ void readButtonStatus(){
       moleculeStatus[index] = digitalRead(digitalPin[index]);
       
       if(moleculeStatus[index] == LOW){
-        if(boolStateMolecule[index] == false && indexState[index] < 2 && buttonChrono[index].hasPassed(500) && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9){
+        if(boolStateMolecule[index] == false && indexState[index] < 2 && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9 && receiveState[index] != 22){//(receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 14)){
           if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
@@ -372,7 +375,7 @@ void readButtonStatus(){
           }else{
             Serial.print("Enter if:");
             Serial.println(receiveState[index]);
-            buttonChrono[index].restart();
+            //buttonChrono[index].restart();
             boolStateMolecule[index] = true;
             indexState[index]++;
             receiveState[index] = referenceState[indexState[index]];
@@ -381,10 +384,10 @@ void readButtonStatus(){
             //Serial.println(receiveState[0]);
           }
           
-        }else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(500)){
+        }else if(boolStateMolecule[index] == false){//&& buttonChrono[index].hasPassed(delayMoleculeStatus)
           Serial.print("Enter else if:");
           Serial.println(receiveState[index]);
-          buttonChrono[index].restart();
+          //buttonChrono[index].restart();
           boolStateMolecule[index] = true;
           indexState[index] = 0;
           receiveState[index] = referenceState[indexState[index]];
@@ -416,12 +419,13 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 2 && state != 2){
     //reset_Corrupt[id] = 1;
   }
-  if(state < 15 && state >= 0){
+  if(state < 30 && state >= 0){
     switch (state) {
       case 0: 
         off(id);
         break;
       case 1: 
+        needReset[id] = 1;
         on(id);
         break;
       case 2: 
@@ -436,12 +440,15 @@ void stateCtrl(int id, int state, int prevState){
         //cleanser
         break;
       case 5: 
+        needReset[id] = 1;
         orange(id);
         break;
-      case 6: 
+      case 6:
+        needReset[id] = 1; 
         pink(id);
         break;
       case 7: 
+        needReset[id] = 1;
         blue(id);
         break;
       case 8: 
@@ -449,8 +456,10 @@ void stateCtrl(int id, int state, int prevState){
         //cleansing
         break;
       case 9: 
+        if(needReset[id]){
+          off(id);
+        }
         waveCorrupted(id);
-        needReset[id] = 1;
         break;
       case 13: 
         shield_On(id);
@@ -458,64 +467,46 @@ void stateCtrl(int id, int state, int prevState){
       case 14:
         shield_Off(id);
         break;
-            /*
-      case 17: ANIM_TURQUOISE(id);
-            break;
-      case 18: ANIM_PURPLE(id);
-            break;
-      case 19: ANIM_YELLOW(id);
-            break;
-      case 20: ANIM_ORANGE(id);
-            break;
-      case 21: ANIM_GREEN(id);
-            break;
-      case 22: ANIM_BLACK(id);
-            break;
-      case 23: ANIM_TURQUOISE(id);
-            break;
-      case 24: ANIM_SNAKE_TURQUOISE(id);
-            break;
-      case 25: ANIM_SNAKE_YELLOW(id);
-            break;
-      case 26: ANIM_GREEN_TURQUOISE(id);
-            break;
-            */
+      case 22:
+        off(id);
+        break;
     }
   }
 }
 
 void off(int id){
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = CRGB::Black;
-     }
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setRGB(0,0,0);
+  }
 }
 
 void on(int id){
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = CRGB::White;
-     }
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = CRGB::White;
+  }
 }
 
 void blue(int id){
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = blue_Recette;
-     }
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = blue_Recette;
+  }
 }
 
 void orange(int id){
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = orange_Recette;
-     }
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = orange_Recette;
+  }
 }
 
 void pink(int id){
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = pink_Recette;
-     }
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = pink_Recette;
+  }
 }
 
 void corrupt(int id){
-     
+
+     /*
      if(!myChrono_Purple.hasPassed(1000)){
        for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
         leds[id][i] = palePurple_Recette;
@@ -527,10 +518,9 @@ void corrupt(int id){
      }else{
        myChrono_Purple.restart();
      }
-     /*
+     */
 
     //Writing BLACK for the 5 Dashes
-    //if(!reset_Corrupt[id]){
     for(int x = 0; x < dashLenght_Corrupt; x++){
       if(x != 2){
         leds[id][ledIndexGlitch1_Corrupt[id] + x].setHSV(210, 255, 0);
@@ -539,22 +529,27 @@ void corrupt(int id){
       leds[id][ledIndexGlitch3_Corrupt[id] + x].setHSV(210, 255, 0);
       leds[id][ledIndexGlitch4_Corrupt[id] + x].setHSV(210, 255, 0);
       leds[id][ledIndexGlitch5_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch6_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch7_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch8_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch9_Corrupt[id] + x].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch10_Corrupt[id] + x].setHSV(210, 255, 0);
     }
     leds[id][ledIndexGlitch1_Corrupt[id]+2].setHSV(210, 255, 0);
     leds[id][ledIndexGlitch2_Corrupt[id]+2].setHSV(210, 255, 0);
-    //}
-    
-    //Changing 5 Dashes starting index
-    if(myChrono_Corrupt[dataId].hasPassed(delayIndex_Corrupt)){
-      ledIndexGlitch1_Corrupt[id] = constrain(random8(ledIndexGlitch1_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch1_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
-      ledIndexGlitch2_Corrupt[id] = constrain(random8(ledIndexGlitch2_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch2_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
-      ledIndexGlitch3_Corrupt[id] = constrain(random8(ledIndexGlitch3_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch3_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
-      ledIndexGlitch4_Corrupt[id] = constrain(random8(ledIndexGlitch4_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch4_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
-      ledIndexGlitch5_Corrupt[id] = constrain(random8(ledIndexGlitch5_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch5_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(dashLenght_Corrupt+4));
-      myChrono_Corrupt[id].restart();
-      //reset_Corrupt[id] = false;
-    }
 
+    //Changing 5 Dashes starting index
+    ledIndexGlitch1_Corrupt[id] = constrain(random8(ledIndexGlitch1_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch1_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch2_Corrupt[id] = constrain(random8(ledIndexGlitch2_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch2_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch3_Corrupt[id] = constrain(random8(ledIndexGlitch3_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch3_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch4_Corrupt[id] = constrain(random8(ledIndexGlitch4_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch4_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch5_Corrupt[id] = constrain(random8(ledIndexGlitch5_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch5_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch6_Corrupt[id] = constrain(random8(ledIndexGlitch6_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch6_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch7_Corrupt[id] = constrain(random8(ledIndexGlitch7_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch7_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch8_Corrupt[id] = constrain(random8(ledIndexGlitch8_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch8_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch9_Corrupt[id] = constrain(random8(ledIndexGlitch9_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch9_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    ledIndexGlitch10_Corrupt[id] = constrain(random8(ledIndexGlitch10_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch10_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS_PER_STRIP-(maxCorruptLenght));
+    
     //Writing PURPLE for the 5 Dashes
     for(int x = 0; x < dashLenght_Corrupt; x++){
       if(x != 2){
@@ -564,20 +559,26 @@ void corrupt(int id){
       leds[id][ledIndexGlitch3_Corrupt[id] + x] = purple_Corrupt;
       leds[id][ledIndexGlitch4_Corrupt[id] + x] = purple_Corrupt;
       leds[id][ledIndexGlitch5_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch6_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch7_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch8_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch9_Corrupt[id] + x] = purple_Corrupt;
+      leds[id][ledIndexGlitch10_Corrupt[id] + x] = purple_Corrupt;
     }
     leds[id][ledIndexGlitch1_Corrupt[id]+2] = palePurple_Corrupt;
     leds[id][ledIndexGlitch2_Corrupt[id]+2] = palePurple_Corrupt;
-    */
+    
 }
 
 void waveCorrupted(int id){
-     
-     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+
+    /*
+    for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = red_waveCorrupted;
-     }
+    }
+    
 
     //Writes 5 dashes of red in the strip, 5 index are generated(with random) to change the dashes' positions
-    /*
     //Writing BLACK for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
       leds[id][ledIndexGlitch1_Ultracorrupt[id] + x].setHSV(0, 255, 0);
@@ -585,17 +586,27 @@ void waveCorrupted(int id){
       leds[id][ledIndexGlitch3_Ultracorrupt[id] + x].setHSV(0, 255, 0);
       leds[id][ledIndexGlitch4_Ultracorrupt[id] + x].setHSV(0, 255, 0);
       leds[id][ledIndexGlitch5_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch6_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch7_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch8_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch9_Ultracorrupt[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch10_Ultracorrupt[id] + x].setHSV(0, 255, 0);
     }
-
+    */
     //Changing 5 Dashes starting index
-    if(myChrono_Ultracorrupt[id].hasPassed(delayIndex_Ultracorrupt)){
-      ledIndexGlitch1_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+4));
-      ledIndexGlitch2_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
-      ledIndexGlitch3_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
-      ledIndexGlitch4_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
-      ledIndexGlitch5_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(dashLenght_Ultracorrupt+2));
-      myChrono_Ultracorrupt[id].restart();
-    }
+    //if(myChrono_Ultracorrupt[id].hasPassed(delayIndex_Ultracorrupt)){
+    ledIndexGlitch1_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch2_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch3_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch4_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch5_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch6_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch7_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch8_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch9_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    ledIndexGlitch10_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
+    //myChrono_Ultracorrupt[id].restart();
+    //}
 
     //Writing RED for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
@@ -604,139 +615,46 @@ void waveCorrupted(int id){
       leds[id][ledIndexGlitch3_Ultracorrupt[id] + x] = red_waveCorrupted;
       leds[id][ledIndexGlitch4_Ultracorrupt[id] + x] = red_waveCorrupted;
       leds[id][ledIndexGlitch5_Ultracorrupt[id] + x] = red_waveCorrupted;
-      //FastLED.show();
+      leds[id][ledIndexGlitch6_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch7_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch8_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch9_Ultracorrupt[id] + x] = red_waveCorrupted;
+      leds[id][ledIndexGlitch10_Ultracorrupt[id] + x] = red_waveCorrupted;
     }
-    */
 }
 
 
 void shield_Off(int id){
-  /*
-    if(g_ShieldOff[id] >= 24){
+    /*
+    if(g_ShieldOff[id] >= 14){
       g_ShieldOff[id]-=delayBrightness_ShieldOff;
     }
 
-    if(b_ShieldOff[id] >= 40){
+    if(b_ShieldOff[id] >= 30){
       b_ShieldOff[id]-=delayBrightness_ShieldOff;
     }
     */
+    if(sat_ShieldOff[id] >= 100){
+      sat_ShieldOff[id]-=delayBrightness_ShieldOff;
+    }
+    
+    if(a_ShieldOff[id] >= 100){
+      a_ShieldOff[id]-=delayBrightness_ShieldOff;
+    }
+    
     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i].setHSV(0, 24, 130);
+      leds[id][i].setHSV(125, sat_ShieldOff[id], a_ShieldOff[id]);
     }
 }
 
 void shield_On(int id){
-    /*
-    g_ShieldOff[id] = 50;
-    b_ShieldOff[id] = 170;
-    */
+    
+    //g_ShieldOff[id] = 50;
+    //b_ShieldOff[id] = 170;
+    sat_ShieldOff[id] = 255;
+    a_ShieldOff[id] = 255;
+    
     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = cyan_ShieldOn;
     }
 }
-/*
-void ANIM_TURQUOISE(int id){
-  //17
-  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i] = paleBlue_Cleansing;
-  }
-}
-
-void ANIM_PURPLE(int id){
-  //18
-  //reset to purple
-  hue_TURQUOISE_FADE[id] = 210;
-  hue_SNAKE_YELLOW[id] = 64;
-  
-  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
-    leds[id][i] = purple_Corrupt;
-  }
-}
-
-void ANIM_YELLOW(int id){
-  //19
-  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
-    leds[id][i] = yellow_On;
-  }
-}
-
-void ANIM_ORANGE(int id){
-  //20
-  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
-    leds[id][i] = orange_ANIM;
-  }
-}
-
-void ANIM_GREEN(int id){
-  //21
-  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
-    leds[id][i] = green_ANIM;
-  }
-}
-
-void ANIM_BLACK(int id){
-  //22
-  //reset to blue
-  val_SNAKE_TURQUOISE[id] = 255;
-  
-  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
-    leds[id][i] = empty_off;
-  }
-}
-
-void ANIM_TURQUOISE_FADE(int id){
-  //23 : fade PURPLE to BLUE .3 sec. 
-
-  //Brightness Manager
-  if(hue_TURQUOISE_FADE[id] >= 140){
-    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
-  }else{
-    //change stateCtrl's state
-    //receiveState[id] = 18;
-  }
-
-  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
-  }
-}
-
-void ANIM_SNAKE_TURQUOISE(int id){
-  
-  //24 : .6 sec. BLUE to BLACK
-  
-  //Brightness Manager
-  if(val_SNAKE_TURQUOISE[id] > 0){
-    val_SNAKE_TURQUOISE[id]-=delayBrightness_SNAKE_TURQUOISE;
-  }else{
-    //change stateCtrl's state
-    //receiveState[id] = 22;
-  }
-
-  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(140, 200, val_SNAKE_TURQUOISE[id]);
-  }
-}
-
-void ANIM_SNAKE_YELLOW(int id){
-  //25 : 1 sec. YELLOW to PURPLE
-
-  //Brightness Manager
-  if(hue_SNAKE_YELLOW[id] <= 210){
-    hue_SNAKE_YELLOW[id]+=delayHue_SNAKE_YELLOW;
-  }else{
-    //change stateCtrl's state
-    //receiveState[id] = 18;
-  }
-
-  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
-  }
-}
-
-void ANIM_GREEN_TURQUOISE(int id){
-  //26
-  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
-    leds[id][i] = greenTurquoise_ANIM;
-  }
-}
-*/
