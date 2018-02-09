@@ -312,6 +312,7 @@ void setup() {
 //int tick = 0;
 void loop() {
   // important! non-blocking listen routine
+  
   if(calibrationState == 0){
     calibrateHex();
   }
@@ -332,6 +333,7 @@ void loop() {
       prevReceiveState[i] = receiveState[i];
     }
   }
+  
   FastLED.show();
   delay(2); 
 }
@@ -801,33 +803,37 @@ void corrupt(int id){
     */
 
     //Writing BLACK for the 5 Dashes
-    for(int x = 0; x < dashLenght_Corrupt; x++){
-      leds[id][ledIndexGlitch1_Corrupt[id] + x].setHSV(210, 255, 0);
-      leds[id][ledIndexGlitch2_Corrupt[id] + x].setHSV(210, 255, 0);
-      leds[id][ledIndexGlitch3_Corrupt[id] + x].setHSV(210, 255, 0);
-      leds[id][ledIndexGlitch4_Corrupt[id] + x].setHSV(210, 255, 0);
-      leds[id][ledIndexGlitch5_Corrupt[id] + x].setHSV(210, 255, 0);
+    for(int i = 0; i < dashLenght_Corrupt; i++){
+      if(i != 2){
+        leds[id][ledIndexGlitch1_Corrupt[id] + i].setHSV(210, 255, 0);
+        leds[id][ledIndexGlitch2_Corrupt[id] + i].setHSV(210, 255, 0);
+      }
+      leds[id][ledIndexGlitch3_Corrupt[id] + i].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch4_Corrupt[id] + i].setHSV(210, 255, 0);
+      leds[id][ledIndexGlitch5_Corrupt[id] + i].setHSV(210, 255, 0);
     }
     leds[id][ledIndexGlitch1_Corrupt[id]+2].setHSV(210, 255, 0);
     leds[id][ledIndexGlitch2_Corrupt[id]+2].setHSV(210, 255, 0);
     
     //Changing 5 Dashes starting index
-    if(myChrono_Corrupt[dataId].hasPassed(delayIndex_Corrupt)){
-      ledIndexGlitch1_Corrupt[id] = constrain(random8(ledIndexGlitch1_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch1_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
-      ledIndexGlitch2_Corrupt[id] = constrain(random8(ledIndexGlitch2_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch2_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
-      ledIndexGlitch3_Corrupt[id] = constrain(random8(ledIndexGlitch3_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch3_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
-      ledIndexGlitch4_Corrupt[id] = constrain(random8(ledIndexGlitch4_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch4_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
-      ledIndexGlitch5_Corrupt[id] = constrain(random8(ledIndexGlitch5_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch5_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
-      myChrono_Corrupt[id].restart();
-    }
+    //if(myChrono_Corrupt[dataId].hasPassed(delayIndex_Corrupt)){
+    ledIndexGlitch1_Corrupt[id] = constrain(random8(ledIndexGlitch1_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch1_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
+    ledIndexGlitch2_Corrupt[id] = constrain(random8(ledIndexGlitch2_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch2_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
+    ledIndexGlitch3_Corrupt[id] = constrain(random8(ledIndexGlitch3_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch3_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
+    ledIndexGlitch4_Corrupt[id] = constrain(random8(ledIndexGlitch4_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch4_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
+    ledIndexGlitch5_Corrupt[id] = constrain(random8(ledIndexGlitch5_Corrupt[id]-stepRandom_Corrupt, ledIndexGlitch5_Corrupt[id]+stepRandom_Corrupt+1), 0, NUM_LEDS-(dashLenght_Corrupt+4));
+    //myChrono_Corrupt[id].restart();
+    //}
 
     //Writing PURPLE for the 5 Dashes
-    for(int x = 0; x < dashLenght_Corrupt; x++){
-      leds[id][ledIndexGlitch1_Corrupt[id] + x] = purple_Corrupt;
-      leds[id][ledIndexGlitch2_Corrupt[id] + x] = purple_Corrupt;
-      leds[id][ledIndexGlitch3_Corrupt[id] + x] = purple_Corrupt;
-      leds[id][ledIndexGlitch4_Corrupt[id] + x] = purple_Corrupt;
-      leds[id][ledIndexGlitch5_Corrupt[id] + x] = purple_Corrupt;
+    for(int i = 0; i < dashLenght_Corrupt; i++){
+      if(i != 2){
+        leds[id][ledIndexGlitch1_Corrupt[id] + i] = purple_Corrupt;
+        leds[id][ledIndexGlitch2_Corrupt[id] + i] = purple_Corrupt;
+      }
+      leds[id][ledIndexGlitch3_Corrupt[id] + i] = purple_Corrupt;
+      leds[id][ledIndexGlitch4_Corrupt[id] + i] = purple_Corrupt;
+      leds[id][ledIndexGlitch5_Corrupt[id] + i] = purple_Corrupt;
     }
     leds[id][ledIndexGlitch1_Corrupt[id]+2] = palePurple_Corrupt;
     leds[id][ledIndexGlitch2_Corrupt[id]+2] = palePurple_Corrupt;
