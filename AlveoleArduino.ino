@@ -255,9 +255,9 @@ float delayHue_SNAKE_YELLOW = 1;
 CRGB empty_off(0, 0, 0);
 CRGB yellow_On(190, 135, 15);
 //CRGB yellow_On(200, 110, 15);
-CRGB orange_On(200, 120, 15);
+CRGB orange_On(70, 10, 0);
 //CRGB orange_On(70, 0, 0);
-CHSV purple_Corrupt(180, 255, 255);
+CHSV purple_Corrupt(185, 255, 255);
 //CHSV purple_Corrupt(210, 255, 255);
 CHSV palePurple_Corrupt(195, 50, 255);
 //CHSV palePurple_Corrupt(210, 50, 255);
@@ -812,6 +812,8 @@ void preOn(int id){
         }  
       }
       ledIndex_PreOn[id]+=8;
+    }else{
+      ledIndex_PreOn[id] = 0;
     }
 }
 
