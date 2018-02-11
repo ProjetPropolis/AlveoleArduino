@@ -52,7 +52,7 @@ HX711 scale5(17,18);
 HX711 scale6(19,22);
 
 //datas array use for calculating the outcome of the receive data
-int threshold = 70000;
+int threshold = 10000;
 uint32_t prevValues[NUM_STRIPS];
 int dataId = 419;
 int dataState = 419;
@@ -546,8 +546,10 @@ void readPressurePlate(long int val, int id){
   if(sensorOrientation[index]){
     if(currentValue > 0){
       difference = sensorStartValue[index] - currentValue;
+      difference = abs(difference);
     }else{
       difference = sensorStartValue[index] + abs(currentValue);
+      difference = abs(difference);
     }
     if(difference > sensorThreshold[index]){
       tilePressure[index] = true;
@@ -559,8 +561,10 @@ void readPressurePlate(long int val, int id){
     long int startValue = abs(sensorStartValue[index]);
     if(currentValue > 0){
       difference =  currentValue + startValue ;
+      difference = abs(difference);
     }else{
       difference = sensorStartValue[index] - currentValue;
+      difference = abs(difference);
     }
     difference =  currentValue + startValue ;
     if(difference > sensorThreshold[index]){
