@@ -945,9 +945,9 @@ void ultracorruptPressed(int id){
     //Writing RED for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
       if(x != 2){
-        leds[id][ledIndexGlitch1_Ultracorrupt[id] + x] = white_Ultracorrupt;
-        leds[id][ledIndexGlitch2_Ultracorrupt[id] + x] = white_Ultracorrupt;  
-        leds[id][ledIndexGlitch3_Ultracorrupt[id] + x] = white_Ultracorrupt;
+        leds[id][ledIndexGlitch1_Ultracorrupt[id] + x] = yellow_On;
+        leds[id][ledIndexGlitch2_Ultracorrupt[id] + x] = yellow_On;  
+        leds[id][ledIndexGlitch3_Ultracorrupt[id] + x] = yellow_On;
       }
       leds[id][ledIndexGlitch4_Ultracorrupt[id] + x] = red_Ultracorrupt;
       leds[id][ledIndexGlitch5_Ultracorrupt[id] + x] = red_Ultracorrupt;
