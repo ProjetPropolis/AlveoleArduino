@@ -119,7 +119,11 @@ Chrono masterChrono6_Ultracorrupt;
 Chrono masterChrono_Ultracorrupt[NUM_STRIPS] = {masterChrono0_Ultracorrupt, masterChrono1_Ultracorrupt, masterChrono2_Ultracorrupt, masterChrono3_Ultracorrupt, masterChrono4_Ultracorrupt, masterChrono5_Ultracorrupt, masterChrono6_Ultracorrupt};
 int pastHexStatus = 0;
 bool needReset[NUM_STRIPS] = {0,0,0,0,0,0,0};
-bool unlocked[] = {true, true, true, true, true, true, true, true, true, true};
+bool unlocked[] = {true, true, true, true, true, true, true};
+
+/*==== preOn() Variables ===*/
+int ledIndex_PreOn[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
+int ledAnimIndex_PreOn[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 
 /*==== on() Variables ===*/
 int ledIndex_On[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
@@ -221,16 +225,6 @@ bool state2Second_Cleansing = true;
 bool state3Second_Cleansing = true;
 bool state4Second_Cleansing = true;
 
-/*
-//==== fullColor() Variables ===
-int ledIndex_fullColor[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
-
-//==== snake() Variables ===
-int ledIndex_Snake[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
-float val_Snake[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
-float delayBrightness_Snake = 1.5;
-*/
-
 int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_YELLOW[] = {0, 0, 0, 0, 0, 0, 0};
@@ -241,6 +235,9 @@ int ledIndex_ANIM_TURQUOISE_FADE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_SNAKE_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_SNAKE_YELLOW[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_GREEN_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
+
+/*==== ANIM_PURPLELIT() Variables ===*/
+int switch_PURPLE_WIPE[] = {true, true, true, true, true, true, true};
 
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
 float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210};
@@ -256,11 +253,11 @@ float delayHue_SNAKE_YELLOW = 1;
 
 /*==== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
-CRGB yellow_On(200, 125, 15);
+CRGB yellow_On(190, 135, 15);
 //CRGB yellow_On(200, 110, 15);
-CRGB orange_On(70, 0, 0);
+CRGB orange_On(200, 120, 15);
 //CRGB orange_On(70, 0, 0);
-CHSV purple_Corrupt(195, 255, 255);
+CHSV purple_Corrupt(180, 255, 255);
 //CHSV purple_Corrupt(210, 255, 255);
 CHSV palePurple_Corrupt(195, 50, 255);
 //CHSV palePurple_Corrupt(210, 50, 255);
@@ -270,7 +267,7 @@ CHSV blue_Cleanser(140, 255, 255);
 CRGB cyan_ShieldOn(0, 50, 170);
 CHSV paleBlue_Cleansing(140, 200, 255);
 CRGB orange_ANIM(200, 80, 0);
-CRGB green_ANIM(0, 190, 100);
+CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 CRGB greenTurquoise_ANIM(0, 200, 125);
 
 void setup() {
@@ -755,7 +752,7 @@ void stateCtrl(int id, int state, int prevState){
       ANIM_ORANGE(id);
       break;
     case 21: 
-      ANIM_GREEN(id);
+      ANIM_PURPLE_WIPE(id);
       break;
     case 22: 
       ANIM_BLACK(id);
@@ -797,11 +794,24 @@ void off(int id){
 
 void preOn(int id){
     //Whipes 1 orange for 3 yellow all over the strip
+    /*
     for(int i = 0; i < NUM_LEDS; i+=4){
       leds[id][i] = yellow_On;
       leds[id][i+1] = yellow_On;
       leds[id][i+2] = yellow_On;
       leds[id][i+3] = orange_On;
+    }
+    */
+    if(ledIndex_PreOn[id] < NUM_LEDS){
+      //Writes dash of yellow
+      for(int i = 0; i < 7; i++){
+        if(i < 4){
+          leds[id][ledIndex_PreOn[id]+i] = yellow_On;  
+        }else{
+          leds[id][ledIndex_PreOn[id]+i] = orange_On; 
+        }  
+      }
+      ledIndex_PreOn[id]+=8;
     }
 }
 
@@ -1204,13 +1214,25 @@ void ANIM_ORANGE(int id){
 
 }
 
-void ANIM_GREEN(int id){
+void ANIM_PURPLE_WIPE(int id){
   //21
   
   for(int i=0; i<NUM_LEDS; i++){
-    leds[id][i] = green_ANIM;
+    if(switch_PURPLE_WIPE[id]){
+      if(i <= NUM_LEDS * 0.5){
+        leds[id][i] = purple_Corrupt;
+      }else{
+        leds[id][i] = purpleLit_PURPLE_WIPE;
+      }
+    }else{
+      if(i <= NUM_LEDS * 0.5){
+        leds[id][i] = purpleLit_PURPLE_WIPE;
+      }else{
+        leds[id][i] = purple_Corrupt;
+      }
+      switch_PURPLE_WIPE[id] = false;
+    }
   }
-
 }
 
 void ANIM_BLACK(int id){
