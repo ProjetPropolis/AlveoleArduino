@@ -253,7 +253,7 @@ float delayHue_SNAKE_YELLOW = 1;
 
 /*==== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
-CRGB yellow_On(190, 135, 15);
+CRGB yellow_On(190, 145, 15);
 //CRGB yellow_On(200, 110, 15);
 CRGB orange_On(70, 10, 0);
 //CRGB orange_On(70, 0, 0);
@@ -804,14 +804,14 @@ void preOn(int id){
     */
     if(ledIndex_PreOn[id] < NUM_LEDS){
       //Writes dash of yellow
-      for(int i = 0; i < 7; i++){
-        if(i < 4){
+      for(int i = 0; i < 15; i++){
+        if(i < 8){
           leds[id][ledIndex_PreOn[id]+i] = yellow_On;  
         }else{
           leds[id][ledIndex_PreOn[id]+i] = orange_On; 
         }  
       }
-      ledIndex_PreOn[id]+=8;
+      ledIndex_PreOn[id]+=16;
     }else{
       ledIndex_PreOn[id] = 0;
     }
