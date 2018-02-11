@@ -68,9 +68,6 @@ int prevTileStatus[NUM_STRIPS];
 int tileStatus[NUM_STRIPS];
 int prevTilePressure[NUM_STRIPS];
 int tilePressure[NUM_STRIPS];
-//TODO approuve these 2 variables
-int calibrationState = 0;
-int countCalibrated = 0;
 
 //variable related to the behavior of the different state receive
 
@@ -217,6 +214,7 @@ bool state4Second_Cleansing = true;
 /*
 //==== fullColor() Variables ===
 int ledIndex_fullColor[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
+
 //==== snake() Variables ===
 int ledIndex_Snake[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 float val_Snake[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
