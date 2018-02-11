@@ -93,6 +93,14 @@ int sensorRawValue[NUM_STRIPS];
 int pressureState[NUM_STRIPS];
 
 /*==== sub-hexStatus manager ===*/
+Chrono masterChrono0_On;
+Chrono masterChrono1_On;
+Chrono masterChrono2_On;
+Chrono masterChrono3_On;
+Chrono masterChrono4_On;
+Chrono masterChrono5_On;
+Chrono masterChrono6_On;
+Chrono masterChrono_On[NUM_STRIPS] = {masterChrono0_On, masterChrono1_On, masterChrono2_On, masterChrono3_On, masterChrono4_On, masterChrono5_On, masterChrono6_On};
 Chrono masterChrono0_Corrupt;
 Chrono masterChrono1_Corrupt;
 Chrono masterChrono2_Corrupt;
@@ -248,19 +256,21 @@ float delayHue_SNAKE_YELLOW = 1;
 
 /*==== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
-CRGB yellow_On(200, 110, 15);
-//CRGB yellow_On(200, 100, 15);
+CRGB yellow_On(200, 125, 15);
+//CRGB yellow_On(200, 110, 15);
 CRGB orange_On(70, 0, 0);
-//CRGB orange_On(110, 0, 0);
-CHSV purple_Corrupt(210, 255, 255);
-CHSV palePurple_Corrupt(210, 50, 255);
+//CRGB orange_On(70, 0, 0);
+CHSV purple_Corrupt(195, 255, 255);
+//CHSV purple_Corrupt(210, 255, 255);
+CHSV palePurple_Corrupt(195, 50, 255);
+//CHSV palePurple_Corrupt(210, 50, 255);
 CRGB red_Ultracorrupt(255, 0, 0);
 CRGB white_Ultracorrupt(255, 255, 255);
 CHSV blue_Cleanser(140, 255, 255);
 CRGB cyan_ShieldOn(0, 50, 170);
 CHSV paleBlue_Cleansing(140, 200, 255);
 CRGB orange_ANIM(200, 80, 0);
-CRGB green_ANIM(0, 220, 100);
+CRGB green_ANIM(0, 190, 100);
 CRGB greenTurquoise_ANIM(0, 200, 125);
 
 void setup() {
@@ -672,7 +682,14 @@ void stateCtrl(int id, int state, int prevState){
       break;
     case 1: 
       needReset[id] = 1;
-      on(id);  
+      if(prevState == 2){
+        masterChrono_On[id].restart();
+      }
+      if(!masterChrono_On[id].hasPassed(1000)){
+        preOn(id);
+      }else{
+        on(id);
+      } 
       break;
     case 2:  
       if(prevState == 1){
@@ -776,6 +793,16 @@ void off(int id){
     ledIndex_Off[id] = 0;
   }
   
+}
+
+void preOn(int id){
+    //Whipes 1 orange for 3 yellow all over the strip
+    for(int i = 0; i < NUM_LEDS; i+=4){
+      leds[id][i] = yellow_On;
+      leds[id][i+1] = yellow_On;
+      leds[id][i+2] = yellow_On;
+      leds[id][i+3] = orange_On;
+    }
 }
 
 void on(int id){
