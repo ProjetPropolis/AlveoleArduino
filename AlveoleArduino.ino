@@ -237,10 +237,10 @@ int ledIndex_ANIM_SNAKE_YELLOW[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_GREEN_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 
 /*==== ANIM_PURPLELIT() Variables ===*/
-int switch_PURPLE_WIPE[] = {true, true, true, true, true, true, true};
+bool switch_PURPLE_WIPE[] = {true, true, true, true, true, true, true};
 
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
-float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210};
+float hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185};
 float delayHue_TURQUOISE_FADE = 1;
 
 /*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
@@ -249,13 +249,14 @@ float delayBrightness_SNAKE_TURQUOISE = 1.5;
 
 /*==== ANIM_SNAKE_YELLOW() Variables ===*/
 float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64};
+bool state_SNAKE_YELLOW[] = {true, true, true, true, true, true, true};
 float delayHue_SNAKE_YELLOW = 1;
 
 /*==== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
-CRGB yellow_On(190, 145, 15);
+CRGB yellow_On(190, 155, 15);
 //CRGB yellow_On(200, 110, 15);
-CRGB orange_On(70, 10, 0);
+CRGB orange_On(70, 0, 0);
 //CRGB orange_On(70, 0, 0);
 CHSV purple_Corrupt(185, 255, 255);
 //CHSV purple_Corrupt(210, 255, 255);
@@ -269,6 +270,7 @@ CHSV paleBlue_Cleansing(140, 200, 255);
 CRGB orange_ANIM(200, 80, 0);
 CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 CRGB greenTurquoise_ANIM(0, 200, 125);
+//CRGB greenTurquoise_ANIM(0, 200, 125);
 
 void setup() {
   Serial.begin(115200);
@@ -664,13 +666,14 @@ void stateCtrl(int id, int state, int prevState){
 
   //Resets climax's anim when it's the alveole's prevState
   if(prevState == 23 && state != 23){
-    hue_TURQUOISE_FADE[id] = 210;  
+    hue_TURQUOISE_FADE[id] = 185;  
   }
   if(prevState == 24 && state != 24){
     val_SNAKE_TURQUOISE[id] = 255;
   }
   if(prevState == 25 && state != 25){
     hue_SNAKE_YELLOW[id] = 64;
+    state_SNAKE_YELLOW[id] = true;
   }
   
   switch( state ) {
@@ -843,25 +846,6 @@ void corrupt(int id){
 
     //Writes 5 dashes of purple in the strip, 5 index are generated(with random drunk) to change the dashes' positions
 
-    /*
-    //Brightness Manager
-    if(stateBrightness_Corrupt[id] == 0){
-      if(val_Corrupt[id] > 150){
-        val_Corrupt[id]-=delayBrightness_Corrupt;
-      }else {
-        val_Corrupt[id] = 150;
-        stateBrightness_Corrupt[id] = 1;
-      }
-    }else if(stateBrightness_Corrupt[id] == 1){
-      if(val_Corrupt[id] < 255){
-        val_Corrupt[id]+=delayBrightness_Corrupt;
-      }else{
-        val_Corrupt[id] = 255;
-        stateBrightness_Corrupt[id] = 0;
-      }
-    }
-    */
-
     //Writing BLACK for the 5 Dashes
     for(int i = 0; i < dashLenght_Corrupt; i++){
       if(i != 2){
@@ -960,13 +944,18 @@ void ultracorruptPressed(int id){
 
     //Writing RED for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
-      leds[id][ledIndexGlitch1_Ultracorrupt[id] + x] = white_Ultracorrupt;
-      leds[id][ledIndexGlitch2_Ultracorrupt[id] + x] = white_Ultracorrupt;
-      leds[id][ledIndexGlitch3_Ultracorrupt[id] + x] = white_Ultracorrupt;
-      leds[id][ledIndexGlitch4_Ultracorrupt[id] + x] = white_Ultracorrupt;
-      leds[id][ledIndexGlitch5_Ultracorrupt[id] + x] = white_Ultracorrupt;
+      if(x != 2){
+        leds[id][ledIndexGlitch1_Ultracorrupt[id] + x] = white_Ultracorrupt;
+        leds[id][ledIndexGlitch2_Ultracorrupt[id] + x] = white_Ultracorrupt;  
+        leds[id][ledIndexGlitch3_Ultracorrupt[id] + x] = white_Ultracorrupt;
+      }
+      leds[id][ledIndexGlitch4_Ultracorrupt[id] + x] = red_Ultracorrupt;
+      leds[id][ledIndexGlitch5_Ultracorrupt[id] + x] = red_Ultracorrupt;
       //FastLED.show();
     }
+    leds[id][ledIndexGlitch1_Ultracorrupt[id] + 2] = red_Ultracorrupt;
+    leds[id][ledIndexGlitch2_Ultracorrupt[id] + 2] = red_Ultracorrupt;
+    leds[id][ledIndexGlitch3_Ultracorrupt[id] + 2] = red_Ultracorrupt;  
 }
 
 
@@ -1278,8 +1267,17 @@ void ANIM_SNAKE_YELLOW(int id){
   //25 : 1 sec. YELLOW to PURPLE
 
   //Brightness Manager
-  if(hue_SNAKE_YELLOW[id] <= 210){
-    hue_SNAKE_YELLOW[id]+=delayHue_SNAKE_YELLOW;
+  if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
+    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+  }else if(state_SNAKE_YELLOW[id] == true){
+    hue_SNAKE_YELLOW[id] = 255;
+    state_SNAKE_YELLOW[id] = false;
+  }
+  
+  if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
+    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+  }else{
+    hue_SNAKE_YELLOW[id] = 185;
   }
 
   for(int i = 0; i < NUM_LEDS; i++){
