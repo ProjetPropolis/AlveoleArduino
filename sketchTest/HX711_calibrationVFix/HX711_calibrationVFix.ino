@@ -60,19 +60,16 @@ void setup() {
 int currentSensor = 0;
 
 void loop() {
-
+  //
   //Serial.println("reading sensor:" + String(currentSensor));
   readSensor(currentSensor);
   currentSensor = (currentSensor + 1) % NUMCHANNEL;
+  //Serial.println("currentSensor" + String(currentSensor));
   //Serial.println(calibrationState);
   
   if(calibrationState == 0){
     calibrateHex();
   }
-  if(currentSensor == (NUMCHANNEL - 1)){
-    Serial.println("loop  ---------------------------------------------------");
-    delay(500);
-  } 
 }
 
 void calibrateHex() {
@@ -150,6 +147,7 @@ int readSensor(int sensorId) {
 
   bool valid = false;
   switch (sensorId) {
+    Serial.println("sensorId" + String(sensorId));
     case 0:
       //Serial.println("preRead :" + String(scale0.readNonBlocking(&value)));
       valid = scale0.readNonBlocking(&value);
@@ -189,6 +187,7 @@ void checkThreshold(long int val, int id) {
   Serial.print(index);
   Serial.print(" : ");
   Serial.println(currentValue);
+
   if (sensorOrientation[index]) {
     difference = sensorStartValue[index] - currentValue;
     if (difference > sensorThreshold[index]) {
