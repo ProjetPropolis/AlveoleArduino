@@ -567,6 +567,7 @@ void readPressurePlate(long int val, int id){
       difference = abs(difference);
     }
     difference =  currentValue + startValue ;
+    difference = abs(difference);
     if(difference > sensorThreshold[index]){
       tilePressure[index] = true;
     }
