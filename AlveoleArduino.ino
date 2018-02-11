@@ -685,7 +685,7 @@ void stateCtrl(int id, int state, int prevState){
       if(prevState == 2){
         masterChrono_On[id].restart();
       }
-      if(!masterChrono_On[id].hasPassed(1000)){
+      if(!masterChrono_On[id].hasPassed(500)){
         preOn(id);
       }else{
         on(id);
