@@ -520,9 +520,9 @@ void decipherPacket(){
         resetTile(i);  
         int stripState = receiveState[i];
         Serial.println("update led: " + String(stripState));
-        if(stripState != 15 && stripState != 16){
-          stateCtrl(i, stripState, prevReceiveState[i]);
-        }
+        //if(stripState != 15 && stripState != 16){
+        stateCtrl(i, stripState, prevReceiveState[i]);
+        //}
       }
       //prevReceiveState[i] = receiveState[i];
     }
@@ -703,6 +703,22 @@ void stateCtrl(int id, int state, int prevState){
     case 5: 
       //Serial.print("call on id: "); Serial.print(id); Serial.print(" with state: "); Serial.print(state); Serial.print(" and prevState of: "); Serial.print(prevState); Serial.println(" in case 5");
       cleansing(id);
+      break;
+    case 15: 
+      if(needReset[id] != 0){
+        resetTile(id);
+        needReset[id] = 0;
+      }else{
+        corrupt(id);
+      }
+      break;
+    case 16: 
+      if(needReset[id] != 0){
+        resetTile(id);
+        needReset[id] = 0;
+      }else{
+        corrupt(id);
+      }
       break;
     case 17: 
       ANIM_TURQUOISE(id);
