@@ -953,9 +953,9 @@ void ultracorruptPressed(int id){
       leds[id][ledIndexGlitch5_Ultracorrupt[id] + x] = red_Ultracorrupt;
       //FastLED.show();
     }
-    leds[id][ledIndexGlitch1_Ultracorrupt[id] + 2] = white_Ultracorrupt;
-    leds[id][ledIndexGlitch2_Ultracorrupt[id] + 2] = white_Ultracorrupt;
-    leds[id][ledIndexGlitch3_Ultracorrupt[id] + 2] = white_Ultracorrupt;  
+    leds[id][ledIndexGlitch1_Ultracorrupt[id] + 2] = yellow_On;
+    leds[id][ledIndexGlitch2_Ultracorrupt[id] + 2] = yellow_On;
+    leds[id][ledIndexGlitch3_Ultracorrupt[id] + 2] = yellow_On;  
 }
 
 
