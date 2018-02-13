@@ -506,8 +506,7 @@ void stateCtrl(int id, int state, int prevState){
         off(id);
         break;
       case 23:
-        off(id);
-        //ANIM_TURQUOISE_FADE(id);
+        ANIM_CYAN_FADE(id);
         break;
       case 24:
         ANIM_SNAKE_TURQUOISE(id);
@@ -755,7 +754,7 @@ void ANIM_BLACK(int id){
   }
 }
 
-void ANIM_TURQUOISE_FADE(int id){
+void ANIM_CYAN_FADE(int id){
   //23 : fade PURPLE to CYAN .3 sec.
   
   //Brightness Manager
