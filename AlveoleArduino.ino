@@ -765,12 +765,8 @@ void ANIM_TURQUOISE_FADE(int id){
     leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
   } 
   */
-  if(hue_TURQUOISE_FADE[id] >= 120){
-    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
-  }
-  
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
+    leds[id][i].setHSV(184, 255, 255);
   }
 }
 
@@ -791,14 +787,14 @@ void ANIM_SNAKE_YELLOW(int id){
   //25 : 1 sec. YELLOW to PURPLE
   
   /*Brightness Manager
-  if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
+  if(hue_SNAKE_YELLOW[id] > 0 && state_SNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else if(state_SNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id] = 255;
     state_SNAKE_YELLOW[id] = false;
   }
   
-  if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
+  if(hue_SNAKE_YELLOW[id] > 185 && state_SNAKE_YELLOW[id] == false){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else{
     hue_SNAKE_YELLOW[id] = 185;
