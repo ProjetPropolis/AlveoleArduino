@@ -500,14 +500,14 @@ void stateCtrl(int id, int state, int prevState){
         ANIM_ORANGE(id);
         break;
       case 21:
-        off(id);
-        //ANIM_PURPLE_WIPE(id);
+        ANIM_PURPLE_WIPE(id);
         break;
       case 22:
         off(id);
         break;
       case 23:
-        ANIM_TURQUOISE_FADE(id);
+        off(id);
+        //ANIM_TURQUOISE_FADE(id);
         break;
       case 24:
         ANIM_SNAKE_TURQUOISE(id);
