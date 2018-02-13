@@ -472,9 +472,7 @@ void stateCtrl(int id, int state, int prevState){
         //cleansing
         break;
       case 9: 
-        if(needReset[id]){
-          off(id);
-        }
+        needReset[id] = 1;
         waveCorrupted(id);
         break;
       case 13: 
