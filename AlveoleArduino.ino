@@ -63,6 +63,10 @@ int digitalPin9 = 23;
 int digitalPin[] = {digitalPin0 ,digitalPin1 ,digitalPin2 ,digitalPin3 ,digitalPin4 ,digitalPin5 ,digitalPin6, digitalPin7, digitalPin8, digitalPin9};
 int referenceDigitalPin[] = {0,1,2,3,4,5,6,7,8,9};
 
+/*==== blue() Variables ====*/
+int hue_Blue[] = {130, 130, 130, 130, 130, 130, 130, 130, 130, 130};
+bool state_Blue[] = {true, true, true, true, true, true, true, true, true, true};
+
 /*==== purple molecules Variables ====*/
 Chrono myChrono_Purple;
 int receiveInfectId = 0;
@@ -122,9 +126,12 @@ int sat_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int a_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int delayBrightness_ShieldOff = 2;
 
+/*==== ANIM_PURPLELIT() Variables ===*/
+bool switch_PURPLE_WIPE[] = {true, true, true, true, true, true, true, true, true, true};
+
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
-float hue_TURQUOISE_FADE[NUM_STRIPS] = {210, 210, 210, 210, 210, 210, 210, 210, 210, 210};
-float delayHue_TURQUOISE_FADE = 3;
+float hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
+float delayHue_TURQUOISE_FADE = 1;
 
 /*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
 float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
@@ -132,7 +139,8 @@ float delayBrightness_SNAKE_TURQUOISE = 1.5;
 
 /*==== ANIM_SNAKE_YELLOW() Variables ===*/
 float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
-float delayHue_SNAKE_YELLOW = 3;
+bool state_SNAKE_YELLOW[] = {true, true, true, true, true, true, true, true, true, true};
+float delayHue_SNAKE_YELLOW = 1;
 
 bool moleculeStatus[10];
 int delayMoleculeStatus = 100;
@@ -174,6 +182,7 @@ CRGB yellow_On(200, 110, 15);
 CRGB orange_ANIM(200, 80, 0);
 CRGB green_ANIM(0, 220, 100);
 CRGB greenTurquoise_ANIM(0, 200, 125);
+CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 
 void setup() {
   // put your setup code here, to run once:
@@ -367,7 +376,7 @@ void readButtonStatus(){
       moleculeStatus[index] = digitalRead(digitalPin[index]);
       
       if(moleculeStatus[index] == LOW){
-        if(boolStateMolecule[index] == false && indexState[index] < 2 && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9 && receiveState[index] != 22){//(receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 14)){
+        if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && indexState[index] < 2 && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9 && receiveState[index] != 22){//(receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 14)){
           if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
@@ -375,7 +384,7 @@ void readButtonStatus(){
           }else{
             Serial.print("Enter if:");
             Serial.println(receiveState[index]);
-            //buttonChrono[index].restart();
+            buttonChrono[index].restart();
             boolStateMolecule[index] = true;
             indexState[index]++;
             receiveState[index] = referenceState[indexState[index]];
@@ -384,10 +393,10 @@ void readButtonStatus(){
             //Serial.println(receiveState[0]);
           }
           
-        }else if(boolStateMolecule[index] == false){//&& buttonChrono[index].hasPassed(delayMoleculeStatus)
+        }else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus)){
           Serial.print("Enter else if:");
           Serial.println(receiveState[index]);
-          //buttonChrono[index].restart();
+          buttonChrono[index].restart();
           boolStateMolecule[index] = true;
           indexState[index] = 0;
           receiveState[index] = referenceState[indexState[index]];
@@ -416,9 +425,6 @@ void readButtonStatus(){
 }
 
 void stateCtrl(int id, int state, int prevState){
-  if(prevState == 2 && state != 2){
-    //reset_Corrupt[id] = 1;
-  }
   if(state < 30 && state >= 0){
     switch (state) {
       case 0: 
@@ -467,6 +473,24 @@ void stateCtrl(int id, int state, int prevState){
       case 14:
         shield_Off(id);
         break;
+      case 15:
+        corrupt(id);
+        break;
+      case 16:
+        corrupt(id);
+        break;
+      case 17:
+        ANIM_TURQUOISE(id);
+        break;
+      case 18:
+        ANIM_PURPLE(id);
+        break;
+      case 19:
+        ANIM_YELLOW(id);
+        break;
+      case 20:
+        ANIM_ORANGE(id);
+        break;
       case 22:
         off(id);
         break;
@@ -487,8 +511,25 @@ void on(int id){
 }
 
 void blue(int id){
+  //CHSV blue_Recette(135, 200, 190);
+  /*
+  if(hue_Blue[id] <=140 && state_Blue[id] == true){
+    hue_Blue[id]++;
+  }else if(state_Blue[id] == true){
+    hue_Blue[id] = 140;
+    state_Blue[id] = false;
+  }
+  
+  if(hue_Blue[id] >= 130 && state_Blue[id] == false){
+    hue_Blue[id]--;
+  }else{
+    hue_Blue[id] = 130;
+    state_Blue[id] = true;
+  }
+  */
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i] = blue_Recette;
+    //.setHSV(hue_Blue[id], 200, 190);
   }
 }
 
@@ -576,25 +617,9 @@ void waveCorrupted(int id){
     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = red_waveCorrupted;
     }
-    
-
-    //Writes 5 dashes of red in the strip, 5 index are generated(with random) to change the dashes' positions
-    //Writing BLACK for the 5 Dashes
-    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
-      leds[id][ledIndexGlitch1_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch2_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch3_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch4_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch5_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch6_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch7_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch8_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch9_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch10_Ultracorrupt[id] + x].setHSV(0, 255, 0);
-    }
     */
+
     //Changing 5 Dashes starting index
-    //if(myChrono_Ultracorrupt[id].hasPassed(delayIndex_Ultracorrupt)){
     ledIndexGlitch1_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
     ledIndexGlitch2_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
     ledIndexGlitch3_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
@@ -605,8 +630,6 @@ void waveCorrupted(int id){
     ledIndexGlitch8_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
     ledIndexGlitch9_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
     ledIndexGlitch10_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
-    //myChrono_Ultracorrupt[id].restart();
-    //}
 
     //Writing RED for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
@@ -657,4 +680,126 @@ void shield_On(int id){
     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = cyan_ShieldOn;
     }
+}
+
+void ANIM_TURQUOISE(int id){
+  //17
+  
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = paleBlue_Cleansing;
+  }
+}
+
+void ANIM_PURPLE(int id){
+  //18
+  
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = purple_Corrupt;
+  }
+}
+
+void ANIM_YELLOW(int id){
+  //19
+  
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = yellow_On;
+  }
+}
+
+void ANIM_ORANGE(int id){
+  //20
+  
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = orange_ANIM;
+  }
+}
+
+void ANIM_PURPLE_WIPE(int id){
+  //21
+
+  /*
+  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
+    if(switch_PURPLE_WIPE[id]){
+      if(i <= NUM_LEDS_PER_STRIP * 0.5){
+        leds[id][i] = purple_Corrupt;
+      }else{
+        leds[id][i] = purpleLit_PURPLE_WIPE;
+      }
+    }else{
+      if(i <= NUM_LEDS_PER_STRIP * 0.5){
+        leds[id][i] = purpleLit_PURPLE_WIPE;
+      }else{
+        leds[id][i] = purple_Corrupt;
+      }
+      switch_PURPLE_WIPE[id] = false;
+    }
+  }
+  */
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = purple_Corrupt;
+  }
+}
+
+void ANIM_BLACK(int id){
+  //22
+  
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = empty_off;
+  }
+}
+
+void ANIM_TURQUOISE_FADE(int id){
+  //23 : fade PURPLE to CYAN .3 sec. 
+
+  //Brightness Manager
+  if(hue_TURQUOISE_FADE[id] >= 120){
+    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
+  }
+
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
+  }
+}
+
+void ANIM_SNAKE_TURQUOISE(int id){
+  //24 : .6 sec. CYAN to BLACK
+  
+  //Brightness Manager
+  if(val_SNAKE_TURQUOISE[id] > 0){
+    val_SNAKE_TURQUOISE[id]-=delayBrightness_SNAKE_TURQUOISE;
+  }
+  
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setHSV(120, 200, val_SNAKE_TURQUOISE[id]);
+  }
+}
+
+void ANIM_SNAKE_YELLOW(int id){
+  //25 : 1 sec. YELLOW to PURPLE
+
+  //Brightness Manager
+  if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
+    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+  }else if(state_SNAKE_YELLOW[id] == true){
+    hue_SNAKE_YELLOW[id] = 255;
+    state_SNAKE_YELLOW[id] = false;
+  }
+  
+  if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
+    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+  }else{
+    hue_SNAKE_YELLOW[id] = 185;
+  }
+
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
+  }
+}
+
+void ANIM_GREEN_TURQUOISE(int id){
+  //26
+  
+  for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i] = greenTurquoise_ANIM;
+  }
 }
