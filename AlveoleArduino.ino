@@ -423,12 +423,12 @@ void readButtonStatus(){
 
 void stateCtrl(int id, int state, int prevState){
   //Resets climax's anim when it's the alveole's prevState
+  if(prevState == 24 && state != 24){
+    val_SNAKE_TURQUOISE[id] = 255;
+  }
   /*
   if(prevState == 23 && state != 23){
     hue_TURQUOISE_FADE[id] = 185;  
-  }
-  if(prevState == 24 && state != 24){
-    val_SNAKE_TURQUOISE[id] = 255;
   }
   if(prevState == 25 && state != 25){
     hue_SNAKE_YELLOW[id] = 64;
