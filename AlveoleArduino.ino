@@ -507,8 +507,7 @@ void stateCtrl(int id, int state, int prevState){
         off(id);
         break;
       case 23:
-        off(id);
-        //ANIM_TURQUOISE_FADE(id);
+        ANIM_TURQUOISE_FADE(id);
         break;
       case 24:
         ANIM_SNAKE_TURQUOISE(id);
