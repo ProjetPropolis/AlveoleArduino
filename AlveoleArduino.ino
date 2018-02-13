@@ -127,17 +127,17 @@ int a_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int delayBrightness_ShieldOff = 2;
 
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
-float hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
-float delayHue_TURQUOISE_FADE = 1;
+float hue_TurquoiseFADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
+float delayHue_TurquoiseFADE = 1;
 
 /*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
-float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
-float delayBrightness_SNAKE_TURQUOISE = 1.5;
+float val_SnakeTURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
+float delayBrightness_SnakeTURQUOISE = 1.5;
 
 /*==== ANIM_SNAKE_YELLOW() Variables ===*/
-float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
-bool state_SNAKE_YELLOW[] = {true, true, true, true, true, true, true, true, true, true};
-float delayHue_SNAKE_YELLOW = 1;
+float hue_SnakeYELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
+bool state_SnakeYELLOW[] = {true, true, true, true, true, true, true, true, true, true};
+float delayHue_SnakeYELLOW = 1;
 
 bool moleculeStatus[10];
 int delayMoleculeStatus = 100;
@@ -423,18 +423,16 @@ void readButtonStatus(){
 
 void stateCtrl(int id, int state, int prevState){
   //Resets climax's anim when it's the alveole's prevState
-  /*
   if(prevState == 23 && state != 23){
-    hue_TURQUOISE_FADE[id] = 185;  
+    hue_TurquoiseFADE[id] = 185;  
   }
   if(prevState == 24 && state != 24){
-    val_SNAKE_TURQUOISE[id] = 255;
+    val_SnakeTURQUOISE[id] = 255;
   }
   if(prevState == 25 && state != 25){
-    hue_SNAKE_YELLOW[id] = 64;
-    state_SNAKE_YELLOW[id] = true;
+    hue_SnakeYELLOW[id] = 64;
+    state_SnakeYELLOW[id] = true;
   }
-  */
   if(state < 30 && state >= 0){
     switch (state) {
       case 0: 
@@ -502,27 +500,22 @@ void stateCtrl(int id, int state, int prevState){
         ANIM_ORANGE(id);
         break;
       case 21:
-        off(id);
-        //ANIM_PURPLE_WIPE(id);
+        PURPLE_WIPE(id);
         break;
       case 22:
         off(id);
         break;
       case 23:
-        off(id);
-        //ANIM_TURQUOISE_FADE(id);
+        TURQUOISE_FADE(id);
         break;
       case 24:
-        off(id);
-        //ANIM_SNAKE_TURQUOISE(id);
+        SNAKE_TURQUOISE(id);
         break;
       case 25:
-        off(id);
-        //ANIM_SNAKE_YELLOW(id);
+        SNAKE_YELLOW(id);
         break;
       case 26:
-        off(id);
-        //ANIM_GREEN_TURQUOISE(id);
+        GREEN_TURQUOISE(id);
         break;
     }
   }
@@ -744,7 +737,7 @@ void ANIM_ORANGE(int id){
   }
 }
 
-void ANIM_PURPLE_WIPE(int id){
+void PURPLE_WIPE(int id){
   //21
 
   for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
@@ -760,55 +753,55 @@ void ANIM_BLACK(int id){
   }
 }
 
-void ANIM_TURQUOISE_FADE(int id){
+void TURQUOISE_FADE(int id){
   //23 : fade PURPLE to CYAN .3 sec. 
 
   //Brightness Manager
-  if(hue_TURQUOISE_FADE[id] >= 120){
-    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
+  if(hue_TurquoiseFADE[id] >= 120){
+    hue_TurquoiseFADE[id]-=delayHue_TurquoiseFADE;
   }
 
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
+    leds[id][i].setHSV(hue_TurquoiseFADE[id], 255, 255);
   }
 }
 
-void ANIM_SNAKE_TURQUOISE(int id){
+void SNAKE_TURQUOISE(int id){
   //24 : .6 sec. CYAN to BLACK
   
   //Brightness Manager
-  if(val_SNAKE_TURQUOISE[id] > 0){
-    val_SNAKE_TURQUOISE[id]-=delayBrightness_SNAKE_TURQUOISE;
+  if(val_SnakeTURQUOISE[id] > 0){
+    val_SnakeTURQUOISE[id]-=delayBrightness_SnakeTURQUOISE;
   }
   
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(120, 200, val_SNAKE_TURQUOISE[id]);
+    leds[id][i].setHSV(120, 200, val_SnakeTURQUOISE[id]);
   }
 }
 
-void ANIM_SNAKE_YELLOW(int id){
+void SNAKE_YELLOW(int id){
   //25 : 1 sec. YELLOW to PURPLE
 
   //Brightness Manager
-  if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
-    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
-  }else if(state_SNAKE_YELLOW[id] == true){
-    hue_SNAKE_YELLOW[id] = 255;
-    state_SNAKE_YELLOW[id] = false;
+  if(hue_SnakeYELLOW[id] >= 0 && state_SnakeYELLOW[id] == true){
+    hue_SnakeYELLOW[id]-=delayHue_SnakeYELLOW;
+  }else if(state_SnakeYELLOW[id] == true){
+    hue_SnakeYELLOW[id] = 255;
+    state_SnakeYELLOW[id] = false;
   }
   
-  if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
-    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+  if(hue_SnakeYELLOW[id] >= 185 && state_SnakeYELLOW[id] == false){
+    hue_SnakeYELLOW[id]-=delayHue_SnakeYELLOW;
   }else{
-    hue_SNAKE_YELLOW[id] = 185;
+    hue_SnakeYELLOW[id] = 185;
   }
 
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
+    leds[id][i].setHSV(hue_SnakeYELLOW[id], 255, 255);
   }
 }
 
-void ANIM_GREEN_TURQUOISE(int id){
+void GREEN_TURQUOISE(int id){
   //26
   
   for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
