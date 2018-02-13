@@ -786,7 +786,7 @@ void ANIM_SNAKE_TURQUOISE(int id){
 void ANIM_SNAKE_YELLOW(int id){
   //25 : 1 sec. YELLOW to PURPLE
   
-  //Brightness Manager
+  /*Brightness Manager
   if(hue_SNAKE_YELLOW[id] > 0 && state_SNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else if(state_SNAKE_YELLOW[id] == true){
@@ -799,9 +799,9 @@ void ANIM_SNAKE_YELLOW(int id){
   }else{
     hue_SNAKE_YELLOW[id] = 185;
   }
-  
+  */
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
+    leds[id][i].setHSV(64, 255, 255);
   }
 }
 
