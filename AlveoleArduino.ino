@@ -491,8 +491,23 @@ void stateCtrl(int id, int state, int prevState){
       case 20:
         ANIM_ORANGE(id);
         break;
+      case 21:
+        ANIM_PURPLE_WIPE(id);
+        break;
       case 22:
         off(id);
+        break;
+      case 23:
+        ANIM_TURQUOISE_FADE(id);
+        break;
+      case 24:
+        ANIM_SNAKE_TURQUOISE(id);
+        break;
+      case 25:
+        ANIM_SNAKE_YELLOW(id);
+        break;
+      case 26:
+        ANIM_GREEN_TURQUOISE(id);
         break;
     }
   }
