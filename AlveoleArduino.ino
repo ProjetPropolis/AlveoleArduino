@@ -126,9 +126,6 @@ int sat_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int a_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int delayBrightness_ShieldOff = 2;
 
-/*==== ANIM_PURPLELIT() Variables ===*/
-bool switch_PURPLE_WIPE[] = {true, true, true, true, true, true, true, true, true, true};
-
 /*==== ANIM_TURQUOISE_FADE() Variables ===*/
 float hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
 float delayHue_TURQUOISE_FADE = 1;
@@ -492,22 +489,27 @@ void stateCtrl(int id, int state, int prevState){
         ANIM_ORANGE(id);
         break;
       case 21:
-        ANIM_PURPLE_WIPE(id);
+        off(id);
+        //ANIM_PURPLE_WIPE(id);
         break;
       case 22:
         off(id);
         break;
       case 23:
-        ANIM_TURQUOISE_FADE(id);
+        off(id);
+        //ANIM_TURQUOISE_FADE(id);
         break;
       case 24:
-        ANIM_SNAKE_TURQUOISE(id);
+        off(id);
+        //ANIM_SNAKE_TURQUOISE(id);
         break;
       case 25:
-        ANIM_SNAKE_YELLOW(id);
+        off(id);
+        //ANIM_SNAKE_YELLOW(id);
         break;
       case 26:
-        ANIM_GREEN_TURQUOISE(id);
+        off(id);
+        //ANIM_GREEN_TURQUOISE(id);
         break;
     }
   }
@@ -732,24 +734,6 @@ void ANIM_ORANGE(int id){
 void ANIM_PURPLE_WIPE(int id){
   //21
 
-  /*
-  for(int i=0; i<NUM_LEDS_PER_STRIP; i++){
-    if(switch_PURPLE_WIPE[id]){
-      if(i <= NUM_LEDS_PER_STRIP * 0.5){
-        leds[id][i] = purple_Corrupt;
-      }else{
-        leds[id][i] = purpleLit_PURPLE_WIPE;
-      }
-    }else{
-      if(i <= NUM_LEDS_PER_STRIP * 0.5){
-        leds[id][i] = purpleLit_PURPLE_WIPE;
-      }else{
-        leds[id][i] = purple_Corrupt;
-      }
-      switch_PURPLE_WIPE[id] = false;
-    }
-  }
-  */
   for(int i=0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i] = purple_Corrupt;
   }
