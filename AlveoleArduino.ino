@@ -506,8 +506,7 @@ void stateCtrl(int id, int state, int prevState){
         off(id);
         break;
       case 23:
-        off(id);
-        //ANIM_TURQUOISE_FADE(id);
+        ANIM_TURQUOISE_FADE(id);
         break;
       case 24:
         ANIM_SNAKE_TURQUOISE(id);
@@ -756,13 +755,13 @@ void ANIM_BLACK(int id){
 }
 
 void ANIM_TURQUOISE_FADE(int id){
-  //23 : fade PURPLE to CYAN .3 sec. 
-
+  //23 : fade PURPLE to CYAN .3 sec.
+  
   //Brightness Manager
   if(hue_TURQUOISE_FADE[id] >= 120){
     hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
   }
-
+  
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
   }
