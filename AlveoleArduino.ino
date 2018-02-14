@@ -72,15 +72,6 @@ Chrono myChrono_Purple;
 int receiveInfectId = 0;
 
 /*==== corrupt() Variables ===*/
-Chrono myChrono0_Corrupt;
-Chrono myChrono1_Corrupt;
-Chrono myChrono2_Corrupt;
-Chrono myChrono3_Corrupt;
-Chrono myChrono4_Corrupt;
-Chrono myChrono5_Corrupt;
-Chrono myChrono6_Corrupt;
-Chrono myChrono_Corrupt[NUM_STRIPS] = {myChrono0_Corrupt, myChrono1_Corrupt, myChrono2_Corrupt, myChrono3_Corrupt, myChrono4_Corrupt, myChrono5_Corrupt, myChrono6_Corrupt};
-//int stateBrightness_Corrupt[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int ledIndexGlitch1_Corrupt[NUM_STRIPS];
 int ledIndexGlitch2_Corrupt[NUM_STRIPS];
 int ledIndexGlitch3_Corrupt[NUM_STRIPS];
@@ -91,20 +82,11 @@ int ledIndexGlitch7_Corrupt[NUM_STRIPS];
 int ledIndexGlitch8_Corrupt[NUM_STRIPS];
 int ledIndexGlitch9_Corrupt[NUM_STRIPS];
 int ledIndexGlitch10_Corrupt[NUM_STRIPS];
-int delayIndex_Corrupt = 30;
 int dashLenght_Corrupt = 3;
 int stepRandom_Corrupt = 1;
 int maxCorruptLenght = dashLenght_Corrupt+30;
 
 /*==== ultracorrupt() Variables ===*/
-Chrono myChrono0_Ultracorrupt;
-Chrono myChrono1_Ultracorrupt;
-Chrono myChrono2_Ultracorrupt;
-Chrono myChrono3_Ultracorrupt;
-Chrono myChrono4_Ultracorrupt;
-Chrono myChrono5_Ultracorrupt;
-Chrono myChrono6_Ultracorrupt;
-Chrono myChrono_Ultracorrupt[NUM_STRIPS] = {myChrono0_Ultracorrupt, myChrono1_Ultracorrupt, myChrono2_Ultracorrupt, myChrono3_Ultracorrupt, myChrono4_Ultracorrupt, myChrono5_Ultracorrupt, myChrono6_Ultracorrupt};
 int ledIndexGlitch1_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch2_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch3_Ultracorrupt[NUM_STRIPS];
@@ -113,9 +95,6 @@ int ledIndexGlitch5_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch6_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch7_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch8_Ultracorrupt[NUM_STRIPS];
-int ledIndexGlitch9_Ultracorrupt[NUM_STRIPS];
-int ledIndexGlitch10_Ultracorrupt[NUM_STRIPS];
-int delayIndex_Ultracorrupt = 750;
 int dashLenght_Ultracorrupt = 4;
 int maxUltracorruptLenght = dashLenght_Ultracorrupt+30;
 
@@ -570,20 +549,6 @@ void pink(int id){
 
 void corrupt(int id){
 
-     /*
-     if(!myChrono_Purple.hasPassed(1000)){
-       for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-        leds[id][i] = palePurple_Recette;
-       }
-     }else if(!myChrono_Purple.hasPassed(2000)){
-       for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-        leds[id][i] = darkPurple_Recette;
-       }
-     }else{
-       myChrono_Purple.restart();
-     }
-     */
-
     //Writing BLACK for the 5 Dashes
     for(int x = 0; x < dashLenght_Corrupt; x++){
       if(x != 2){
@@ -651,8 +616,6 @@ void waveCorrupted(int id){
     ledIndexGlitch6_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
     ledIndexGlitch7_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
     ledIndexGlitch8_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
-    ledIndexGlitch9_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
-    ledIndexGlitch10_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
 
     //Writing RED for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
@@ -664,8 +627,6 @@ void waveCorrupted(int id){
       leds[id][ledIndexGlitch6_Ultracorrupt[id] + x] = red_waveCorrupted;
       leds[id][ledIndexGlitch7_Ultracorrupt[id] + x] = red_waveCorrupted;
       leds[id][ledIndexGlitch8_Ultracorrupt[id] + x] = red_waveCorrupted;
-      leds[id][ledIndexGlitch9_Ultracorrupt[id] + x] = red_waveCorrupted;
-      leds[id][ledIndexGlitch10_Ultracorrupt[id] + x] = red_waveCorrupted;
     }
 }
 
