@@ -209,8 +209,6 @@ void loop() {
       stateCtrl(i,stripState, prevReceiveState[i]);
     }else if(i == indexShield && (stripState == 13 || stripState == 14)){
       stateCtrl(i,stripState, prevReceiveState[i]);
-    }else if(stripState == 15 || stripState == 16){
-      stateCtrl(i, prevReceiveState[i], prevReceiveState[i]);
     }
   }
 
@@ -330,8 +328,6 @@ void decipherPacket(){
         }else if(i == indexShield && (stripState == 13 || stripState == 14)){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
-        }else if(stripState == 15 || stripState == 16){
-          stateCtrl(referenceDigitalPin[i], prevReceiveState[i], prevReceiveState[i]);
         }
       }
       
