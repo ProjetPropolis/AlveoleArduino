@@ -225,6 +225,13 @@ bool state2Second_Cleansing = true;
 bool state3Second_Cleansing = true;
 bool state4Second_Cleansing = true;
 
+/*=== ultracorrupt_clearHint() Variables ===*/
+int ledIndexGlitch1_Ultracorrupt_clearHint[NUM_STRIPS];
+int ledIndexGlitch2_Ultracorrupt_clearHint[NUM_STRIPS];
+int ledIndexGlitch3_Ultracorrupt_clearHint[NUM_STRIPS];
+int ledIndexGlitch4_Ultracorrupt_clearHint[NUM_STRIPS];
+int ledIndexGlitch5_Ultracorrupt_clearHint[NUM_STRIPS];
+
 int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_YELLOW[] = {0, 0, 0, 0, 0, 0, 0};
@@ -726,6 +733,9 @@ void stateCtrl(int id, int state, int prevState){
       //Serial.print("call on id: "); Serial.print(id); Serial.print(" with state: "); Serial.print(state); Serial.print(" and prevState of: "); Serial.print(prevState); Serial.println(" in case 5");
       cleansing(id);
       break;
+    case 10:
+      ultracorrupt_clearHint(id);
+      break;
     case 15: 
       if(needReset[id] != 0){
         resetTile(id);
@@ -1160,6 +1170,34 @@ void cleansing(int id){
      state4Second_Cleansing = true;
     }
 
+}
+
+void ultracorrupt_clearHint(int id){
+
+    //Writing BLACK for the 5 Dashes
+    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      leds[id][ledIndexGlitch1_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch2_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch3_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch4_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
+      leds[id][ledIndexGlitch5_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
+    }
+
+    //Changing 5 Dashes starting index
+    ledIndexGlitch1_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch2_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch3_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch4_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    ledIndexGlitch5_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+
+    //Writing WHITE for the 5 Dashes
+    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+        leds[id][ledIndexGlitch1_Ultracorrupt_clearHint[id] + x] = white_Ultracorrupt;
+        leds[id][ledIndexGlitch2_Ultracorrupt_clearHint[id] + x] = white_Ultracorrupt;  
+        leds[id][ledIndexGlitch3_Ultracorrupt_clearHint[id] + x] = white_Ultracorrupt;
+        leds[id][ledIndexGlitch4_Ultracorrupt_clearHint[id] + x] = white_Ultracorrupt;
+        leds[id][ledIndexGlitch5_Ultracorrupt_clearHint[id] + x] = white_Ultracorrupt;
+    }
 }
 
 void ANIM_TURQUOISE(int id){
