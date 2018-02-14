@@ -1192,11 +1192,11 @@ void ultracorrupt_clearHint(int id){
 
     //Writing WHITE for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
-        leds[id][ledIndexGlitch1_Ultracorrupt_clearHint[id] + x] = yellow_On;
-        leds[id][ledIndexGlitch2_Ultracorrupt_clearHint[id] + x] = yellow_On;  
-        leds[id][ledIndexGlitch3_Ultracorrupt_clearHint[id] + x] = yellow_On;
-        leds[id][ledIndexGlitch4_Ultracorrupt_clearHint[id] + x] = yellow_On;
-        leds[id][ledIndexGlitch5_Ultracorrupt_clearHint[id] + x] = yellow_On;
+        leds[id][ledIndexGlitch1_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
+        leds[id][ledIndexGlitch2_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;  
+        leds[id][ledIndexGlitch3_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
+        leds[id][ledIndexGlitch4_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
+        leds[id][ledIndexGlitch5_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
     }
 }
 
