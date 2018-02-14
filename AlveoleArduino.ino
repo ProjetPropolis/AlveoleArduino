@@ -635,7 +635,7 @@ void shield_Off(int id){
       a_ShieldOff[id]-=delayBrightness_ShieldOff;
     }
     
-    for(int i = 10; i < NUM_LEDS_PER_STRIP; i++){
+    for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i].setHSV(125, sat_ShieldOff[id], a_ShieldOff[id]);
     }
 }
@@ -647,7 +647,7 @@ void shield_On(int id){
     sat_ShieldOff[id] = 255;
     a_ShieldOff[id] = 255;
     
-    for(int i = 10; i < NUM_LEDS_PER_STRIP; i++){
+    for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
       leds[id][i] = cyan_ShieldOn;
     }
 }
