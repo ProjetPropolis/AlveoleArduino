@@ -355,7 +355,7 @@ void readButtonStatus(){
       moleculeStatus[index] = digitalRead(digitalPin[index]);
       
       if(moleculeStatus[index] == LOW){
-        if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && indexState[index] < 2 && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9 && receiveState[index] != 22){//(receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 14)){
+        if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && indexState[index] < 2 && receiveState[index] != 0 && receiveState[index] != 1 && receiveState[index] != 2 && receiveState[index] != 4 && receiveState[index] != 8 && receiveState[index] != 9 && receiveState[index] != 15 && receiveState[index] != 16 && receiveState[index] != 22){//(receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 14)){
           if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
@@ -517,24 +517,8 @@ void on(int id){
 
 void blue(int id){
   //CHSV blue_Recette(135, 200, 190);
-  /*
-  if(hue_Blue[id] <=140 && state_Blue[id] == true){
-    hue_Blue[id]++;
-  }else if(state_Blue[id] == true){
-    hue_Blue[id] = 140;
-    state_Blue[id] = false;
-  }
-  
-  if(hue_Blue[id] >= 130 && state_Blue[id] == false){
-    hue_Blue[id]--;
-  }else{
-    hue_Blue[id] = 130;
-    state_Blue[id] = true;
-  }
-  */
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i] = blue_Recette;
-    //.setHSV(hue_Blue[id], 200, 190);
   }
 }
 
