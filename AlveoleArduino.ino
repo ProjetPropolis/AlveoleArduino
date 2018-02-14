@@ -322,7 +322,7 @@ void decipherPacket(){
         //Serial.println("update led: " + String(receiveState[i]));
         if(i != indexShield && stripState != 15 && stripState != 16){
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
-        }else if(stripState != 15 && stripState != 16){
+        }else if(i == indexShield && (stripState == 13 || stripState == 14)){//stripState != 15 && stripState != 16){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
