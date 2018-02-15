@@ -358,35 +358,35 @@ void readButtonStatus(){
           if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
+            stateCtrl(index, receiveState[index], prevReceiveState[index]);
             sendHexStatus(index, 1);
           }else if(index != indexShield){
-            Serial.print("Enter if:");
-            Serial.println(receiveState[index]);
+            //Serial.print("Enter if:");
+            //Serial.println(receiveState[index]);
             buttonChrono[index].restart();
             boolStateMolecule[index] = true;
             indexState[index]++;
             receiveState[index] = referenceState[indexState[index]];
             isPressedMolecule[referenceState[i]] = 1;
+            stateCtrl(index, receiveState[index], prevReceiveState[index]);
             sendHexStatus(index, 1);
-            //Serial.println(receiveState[0]);
           }
-          
         }else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus && index != indexShield)){
-          Serial.print("Enter else if:");
-          Serial.println(receiveState[index]);
+          //Serial.print("Enter else if:");
+          //Serial.println(receiveState[index]);
           buttonChrono[index].restart();
           boolStateMolecule[index] = true;
           indexState[index] = 0;
           receiveState[index] = referenceState[indexState[index]];
           isPressedMolecule[referenceState[i]] = 1;
-          
+          stateCtrl(index, receiveState[index], prevReceiveState[index]);
           sendHexStatus(index, 1);
         }
-        stateCtrl(index, receiveState[index], prevReceiveState[index]);
       }else if (moleculeStatus[index] == HIGH) {
         if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
           boolStateMolecule[index] = false;
           receiveState[index] = 14;
+          stateCtrl(index, receiveState[index], prevReceiveState[index]);
           sendHexStatus(index, 0);
         }else if(index != indexShield){
           boolStateMolecule[index] = false;
