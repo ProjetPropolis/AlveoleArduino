@@ -233,7 +233,7 @@ int ledIndexGlitch4_Ultracorrupt_clearHint[NUM_STRIPS];
 int ledIndexGlitch5_Ultracorrupt_clearHint[NUM_STRIPS];
 int stateVal_Ultracorrupt_clearHint[] = {0, 0, 0, 0, 0, 0, 0};
 float val_Ultracorrupt_clearHint[] = {255, 255, 255, 255, 255, 255, 255};
-float delayVal_Ultracorrupt_clearHint = 1;
+float delayVal_Ultracorrupt_clearHint = 4;
 
 int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
@@ -692,7 +692,7 @@ void stateCtrl(int id, int state, int prevState){
       break;
     case 1: 
       needReset[id] = 1;
-      if(prevState == 2){
+      if(prevState == 2 || prevState == 10){
         masterChrono_On[id].restart();
       }
       if(!masterChrono_On[id].hasPassed(500)){
