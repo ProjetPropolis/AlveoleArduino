@@ -226,7 +226,6 @@ bool state3Second_Cleansing = true;
 bool state4Second_Cleansing = true;
 
 /*=== ultracorrupt_clearHint() Variables ===*/
-/*==== ultracorrupt() Variables ===*/
 Chrono myChrono0_UltracorruptClearHint;
 Chrono myChrono1_UltracorruptClearHint;
 Chrono myChrono2_UltracorruptClearHint;
@@ -237,7 +236,7 @@ Chrono myChrono6_UltracorruptClearHint;
 Chrono myChrono_UltracorruptClearHint[NUM_STRIPS] = {myChrono0_UltracorruptClearHint, myChrono1_UltracorruptClearHint, myChrono2_UltracorruptClearHint, myChrono3_UltracorruptClearHint, myChrono4_UltracorruptClearHint, myChrono5_UltracorruptClearHint, myChrono6_UltracorruptClearHint};
 int stateSat_Ultracorrupt_clearHint[] = {0, 0, 0, 0, 0, 0, 0};
 int sat_Ultracorrupt_clearHint[] = {255, 255, 255, 255, 255, 255, 255};
-int delaySat_Ultracorrupt_clearHint = 18;
+int delaySat_Ultracorrupt_clearHint = 40;
 
 int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
@@ -1181,7 +1180,7 @@ void cleansing(int id){
 
 void ultracorrupt_clearHint(int id){
 
-    if(myChrono_UltracorruptClearHint[id].hasPassed(1000)){
+    if(myChrono_UltracorruptClearHint[id].hasPassed(500)){
       if(sat_Ultracorrupt_clearHint[id] >= 0 && stateSat_Ultracorrupt_clearHint[id] == 0){
         sat_Ultracorrupt_clearHint[id]-=delaySat_Ultracorrupt_clearHint;
       }else if(stateSat_Ultracorrupt_clearHint[id] == 0){
