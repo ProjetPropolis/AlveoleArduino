@@ -1217,7 +1217,7 @@ void ultracorrupt_clearHint(int id){
     }
     
     for(int i = 0; i < NUM_LEDS; i++){
-      leds[id][i].setHSV(185, 255, val_Ultracorrupt_clearHint[id]);
+      leds[id][i].setHSV(185, val_Ultracorrupt_clearHint[id], 255);
     }
 }
 
