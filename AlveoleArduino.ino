@@ -226,14 +226,18 @@ bool state3Second_Cleansing = true;
 bool state4Second_Cleansing = true;
 
 /*=== ultracorrupt_clearHint() Variables ===*/
-int ledIndexGlitch1_Ultracorrupt_clearHint[NUM_STRIPS];
-int ledIndexGlitch2_Ultracorrupt_clearHint[NUM_STRIPS];
-int ledIndexGlitch3_Ultracorrupt_clearHint[NUM_STRIPS];
-int ledIndexGlitch4_Ultracorrupt_clearHint[NUM_STRIPS];
-int ledIndexGlitch5_Ultracorrupt_clearHint[NUM_STRIPS];
-int stateVal_Ultracorrupt_clearHint[] = {0, 0, 0, 0, 0, 0, 0};
-float val_Ultracorrupt_clearHint[] = {255, 255, 255, 255, 255, 255, 255};
-float delayVal_Ultracorrupt_clearHint = 12;
+/*==== ultracorrupt() Variables ===*/
+Chrono myChrono0_UltracorruptClearHint;
+Chrono myChrono1_UltracorruptClearHint;
+Chrono myChrono2_UltracorruptClearHint;
+Chrono myChrono3_UltracorruptClearHint;
+Chrono myChrono4_UltracorruptClearHint;
+Chrono myChrono5_UltracorruptClearHint;
+Chrono myChrono6_UltracorruptClearHint;
+Chrono myChrono_UltracorruptClearHint[NUM_STRIPS] = {myChrono0_UltracorruptClearHint, myChrono1_UltracorruptClearHint, myChrono2_UltracorruptClearHint, myChrono3_UltracorruptClearHint, myChrono4_UltracorruptClearHint, myChrono5_UltracorruptClearHint, myChrono6_UltracorruptClearHint};
+int stateSat_Ultracorrupt_clearHint[] = {0, 0, 0, 0, 0, 0, 0};
+int sat_Ultracorrupt_clearHint[] = {255, 255, 255, 255, 255, 255, 255};
+int delaySat_Ultracorrupt_clearHint = 18;
 
 int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
@@ -1176,48 +1180,40 @@ void cleansing(int id){
 }
 
 void ultracorrupt_clearHint(int id){
-    /*
-    //Writing BLACK for the 5 Dashes
-    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
-      leds[id][ledIndexGlitch1_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch2_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch3_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch4_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
-      leds[id][ledIndexGlitch5_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
-    }
 
-    //Changing 5 Dashes starting index
-    ledIndexGlitch1_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-    ledIndexGlitch2_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-    ledIndexGlitch3_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-    ledIndexGlitch4_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
-    ledIndexGlitch5_Ultracorrupt_clearHint[id] = random8(NUM_LEDS-(dashLenght_Ultracorrupt+2));
+    if(myChrono_UltracorruptClearHint[id].hasPassed(1000)){
+      if(sat_Ultracorrupt_clearHint[id] >= 0 && stateSat_Ultracorrupt_clearHint[id] == 0){
+        sat_Ultracorrupt_clearHint[id]-=delaySat_Ultracorrupt_clearHint;
+      }else if(stateSat_Ultracorrupt_clearHint[id] == 0){
+        sat_Ultracorrupt_clearHint[id] = 0;
+        stateSat_Ultracorrupt_clearHint[id] = 1;
+      }
+      
+      if(sat_Ultracorrupt_clearHint[id] <= (255 - delaySat_Ultracorrupt_clearHint) && stateSat_Ultracorrupt_clearHint[id] == 1){
+        sat_Ultracorrupt_clearHint[id]+=delaySat_Ultracorrupt_clearHint;
+      }else if(stateSat_Ultracorrupt_clearHint[id] == 1){
+        sat_Ultracorrupt_clearHint[id] = (255 - delaySat_Ultracorrupt_clearHint);
+        stateSat_Ultracorrupt_clearHint[id] = 2;
+      }
 
-    //Writing WHITE for the 5 Dashes
-    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
-        leds[id][ledIndexGlitch1_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
-        leds[id][ledIndexGlitch2_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;  
-        leds[id][ledIndexGlitch3_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
-        leds[id][ledIndexGlitch4_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
-        leds[id][ledIndexGlitch5_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
-    }
-    */
-    if(val_Ultracorrupt_clearHint[id] >= 0 && stateVal_Ultracorrupt_clearHint[id] == 0){
-      val_Ultracorrupt_clearHint[id]-=delayVal_Ultracorrupt_clearHint;
-    }else if(stateVal_Ultracorrupt_clearHint[id] == 0){
-      val_Ultracorrupt_clearHint[id] = 0;
-      stateVal_Ultracorrupt_clearHint[id] = 1;
-    }
-    
-    if(val_Ultracorrupt_clearHint[id] <= (255 - delayVal_Ultracorrupt_clearHint) && stateVal_Ultracorrupt_clearHint[id] == 1){
-      val_Ultracorrupt_clearHint[id]+=delayVal_Ultracorrupt_clearHint;
-    }else if(stateVal_Ultracorrupt_clearHint[id] == 1){
-      val_Ultracorrupt_clearHint[id] = (255 - delayVal_Ultracorrupt_clearHint);
-      stateVal_Ultracorrupt_clearHint[id] = 0;
+      if(sat_Ultracorrupt_clearHint[id] >= 0 && stateSat_Ultracorrupt_clearHint[id] == 2){
+        sat_Ultracorrupt_clearHint[id]-=delaySat_Ultracorrupt_clearHint;
+      }else if(stateSat_Ultracorrupt_clearHint[id] == 2){
+        sat_Ultracorrupt_clearHint[id] = 0;
+        stateSat_Ultracorrupt_clearHint[id] = 3;
+      }
+      
+      if(sat_Ultracorrupt_clearHint[id] <= (255 - delaySat_Ultracorrupt_clearHint) && stateSat_Ultracorrupt_clearHint[id] == 3){
+        sat_Ultracorrupt_clearHint[id]+=delaySat_Ultracorrupt_clearHint;
+      }else if(stateSat_Ultracorrupt_clearHint[id] == 3){
+        sat_Ultracorrupt_clearHint[id] = (255 - delaySat_Ultracorrupt_clearHint);
+        stateSat_Ultracorrupt_clearHint[id] = 0;
+        myChrono_UltracorruptClearHint[id].restart();
+      }
     }
     
     for(int i = 0; i < NUM_LEDS; i++){
-      leds[id][i].setHSV(185, val_Ultracorrupt_clearHint[id], 255);
+      leds[id][i].setHSV(185, sat_Ultracorrupt_clearHint[id], 255);
     }
 }
 
