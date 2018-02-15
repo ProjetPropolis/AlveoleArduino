@@ -233,7 +233,7 @@ int ledIndexGlitch4_Ultracorrupt_clearHint[NUM_STRIPS];
 int ledIndexGlitch5_Ultracorrupt_clearHint[NUM_STRIPS];
 int stateVal_Ultracorrupt_clearHint[] = {0, 0, 0, 0, 0, 0, 0};
 float val_Ultracorrupt_clearHint[] = {255, 255, 255, 255, 255, 255, 255};
-float delayVal_Ultracorrupt_clearHint = 4;
+float delayVal_Ultracorrupt_clearHint = 12;
 
 int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
