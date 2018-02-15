@@ -359,7 +359,7 @@ void readButtonStatus(){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
             sendHexStatus(index, 1);
-          }else{
+          }else if(index != indexShield){
             Serial.print("Enter if:");
             Serial.println(receiveState[index]);
             buttonChrono[index].restart();
@@ -388,7 +388,7 @@ void readButtonStatus(){
           boolStateMolecule[index] = false;
           receiveState[index] = 14;
           sendHexStatus(index, 0);
-        }else{
+        }else if(index != indexShield){
           boolStateMolecule[index] = false;
           if(isPressedMolecule[referenceState[i]] == 1){
             sendHexStatus(index, 0);
