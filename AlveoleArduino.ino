@@ -17,6 +17,7 @@
 #define COLOR_ORDER         GRB
 #define CHIPSET             WS2811
 #define NUM_LEDS_PER_STRIP  60
+#define NUM_LEDS_ATOM       30
 #define NUM_STRIPS          10
 #define NUM_AVAILABLE       10
 #define BRIGHTNESS          255
@@ -38,7 +39,7 @@ int dataBufferIndex = 0;
 int lengthOfNbr1 = 0;
 int lengthOfNbr2 = 0;
 
-/*==== buttons Variables ====*/
+/*=== buttons Variables ===*/
 Chrono buttonChrono0;
 Chrono buttonChrono1;
 Chrono buttonChrono2;
@@ -63,11 +64,16 @@ int digitalPin9 = 23;
 int digitalPin[] = {digitalPin0 ,digitalPin1 ,digitalPin2 ,digitalPin3 ,digitalPin4 ,digitalPin5 ,digitalPin6, digitalPin7, digitalPin8, digitalPin9};
 int referenceDigitalPin[] = {0,1,2,3,4,5,6,7,8,9};
 
-/*==== blue() Variables ====*/
+/*=== Recettes Variables ===*/
+int ledIndex_Recette[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int stateAnim_Recette[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int delayIndex_Recette = 10;
+
+/*=== blue() Variables ===*/
 int hue_Blue[] = {130, 130, 130, 130, 130, 130, 130, 130, 130, 130};
 bool state_Blue[] = {true, true, true, true, true, true, true, true, true, true};
 
-/*==== corrupt() Variables ===*/
+/*=== corrupt() Variables ===*/
 int ledIndexGlitch1_Corrupt[NUM_STRIPS];
 int ledIndexGlitch2_Corrupt[NUM_STRIPS];
 int ledIndexGlitch3_Corrupt[NUM_STRIPS];
@@ -82,7 +88,7 @@ int dashLenght_Corrupt = 3;
 int stepRandom_Corrupt = 1;
 int maxCorruptLenght = dashLenght_Corrupt+30;
 
-/*==== ultracorrupt() Variables ===*/
+/*=== ultracorrupt() Variables ===*/
 int ledIndexGlitch1_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch2_Ultracorrupt[NUM_STRIPS];
 int ledIndexGlitch3_Ultracorrupt[NUM_STRIPS];
@@ -94,22 +100,20 @@ int ledIndexGlitch8_Ultracorrupt[NUM_STRIPS];
 int dashLenght_Ultracorrupt = 4;
 int maxUltracorruptLenght = dashLenght_Ultracorrupt+30;
 
-/*==== shield_Off Variables ====*/
-//int g_ShieldOff[] = {14, 14, 14, 14, 14, 14, 14, 14, 14, 14};
-//int b_ShieldOff[] = {30, 30, 30, 30, 30, 30, 30, 30, 30, 30};
+/*=== shield_Off Variables ===*/
 int sat_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int a_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int delayBrightness_ShieldOff = 2;
 
-/*==== ANIM_TURQUOISE_FADE() Variables ===*/
+/*=== ANIM_TURQUOISE_FADE() Variables ===*/
 float hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
 float delayHue_TURQUOISE_FADE = 1;
 
-/*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
+/*=== ANIM_SNAKE_TURQUOISE() Variables ===*/
 float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 float delayBrightness_SNAKE_TURQUOISE = 1.5;
 
-/*==== ANIM_SNAKE_YELLOW() Variables ===*/
+/*=== ANIM_SNAKE_YELLOW() Variables ===*/
 float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
 bool state_SNAKE_YELLOW[] = {true, true, true, true, true, true, true, true, true, true};
 float delayHue_SNAKE_YELLOW = 1;
@@ -135,7 +139,7 @@ uint32_t maxReadableValue = 70000;
 int colorArray[7][3] = { {0,0,0}, {0, 0, 255}, {200, 50, 0}, {255, 35, 40}, {0,150,255}, {100,0,255}, {50,0,80} };
 int stripState = 0;
 
-/*==== colors Variables ===*/
+/*=== colors Variables ===*/
 CRGB empty_off(0, 0, 0);
 CHSV blue_Recette(135, 200, 190);
 CRGB orange_Recette(200, 50, 0);
@@ -403,6 +407,10 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 24 && state != 24){
     val_SNAKE_TURQUOISE[id] = 255;
   }
+  if((prevState == 5 && state != 5) || (prevState == 6 && state != 6) || (prevState == 7 && state != 7)){
+    ledIndex_Recette[id] = 0;
+    stateAnim_Recette[id] = 0;
+  }
   /*
   if(prevState == 23 && state != 23){
     hue_TURQUOISE_FADE[id] = 185;  
@@ -512,8 +520,32 @@ void on(int id){
 
 void blue(int id){
   //CHSV blue_Recette(135, 200, 190);
+  /*
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i] = blue_Recette;
+  }
+  */
+  if(ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette) && stateAnim_Recette[id] == 0){
+    leds[id][ledIndex_Recette[id]] = blue_Recette;
+    ledIndex_Recette[id]+=delayIndex_Recette;
+  }else if(stateAnim_Recette[id] == 0){
+    ledIndex_Recette[id] = 0;
+    stateAnim_Recette[id] = 1;
+  }
+  
+  if(ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette) && stateAnim_Recette[id] == 1){
+    leds[id][ledIndex_Recette[id]] = CRGB::White;
+    ledIndex_Recette[id]+=delayIndex_Recette;
+  }else if(stateAnim_Recette[id] == 1){
+    ledIndex_Recette[id] = 0;
+    stateAnim_Recette[id] = 2;
+  }
+
+  if(ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette) && stateAnim_Recette[id] == 2){
+    leds[id][ledIndex_Recette[id]] = blue_Recette;
+    ledIndex_Recette[id]+=delayIndex_Recette;
+  }else if(stateAnim_Recette[id] == 2){
+    ledIndex_Recette[id] = 0;
   }
 }
 
@@ -644,8 +676,6 @@ void shield_Off(int id){
 
 void shield_On(int id){
     
-    //g_ShieldOff[id] = 50;
-    //b_ShieldOff[id] = 170;
     sat_ShieldOff[id] = 255;
     a_ShieldOff[id] = 255;
     
