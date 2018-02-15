@@ -1180,7 +1180,7 @@ void cleansing(int id){
 
 void ultracorrupt_clearHint(int id){
 
-    if(myChrono_UltracorruptClearHint[id].hasPassed(500)){
+    if(myChrono_UltracorruptClearHint[id].hasPassed(250)){
       if(sat_Ultracorrupt_clearHint[id] >= 0 && stateSat_Ultracorrupt_clearHint[id] == 0){
         sat_Ultracorrupt_clearHint[id]-=delaySat_Ultracorrupt_clearHint;
       }else if(stateSat_Ultracorrupt_clearHint[id] == 0){
