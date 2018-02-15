@@ -1209,10 +1209,10 @@ void ultracorrupt_clearHint(int id){
       stateVal_Ultracorrupt_clearHint[id] = 1;
     }
     
-    if(val_Ultracorrupt_clearHint[id] <= 255 && stateVal_Ultracorrupt_clearHint[id] == 1){
+    if(val_Ultracorrupt_clearHint[id] <= (255 - delayVal_Ultracorrupt_clearHint) && stateVal_Ultracorrupt_clearHint[id] == 1){
       val_Ultracorrupt_clearHint[id]+=delayVal_Ultracorrupt_clearHint;
     }else if(stateVal_Ultracorrupt_clearHint[id] == 1){
-      val_Ultracorrupt_clearHint[id] = 255;
+      val_Ultracorrupt_clearHint[id] = (255 - delayVal_Ultracorrupt_clearHint);
       stateVal_Ultracorrupt_clearHint[id] = 0;
     }
     
