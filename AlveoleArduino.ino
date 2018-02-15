@@ -355,7 +355,7 @@ void readButtonStatus(){
       
       if(moleculeStatus[index] == LOW){
         if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && indexState[index] < 2 && (receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 13 || receiveState[index] == 14)){
-          if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
+          if(index == indexShield && (stripState == 13 || stripState == 14)){ //&& prevStateMolecule[index] != moleculeStatus[index]){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
             stateCtrl(index, receiveState[index], prevReceiveState[index]);
@@ -383,7 +383,7 @@ void readButtonStatus(){
           sendHexStatus(index, 1);
         }
       }else if (moleculeStatus[index] == HIGH) {
-        if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
+        if(index == indexShield  && (stripState == 13 || stripState == 14)){ //&& prevStateMolecule[index] != moleculeStatus[index]){
           boolStateMolecule[index] = false;
           receiveState[index] = 14;
           stateCtrl(index, receiveState[index], prevReceiveState[index]);
