@@ -354,7 +354,7 @@ void readButtonStatus(){
       moleculeStatus[index] = digitalRead(digitalPin[index]);
       
       if(moleculeStatus[index] == LOW){
-        if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && indexState[index] < 2 && (receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 13 || receiveState[index] == 14)){
+        if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && indexState[index] < 2 && (receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 13 || receiveState[index] == 14 || receiveState[index] == 15 || receiveState[index] == 16)){
           if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
