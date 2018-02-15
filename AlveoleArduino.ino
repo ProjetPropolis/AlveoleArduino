@@ -231,6 +231,9 @@ int ledIndexGlitch2_Ultracorrupt_clearHint[NUM_STRIPS];
 int ledIndexGlitch3_Ultracorrupt_clearHint[NUM_STRIPS];
 int ledIndexGlitch4_Ultracorrupt_clearHint[NUM_STRIPS];
 int ledIndexGlitch5_Ultracorrupt_clearHint[NUM_STRIPS];
+int stateVal_Ultracorrupt_clearHint[] = {0, 0, 0, 0, 0, 0, 0};
+float val_Ultracorrupt_clearHint[] = {255, 255, 255, 255, 255, 255, 255};
+float delayVal_Ultracorrupt_clearHint = 1;
 
 int ledIndex_ANIM_TURQUOISE[] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_ANIM_PURPLE[] = {0, 0, 0, 0, 0, 0, 0};
@@ -1173,7 +1176,7 @@ void cleansing(int id){
 }
 
 void ultracorrupt_clearHint(int id){
-
+    /*
     //Writing BLACK for the 5 Dashes
     for(int x = 0; x < dashLenght_Ultracorrupt; x++){
       leds[id][ledIndexGlitch1_Ultracorrupt_clearHint[id] + x].setHSV(0, 255, 0);
@@ -1197,6 +1200,24 @@ void ultracorrupt_clearHint(int id){
         leds[id][ledIndexGlitch3_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
         leds[id][ledIndexGlitch4_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
         leds[id][ledIndexGlitch5_Ultracorrupt_clearHint[id] + x] = purple_Corrupt;
+    }
+    */
+    if(val_Ultracorrupt_clearHint[id] >= 0 && stateVal_Ultracorrupt_clearHint[id] == 0){
+      val_Ultracorrupt_clearHint[id]-=delayVal_Ultracorrupt_clearHint;
+    }else if(stateVal_Ultracorrupt_clearHint[id] == 0){
+      val_Ultracorrupt_clearHint[id] = 0;
+      stateVal_Ultracorrupt_clearHint[id] = 1;
+    }
+    
+    if(val_Ultracorrupt_clearHint[id] <= 255 && stateVal_Ultracorrupt_clearHint[id] == 1){
+      val_Ultracorrupt_clearHint[id]+=delayVal_Ultracorrupt_clearHint;
+    }else if(stateVal_Ultracorrupt_clearHint[id] == 1){
+      val_Ultracorrupt_clearHint[id] = 255;
+      stateVal_Ultracorrupt_clearHint[id] = 0;
+    }
+    
+    for(int i = 0; i < NUM_LEDS; i++){
+      leds[id][i].setHSV(185, 255, val_Ultracorrupt_clearHint[id]);
     }
 }
 
