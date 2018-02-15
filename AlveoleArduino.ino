@@ -407,7 +407,7 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 24 && state != 24){
     val_SNAKE_TURQUOISE[id] = 255;
   }
-  if((prevState == 5 && state != 5) || (prevState == 6 && state != 6) || (prevState == 7 && state != 7)){
+  if(prevState == 7 && state != 7){
     ledIndex_Recette[id] = 0;
     stateAnim_Recette[id] = 0;
   }
