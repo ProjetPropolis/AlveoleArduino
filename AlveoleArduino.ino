@@ -67,10 +67,6 @@ int referenceDigitalPin[] = {0,1,2,3,4,5,6,7,8,9};
 int hue_Blue[] = {130, 130, 130, 130, 130, 130, 130, 130, 130, 130};
 bool state_Blue[] = {true, true, true, true, true, true, true, true, true, true};
 
-/*==== purple molecules Variables ====*/
-Chrono myChrono_Purple;
-int receiveInfectId = 0;
-
 /*==== corrupt() Variables ===*/
 int ledIndexGlitch1_Corrupt[NUM_STRIPS];
 int ledIndexGlitch2_Corrupt[NUM_STRIPS];
@@ -587,11 +583,17 @@ void corrupt(int id){
 
 void waveCorrupted(int id){
 
-    /*
-    for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = red_waveCorrupted;
+    //Writing RED for the 5 Dashes
+    for(int x = 0; x < dashLenght_Ultracorrupt; x++){
+      leds[id][ledIndexGlitch1_Ultracorrupt[id] + x].setRGB(0, 0, 0);
+      leds[id][ledIndexGlitch2_Ultracorrupt[id] + x].setRGB(0, 0, 0);
+      leds[id][ledIndexGlitch3_Ultracorrupt[id] + x].setRGB(0, 0, 0);
+      leds[id][ledIndexGlitch4_Ultracorrupt[id] + x].setRGB(0, 0, 0);
+      leds[id][ledIndexGlitch5_Ultracorrupt[id] + x].setRGB(0, 0, 0);
+      leds[id][ledIndexGlitch6_Ultracorrupt[id] + x].setRGB(0, 0, 0);
+      leds[id][ledIndexGlitch7_Ultracorrupt[id] + x].setRGB(0, 0, 0);
+      leds[id][ledIndexGlitch8_Ultracorrupt[id] + x].setRGB(0, 0, 0);
     }
-    */
 
     //Changing 5 Dashes starting index
     ledIndexGlitch1_Ultracorrupt[id] = random8(NUM_LEDS_PER_STRIP-(maxUltracorruptLenght));
