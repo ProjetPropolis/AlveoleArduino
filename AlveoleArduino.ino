@@ -552,6 +552,7 @@ void blue(int id){
     ledIndex_Recette[id]+=delayIndex_Recette;
   }else if(stateAnim_Recette[id] == 2){
     ledIndex_Recette[id] = 0;
+    stateAnim_Recette[id] = 0;
   }
   
 }
