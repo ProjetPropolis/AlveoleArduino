@@ -556,7 +556,7 @@ void blue(int id){
   }
   */
 
-  if(ledIndex_Recette[id] < NUM_LEDS_ATOM){
+  if(ledIndex_Recette[id] < NUM_LEDS_PER_STRIP){
     leds[id][ledIndex_Recette[id]] = blue_Recette;
     ledIndex_Recette[id]++;
   }else{
