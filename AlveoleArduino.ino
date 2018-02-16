@@ -527,7 +527,7 @@ void blue(int id){
   */  
   if((ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette)) && stateAnim_Recette[id] == 0){
     for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
-      leds[id][i] = blue_Recette;
+      leds[id][i].setHSV(135, 200, 190);
     }
     ledIndex_Recette[id]+=delayIndex_Recette;
   }else if(stateAnim_Recette[id] == 0){
@@ -547,7 +547,7 @@ void blue(int id){
 
   if((ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette)) && stateAnim_Recette[id] == 2){
     for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
-      leds[id][i] = blue_Recette;
+      leds[id][i].setHSV(135, 200, 190);
     }
     ledIndex_Recette[id]+=delayIndex_Recette;
   }else if(stateAnim_Recette[id] == 2){
