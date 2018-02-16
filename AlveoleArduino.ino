@@ -520,13 +520,15 @@ void on(int id){
 
 void blue(int id){
   //CHSV blue_Recette(135, 200, 190);
-  
+  /*
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i] = blue_Recette;
   }
-  /*
+  */
   if(ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette) && stateAnim_Recette[id] == 0){
-    leds[id][ledIndex_Recette[id]] = blue_Recette;
+    for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
+      leds[id][i] = blue_Recette;
+    }
     ledIndex_Recette[id]+=delayIndex_Recette;
   }else if(stateAnim_Recette[id] == 0){
     ledIndex_Recette[id] = 0;
@@ -534,7 +536,9 @@ void blue(int id){
   }
   
   if(ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette) && stateAnim_Recette[id] == 1){
-    leds[id][ledIndex_Recette[id]] = CRGB::White;
+    for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
+      leds[id][i] = CRGB::White;
+    }
     ledIndex_Recette[id]+=delayIndex_Recette;
   }else if(stateAnim_Recette[id] == 1){
     ledIndex_Recette[id] = 0;
@@ -542,12 +546,14 @@ void blue(int id){
   }
 
   if(ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette) && stateAnim_Recette[id] == 2){
-    leds[id][ledIndex_Recette[id]] = blue_Recette;
+    for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
+      leds[id][i] = blue_Recette;
+    }
     ledIndex_Recette[id]+=delayIndex_Recette;
   }else if(stateAnim_Recette[id] == 2){
     ledIndex_Recette[id] = 0;
   }
-  */
+  
 }
 
 void orange(int id){
