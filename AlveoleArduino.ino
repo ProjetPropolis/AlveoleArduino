@@ -537,7 +537,7 @@ void blue(int id){
   
   if((ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette)) && stateAnim_Recette[id] == 1){
     for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
-      leds[id][i] = CRGB::White;
+      leds[id][i].setRGB(255, 255, 255);
     }
     ledIndex_Recette[id]+=delayIndex_Recette;
   }else if(stateAnim_Recette[id] == 1){
