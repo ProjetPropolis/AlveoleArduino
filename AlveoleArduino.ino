@@ -411,10 +411,10 @@ void stateCtrl(int id, int state, int prevState){
     ledIndex_Recette[id] = 0;
     stateAnim_Recette[id] = 0;
   }
-  /*
   if(prevState == 23 && state != 23){
     hue_TURQUOISE_FADE[id] = 185;  
   }
+  /*
   if(prevState == 25 && state != 25){
     hue_SNAKE_YELLOW[id] = 64;
     state_SNAKE_YELLOW[id] = true;
@@ -743,7 +743,6 @@ void ANIM_BLACK(int id){
 void ANIM_TURQUOISE_FADE(int id){
   //23 : fade PURPLE to CYAN .3 sec.
 
-  /*
   if(hue_TURQUOISE_FADE[id] >= 120){
     hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
   }
@@ -751,10 +750,6 @@ void ANIM_TURQUOISE_FADE(int id){
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
   } 
-  */
-  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(184, 255, 255);
-  }
 }
 
 void ANIM_SNAKE_TURQUOISE(int id){
