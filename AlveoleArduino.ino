@@ -775,7 +775,7 @@ void ANIM_SNAKE_YELLOW(int id){
     hue_SNAKE_YELLOW[id] = 255;
     state_SNAKE_YELLOW[id] = false;
   }
-
+  
   if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else{
