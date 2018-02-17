@@ -114,9 +114,9 @@ float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255, 255,
 float delayBrightness_SNAKE_TURQUOISE = 1.5;
 
 /*=== ANIM_SNAKE_YELLOW() Variables ===*/
-float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
+int hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
 bool state_SNAKE_YELLOW[] = {true, true, true, true, true, true, true, true, true, true};
-float delayHue_SNAKE_YELLOW = 1;
+int delayHue_SNAKE_YELLOW = 1;
 
 bool moleculeStatus[10];
 int delayMoleculeStatus = 100;
@@ -414,15 +414,11 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 23 && state!= 23){
     hue_TURQUOISE_FADE[id] = 185;
   }
-  /*
-  if(prevState == 23 && state != 23){
-    hue_TURQUOISE_FADE[id] = 185;  
-  }
   if(prevState == 25 && state != 25){
     hue_SNAKE_YELLOW[id] = 64;
     state_SNAKE_YELLOW[id] = true;
   }
-  */
+  
   if(state < 30 && state >= 0){
     switch (state) {
       case 0: 
@@ -746,16 +742,6 @@ void ANIM_BLACK(int id){
 void ANIM_TURQUOISE_FADE(int id){
   //23 : fade PURPLE to CYAN .3 sec.
 
-  /*
-  if(hue_TURQUOISE_FADE[id] >= 120){
-    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
-  }
-  
-  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
-  } 
-  */
-
   if(hue_TURQUOISE_FADE[id] >= 120){
     hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
   }
@@ -781,22 +767,22 @@ void ANIM_SNAKE_TURQUOISE(int id){
 void ANIM_SNAKE_YELLOW(int id){
   //25 : 1 sec. YELLOW to PURPLE
   
-  /*Brightness Manager
-  if(hue_SNAKE_YELLOW[id] > 0 && state_SNAKE_YELLOW[id] == true){
+  //Brightness Manager
+  if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else if(state_SNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id] = 255;
     state_SNAKE_YELLOW[id] = false;
   }
-  
-  if(hue_SNAKE_YELLOW[id] > 185 && state_SNAKE_YELLOW[id] == false){
+
+  if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else{
     hue_SNAKE_YELLOW[id] = 185;
   }
-  */
+  
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(64, 255, 255);
+    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
   }
 }
 
