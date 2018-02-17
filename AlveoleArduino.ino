@@ -106,8 +106,8 @@ int a_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int delayBrightness_ShieldOff = 2;
 
 /*=== ANIM_TURQUOISE_FADE() Variables ===*/
-float hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
-float delayHue_TURQUOISE_FADE = 1;
+int hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
+int delayHue_TURQUOISE_FADE = 1;
 
 /*=== ANIM_SNAKE_TURQUOISE() Variables ===*/
 float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
@@ -410,6 +410,9 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 7 && state != 7){
     ledIndex_Recette[id] = 0;
     stateAnim_Recette[id] = 0;
+  }
+  if(prevState == 23 && state!= 23){
+    hue_TURQUOISE_FADE[id] = 185;
   }
   /*
   if(prevState == 23 && state != 23){
@@ -752,8 +755,13 @@ void ANIM_TURQUOISE_FADE(int id){
     leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
   } 
   */
+
+  if(hue_TURQUOISE_FADE[id] >= 0){
+    hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
+  }
+  
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(184, 255, 255);
+    leds[id][i].setHSV(120, 255, hue_TURQUOISE_FADE[id]);
   }
 }
 
