@@ -563,14 +563,14 @@ void blue(int id){
 
   if(blueChrono[id].hasPassed(delayAnim_Blue)){
     if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 0){
-      leds[id][ledIndex_Blue[id]].setHSV(135, 150, 190);
+      leds[id][ledIndex_Blue[id]].setHSV(135, 100, 190);
       ledIndex_Blue[id]++;
     }else if(stateAnim_Blue[id] == 0){
       ledIndex_Blue[id] = 0;
       stateAnim_Blue[id] = 1;
     }
     if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 1){
-      leds[id][ledIndex_Blue[id]].setHSV(135, 100, 190);
+      leds[id][ledIndex_Blue[id]].setHSV(0, 50, 190);
       ledIndex_Blue[id]++;
     }else if(stateAnim_Blue[id] == 1){
       ledIndex_Blue[id] = 0;
