@@ -231,11 +231,12 @@ void loop() {
   for(int i = 0; i < NUM_STRIPS; i++){
     //if(receiveState[i] != prevReceiveState[i]){
     int stripState = receiveState[i];
+    int prevStripState = prevReceiveState[i];
     //Serial.println("update led: " + String(receiveState[i]));
     if(i != indexShield && stripState != 15 && stripState != 16){
-      stateCtrl(i,stripState, prevReceiveState[i]);
+      stateCtrl(i, stripState, prevStripState);
     }else if(i == indexShield && (stripState == 13 || stripState == 14 || stripState == 17 || stripState == 18 || stripState == 19 || stripState == 20 || stripState == 21 || stripState == 22 || stripState == 23 || stripState == 24 || stripState == 25 || stripState == 26)){
-      stateCtrl(i,stripState, prevReceiveState[i]);
+      stateCtrl(i, stripState, prevStripState);
     }
   }
 
