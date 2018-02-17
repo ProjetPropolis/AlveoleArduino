@@ -782,7 +782,7 @@ void ANIM_SNAKE_YELLOW(int id){
   }
   
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
+    leds[id][i].setHSV(64, 255, hue_SNAKE_YELLOW[id]);
   }
 }
 
