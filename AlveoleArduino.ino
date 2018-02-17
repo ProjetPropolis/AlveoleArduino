@@ -116,6 +116,7 @@ float delayBrightness_SNAKE_TURQUOISE = 1.5;
 /*=== ANIM_SNAKE_YELLOW() Variables ===*/
 int hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64, 64, 64, 64};
 bool state_SNAKE_YELLOW[] = {true, true, true, true, true, true, true, true, true, true};
+bool stateAnimSNAKE_YELLOW[] = {true, true, true, true, true, true, true, true, true, true};
 int delayHue_SNAKE_YELLOW = 1;
 
 bool moleculeStatus[10];
@@ -418,7 +419,7 @@ void stateCtrl(int id, int state, int prevState){
   }
   if(prevState == 25 && state!= 25){
     hue_SNAKE_YELLOW[id] = 64;
-    state_SNAKE_YELLOW[id] = true;
+    stateAnimSNAKE_YELLOW[id] = true;
   }
   
   if(state < 30 && state >= 0){
@@ -784,9 +785,9 @@ void ANIM_SNAKE_YELLOW(int id){
     //hue_SNAKE_YELLOW[id] = 185;
   }
   */
-  if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
+  if(hue_SNAKE_YELLOW[id] >= 0 && stateAnimSNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
-  }else if(state_SNAKE_YELLOW[id] == true){
+  }else if(stateAnimSNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id] = 255;
     //state_SNAKE_YELLOW[id] = false;
   }
