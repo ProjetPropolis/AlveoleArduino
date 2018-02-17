@@ -414,11 +414,12 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 23 && state!= 23){
     hue_TURQUOISE_FADE[id] = 185;
   }
+  /*
   if(prevState == 25 && state != 25){
     hue_SNAKE_YELLOW[id] = 64;
     state_SNAKE_YELLOW[id] = true;
   }
-  
+  */
   if(state < 30 && state >= 0){
     switch (state) {
       case 0: 
