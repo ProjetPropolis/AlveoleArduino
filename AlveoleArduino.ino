@@ -240,10 +240,11 @@ void loop() {
     }else if(i == indexShield && (stripState == 13 || stripState == 14 || stripState == 17 || stripState == 18 || stripState == 19 || stripState == 20 || stripState == 21 || stripState == 22 || stripState == 23 || stripState == 24 || stripState == 25 || stripState == 26)){
       stateCtrl(i, stripState, prevReceiveState[i]);
     }
-    
+    /*
     if(receiveState[i] != prevReceiveState[i]){
       prevReceiveState[i] = receiveState[i];
     }
+    */
   }
 
   FastLED.show();
