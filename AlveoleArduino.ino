@@ -414,6 +414,9 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 23 && state!= 23){
     hue_TURQUOISE_FADE[id] = 185;
   }
+  if(prevState == 25 && state!= 25){
+    hue_SNAKE_YELLOW[id] = 64;
+  }
   /*
   if(prevState == 25 && state != 25){
     hue_SNAKE_YELLOW[id] = 64;
@@ -783,8 +786,11 @@ void ANIM_SNAKE_YELLOW(int id){
     //hue_SNAKE_YELLOW[id] = 185;
   }
   */
+  if(hue_SNAKE_YELLOW[id] >= 0){
+    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+  }
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(64, 255, 255);
+    leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
   }
 }
 
