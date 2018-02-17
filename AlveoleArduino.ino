@@ -331,7 +331,7 @@ void decipherPacket(){
         }
       }
       
-      //prevReceiveState[i] = receiveState[i];
+      prevReceiveState[i] = receiveState[i];
     }
     FastLED.show();
     //Serial.println("dataId : " + String(dataId));
@@ -348,7 +348,7 @@ void sendHexStatus(int ID, int state){
 void readButtonStatus(){
   for(int i = 0; i < NUM_AVAILABLE; i++){
     if(unlocked[i]){
-      //TODO: clear index value and referenceDigitalPin[] as index == i == referenceDigitalPin[i]
+
       int index = referenceDigitalPin[i];
       
       moleculeStatus[index] = digitalRead(digitalPin[index]);
@@ -403,7 +403,9 @@ void readButtonStatus(){
 }
 
 void stateCtrl(int id, int state, int prevState){
+  
   //Resets climax's anim when it's the alveole's prevState
+  
   if(prevState == 24 && state != 24){
     val_SNAKE_TURQUOISE[id] = 255;
   }
@@ -417,14 +419,9 @@ void stateCtrl(int id, int state, int prevState){
   if(prevState == 25 && state!= 25){
     hue_SNAKE_YELLOW[id] = 64;
   }
-  /*
-  if(prevState == 25 && state != 25){
-    hue_SNAKE_YELLOW[id] = 64;
-    state_SNAKE_YELLOW[id] = true;
-  }
-  */
+
   if(state < 30 && state >= 0){
-    switch (state) {
+    switch( state ) {
       case 0: 
         off(id);
         break;
