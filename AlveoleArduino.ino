@@ -756,7 +756,7 @@ void ANIM_TURQUOISE_FADE(int id){
   } 
   */
 
-  if(hue_TURQUOISE_FADE[id] >= 0){
+  if(hue_TURQUOISE_FADE[id] >= 120){
     hue_TURQUOISE_FADE[id]-=delayHue_TURQUOISE_FADE;
   }
   
