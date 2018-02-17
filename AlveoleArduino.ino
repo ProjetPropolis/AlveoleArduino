@@ -761,7 +761,7 @@ void ANIM_TURQUOISE_FADE(int id){
   }
   
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setHSV(120, 255, hue_TURQUOISE_FADE[id]);
+    leds[id][i].setHSV(hue_TURQUOISE_FADE[id], 255, 255);
   }
 }
 
