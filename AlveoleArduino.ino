@@ -406,18 +406,16 @@ void stateCtrl(int id, int state, int prevState){
   
   //Resets climax's anim when it's the alveole's prevState
   
-  if(prevState == 24 && state != 24){
-    val_SNAKE_TURQUOISE[id] = 255;
-  }
   if(prevState == 7 && state != 7){
     ledIndex_Recette[id] = 0;
     stateAnim_Recette[id] = 0;
-  }
-  if(prevState == 23 && state!= 23){
+  }else if(prevState == 23 && state!= 23){
     hue_TURQUOISE_FADE[id] = 185;
-  }
-  if(prevState == 25 && state!= 25){
+  }else if(prevState == 24 && state != 24){
+    val_SNAKE_TURQUOISE[id] = 255;
+  }else if(prevState == 25 && state!= 25){
     hue_SNAKE_YELLOW[id] = 64;
+    state_SNAKE_YELLOW[id] = true;
   }
 
   if(state < 30 && state >= 0){
@@ -769,7 +767,7 @@ void ANIM_SNAKE_YELLOW(int id){
   //25 : 1 sec. YELLOW to PURPLE
   
   //Brightness Manager
-  /*
+  
   if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else if(state_SNAKE_YELLOW[id] == true){
@@ -778,14 +776,17 @@ void ANIM_SNAKE_YELLOW(int id){
   }
   
   if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
-    //hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else{
-    //hue_SNAKE_YELLOW[id] = 185;
+    hue_SNAKE_YELLOW[id] = 185;
   }
-  */
-  if(hue_SNAKE_YELLOW[id] >= 0){
+  
+  /*
+  if(hue_SNAKE_YELLOW[id] >= 0 ){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }
+  */
+  
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
   }
