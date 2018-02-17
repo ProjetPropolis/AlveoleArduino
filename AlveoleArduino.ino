@@ -86,6 +86,7 @@ Chrono blueChrono9;
 Chrono blueChrono[] = {blueChrono0, blueChrono1, blueChrono2, blueChrono3, blueChrono4, blueChrono5, blueChrono6, blueChrono7, blueChrono8, blueChrono9};
 bool preBlueAnim_Blue[] = {true, true, true, true, true, true, true, true, true, true};
 int ledIndex_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int sat_Blue[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
 int stateAnim_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int delayAnim_Blue = 250;
 
@@ -558,32 +559,26 @@ void preBlue(int id){
     leds[id][i] = blue_Recette;
   }
   preBlueAnim_Blue[id] = false;
+  sat_Blue[id] = 200;
 }
 
 void blue(int id){
   //CHSV blue_Recette(135, 200, 190);
-
+  
   if(blueChrono[id].hasPassed(delayAnim_Blue)){
-    if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 0){
-      leds[id][ledIndex_Blue[id]].setHSV(135, 100, 190);
-      ledIndex_Blue[id]++;
+    if(sat_Blue[id] > 0 && stateAnim_Blue[id] == 0){
+      sat_Blue[id]--;
     }else if(stateAnim_Blue[id] == 0){
-      ledIndex_Blue[id] = 0;
+      sat_Blue[id] = 0;
       stateAnim_Blue[id] = 1;
-    }
-    if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 1){
-      leds[id][ledIndex_Blue[id]].setHSV(0, 50, 190);
-      ledIndex_Blue[id]++;
+    }else if(sat_Blue[id] < 200 && stateAnim_Blue[id] == 1){
+      sat_Blue[id]++;
     }else if(stateAnim_Blue[id] == 1){
-      ledIndex_Blue[id] = 0;
-      stateAnim_Blue[id] = 2;
-    }
-    if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 2){
-      leds[id][ledIndex_Blue[id]].setHSV(135, 200, 190);
-      ledIndex_Blue[id]++;
-    }else if(stateAnim_Blue[id] == 2){
-      ledIndex_Blue[id] = 0;
+      sat_Blue[id] = 200;
       stateAnim_Blue[id] = 0;
+    }
+    for(int i = 0; i < NUM_LEDS_ATOM; i++){
+      leds[id][ledIndex_Blue[id]].setHSV(135, sat_Blue[id], 190);
     }
     blueChrono[id].restart();
   }
@@ -816,20 +811,7 @@ void ANIM_SNAKE_YELLOW(int id){
   //25 : 1 sec. YELLOW to PURPLE
   
   //Brightness Manager
-  /*
-  if(hue_SNAKE_YELLOW[id] >= 0 && state_SNAKE_YELLOW[id] == true){
-    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
-  }else if(state_SNAKE_YELLOW[id] == true){
-    hue_SNAKE_YELLOW[id] = 255;
-    state_SNAKE_YELLOW[id] = false;
-  }
-  
-  if(hue_SNAKE_YELLOW[id] >= 185 && state_SNAKE_YELLOW[id] == false){
-    //hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
-  }else{
-    //hue_SNAKE_YELLOW[id] = 185;
-  }
-  */
+
   if(hue_SNAKE_YELLOW[id] >= 0 && stateAnimSNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else if(stateAnimSNAKE_YELLOW[id] == true){
