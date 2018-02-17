@@ -73,6 +73,22 @@ int delayIndex_Recette = 10;
 int hue_Blue[] = {130, 130, 130, 130, 130, 130, 130, 130, 130, 130};
 bool state_Blue[] = {true, true, true, true, true, true, true, true, true, true};
 
+Chrono blueChrono0;
+Chrono blueChrono1;
+Chrono blueChrono2;
+Chrono blueChrono3;
+Chrono blueChrono4;
+Chrono blueChrono5;
+Chrono blueChrono6;
+Chrono blueChrono7;
+Chrono blueChrono8;
+Chrono blueChrono9;
+Chrono blueChrono[] = {blueChrono0, blueChrono1, blueChrono2, blueChrono3, blueChrono4, blueChrono5, blueChrono6, blueChrono7, blueChrono8, blueChrono9};
+bool preBlueAnim_Blue[] = {true, true, true, true, true, true, true, true, true, true};
+int ledIndex_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int stateAnim_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int delayAnim_Blue = 250;
+
 /*=== corrupt() Variables ===*/
 int ledIndexGlitch1_Corrupt[NUM_STRIPS];
 int ledIndexGlitch2_Corrupt[NUM_STRIPS];
@@ -418,8 +434,9 @@ void stateCtrl(int id, int state, int prevState){
   //Resets climax's anim when it's the alveole's prevState
   
   if(prevState == 7 && state != 7){
-    ledIndex_Recette[id] = 0;
-    stateAnim_Recette[id] = 0;
+    ledIndex_Blue[id] = 0;
+    stateAnim_Blue[id] = 0;
+    preBlueAnim_Blue[id] = true;
   }
   if(prevState == 23 && state!= 23){
     hue_TURQUOISE_FADE[id] = 185;
@@ -462,7 +479,11 @@ void stateCtrl(int id, int state, int prevState){
         break;
       case 7: 
         needReset[id] = 1;
-        blue(id);
+        if(preBlueAnim_Blue[id]){
+          preBlue(id);
+        }else{
+          blue(id);  
+        }
         break;
       case 8: 
         shield_On(id);
@@ -530,43 +551,40 @@ void on(int id){
   }
 }
 
-void blue(int id){
-  //CHSV blue_Recette(135, 200, 190);
-  
+void preBlue(int id){
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i] = blue_Recette;
   }
-  /*  
-  if((ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette)) && stateAnim_Recette[id] == 0){
-    for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
-      leds[id][i].setHSV(135, 200, 190);
-    }
-    ledIndex_Recette[id]+=delayIndex_Recette;
-  }else if(stateAnim_Recette[id] == 0){
-    ledIndex_Recette[id] = 0;
-    stateAnim_Recette[id] = 1;
-  }
-  
-  if((ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette)) && stateAnim_Recette[id] == 1){
-    for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
-      leds[id][i].setRGB(255, 255, 255);
-    }
-    ledIndex_Recette[id]+=delayIndex_Recette;
-  }else if(stateAnim_Recette[id] == 1){
-    ledIndex_Recette[id] = 0;
-    stateAnim_Recette[id] = 2;
-  }
+  preBlueAnim_Blue[id] = false;
+}
 
-  if((ledIndex_Recette[id] < (NUM_LEDS_ATOM - delayIndex_Recette)) && stateAnim_Recette[id] == 2){
-    for(int i = ledIndex_Recette[id]; i < delayIndex_Recette; i++){
-      leds[id][i].setHSV(135, 200, 190);
+void blue(int id){
+  //CHSV blue_Recette(135, 200, 190);
+
+  if(blueChrono[id].hasPassed(delayAnim_Blue)){
+    if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 0){
+      leds[id][ledIndex_Blue[id]].setHSV(135, 150, 190);
+      ledIndex_Blue[id]++;
+    }else if(stateAnim_Blue[id] == 0){
+      ledIndex_Blue[id] = 0;
+      stateAnim_Blue[id] = 1;
     }
-    ledIndex_Recette[id]+=delayIndex_Recette;
-  }else if(stateAnim_Recette[id] == 2){
-    ledIndex_Recette[id] = 0;
-    stateAnim_Recette[id] = 0;
+    if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 1){
+      leds[id][ledIndex_Blue[id]].setHSV(135, 100, 190);
+      ledIndex_Blue[id]++;
+    }else if(stateAnim_Blue[id] == 1){
+      ledIndex_Blue[id] = 0;
+      stateAnim_Blue[id] = 2;
+    }
+    if(ledIndex_Blue[id] < NUM_LEDS_ATOM && stateAnim_Blue[id] == 2){
+      leds[id][ledIndex_Blue[id]].setHSV(135, 200, 190);
+      ledIndex_Blue[id]++;
+    }else if(stateAnim_Blue[id] == 2){
+      ledIndex_Blue[id] = 0;
+      stateAnim_Blue[id] = 0;
+    }
+    blueChrono[id].restart();
   }
-  */
 }
 
 void orange(int id){
@@ -698,7 +716,8 @@ void shield_On(int id){
     
     sat_ShieldOff[id] = 255;
     a_ShieldOff[id] = 255;
-    
+
+    /*
     ledIndexGlitch1_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
     ledIndexGlitch2_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
     ledIndexGlitch3_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
@@ -707,13 +726,14 @@ void shield_On(int id){
     ledIndexGlitch6_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
     ledIndexGlitch7_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
     ledIndexGlitch8_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    */
     
     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      if(i == ledIndexGlitch1_ShieldOn[id] || i == ledIndexGlitch2_ShieldOn[id] || i == ledIndexGlitch3_ShieldOn[id] || i == ledIndexGlitch4_ShieldOn[id] || i == ledIndexGlitch5_ShieldOn[id] || i == ledIndexGlitch6_ShieldOn[id] || i == ledIndexGlitch7_ShieldOn[id] || i == ledIndexGlitch8_ShieldOn[id]){
-        leds[id][i].setRGB(255, 255, 255);  
-      }else{
-        leds[id][i] = cyan_ShieldOn;  
-      }
+      //if(i == ledIndexGlitch1_ShieldOn[id] || i == ledIndexGlitch2_ShieldOn[id] || i == ledIndexGlitch3_ShieldOn[id] || i == ledIndexGlitch4_ShieldOn[id] || i == ledIndexGlitch5_ShieldOn[id] || i == ledIndexGlitch6_ShieldOn[id] || i == ledIndexGlitch7_ShieldOn[id] || i == ledIndexGlitch8_ShieldOn[id]){
+        //leds[id][i].setRGB(255, 255, 255);  
+      //}else{
+      leds[id][i] = cyan_ShieldOn;  
+      //}
     }
 }
 
