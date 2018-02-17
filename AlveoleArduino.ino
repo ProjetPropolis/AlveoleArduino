@@ -244,6 +244,18 @@ void loop() {
     
     if(receiveState[i] != prevReceiveState[i]){
       prevReceiveState[i] = receiveState[i];
+      if(prevReceiveState[i] == 7 && receiveState[i] != 7){
+        ledIndex_Blue[i] = 0;
+        stateAnim_Blue[i] = 0;
+        preBlueAnim_Blue[i] = true;
+      }else if(prevReceiveState[i] == 23 && receiveState[i]!= 23){
+        hue_TURQUOISE_FADE[i] = 185;
+      }else if(prevReceiveState[i] == 24 && receiveState[i] != 24){
+        val_SNAKE_TURQUOISE[i] = 255;
+      }else if(prevReceiveState[i] == 25 && receiveState[i]!= 25){
+        hue_SNAKE_YELLOW[i] = 64;
+        stateAnimSNAKE_YELLOW[i] = true;
+      }
     }
   }
 
@@ -364,7 +376,21 @@ void decipherPacket(){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
-        prevReceiveState[i] = receiveState[i];
+        if(receiveState[i] != prevReceiveState[i]){
+          prevReceiveState[i] = receiveState[i];
+          if(prevReceiveState[i] == 7 && receiveState[i] != 7){
+            ledIndex_Blue[i] = 0;
+            stateAnim_Blue[i] = 0;
+            preBlueAnim_Blue[i] = true;
+          }else if(prevReceiveState[i] == 23 && receiveState[i]!= 23){
+            hue_TURQUOISE_FADE[i] = 185;
+          }else if(prevReceiveState[i] == 24 && receiveState[i] != 24){
+            val_SNAKE_TURQUOISE[i] = 255;
+          }else if(prevReceiveState[i] == 25 && receiveState[i]!= 25){
+            hue_SNAKE_YELLOW[i] = 64;
+            stateAnimSNAKE_YELLOW[i] = true;
+          }
+        }
       }
     }
     FastLED.show();
@@ -440,23 +466,20 @@ void readButtonStatus(){
 void stateCtrl(int id, int state, int prevState){
   
   //Resets climax's anim when it's the alveole's prevState
-  
+  /*
   if(prevState == 7 && state != 7){
     ledIndex_Blue[id] = 0;
     stateAnim_Blue[id] = 0;
     preBlueAnim_Blue[id] = true;
-  }
-  if(prevState == 23 && state!= 23){
+  }else if(prevState == 23 && state!= 23){
     hue_TURQUOISE_FADE[id] = 185;
-  }
-  if(prevState == 24 && state != 24){
+  }else if(prevState == 24 && state != 24){
     val_SNAKE_TURQUOISE[id] = 255;
-  }
-  if(prevState == 25 && state!= 25){
+  }else if(prevState == 25 && state!= 25){
     hue_SNAKE_YELLOW[id] = 64;
     stateAnimSNAKE_YELLOW[id] = true;
   }
-  
+  */
   if(state < 30 && state >= 0){
     switch( state ) {
       case 0: 
