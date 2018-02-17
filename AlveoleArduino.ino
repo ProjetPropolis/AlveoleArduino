@@ -207,7 +207,7 @@ void loop() {
     //Serial.println("update led: " + String(receiveState[i]));
     if(i != indexShield && stripState != 15 && stripState != 16){
       stateCtrl(i,stripState, prevReceiveState[i]);
-    }else if(i == indexShield && (stripState == 13 || stripState == 14)){
+    }else if(i == indexShield && (stripState == 13 || stripState == 14 || stripState == 17 || stripState == 18 || stripState == 19 || stripState == 20 || stripState == 21 || stripState == 22 || stripState == 23 || stripState == 24 || stripState == 25 || stripState == 26)){
       stateCtrl(i,stripState, prevReceiveState[i]);
     }
   }
@@ -325,7 +325,7 @@ void decipherPacket(){
         //Serial.println("update led: " + String(receiveState[i]));
         if(i != indexShield && stripState != 15 && stripState != 16){
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
-        }else if(i == indexShield && (stripState == 13 || stripState == 14)){
+        }else if(i == indexShield && (stripState == 13 || stripState == 14 || stripState == 17 || stripState == 18 || stripState == 19 || stripState == 20 || stripState == 21 || stripState == 22 || stripState == 23 || stripState == 24 || stripState == 25 || stripState == 26)){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
