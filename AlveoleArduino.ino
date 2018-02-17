@@ -88,7 +88,7 @@ bool preBlueAnim_Blue[] = {true, true, true, true, true, true, true, true, true,
 int ledIndex_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int sat_Blue[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
 int stateAnim_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int delayAnim_Blue = 250;
+int delayAnim_Blue = 50;
 
 /*=== corrupt() Variables ===*/
 int ledIndexGlitch1_Corrupt[NUM_STRIPS];
@@ -218,8 +218,11 @@ void setup() {
   
   for(int i = 0; i < NUM_STRIPS; i++){
     moleculeStatus[i] = digitalRead(digitalPin[i]);
-    stateCtrl(i, 0, 0);
+    receiveState[i] = 0; 
+    prevReceiveState[i] = 0;  
+    stateCtrl(i, receiveState[i], prevReceiveState[i]);
   }
+
   FastLED.show();
 
 }
@@ -230,7 +233,6 @@ void loop() {
 
   readTheData();
   for(int i = 0; i < NUM_STRIPS; i++){
-    //if(receiveState[i] != prevReceiveState[i]){
     int stripState = receiveState[i];
     int prevStripState = prevReceiveState[i];
     //Serial.println("update led: " + String(receiveState[i]));
@@ -238,6 +240,10 @@ void loop() {
       stateCtrl(i, stripState, prevStripState);
     }else if(i == indexShield && (stripState == 13 || stripState == 14 || stripState == 17 || stripState == 18 || stripState == 19 || stripState == 20 || stripState == 21 || stripState == 22 || stripState == 23 || stripState == 24 || stripState == 25 || stripState == 26)){
       stateCtrl(i, stripState, prevStripState);
+    }
+    
+    if(receiveState[i] != prevReceiveState[i]){
+      prevReceiveState[i] = receiveState[i];
     }
   }
 
@@ -358,9 +364,8 @@ void decipherPacket(){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
+        prevReceiveState[i] = receiveState[i];
       }
-      
-      prevReceiveState[i] = receiveState[i];
     }
     FastLED.show();
     //Serial.println("dataId : " + String(dataId));
@@ -555,33 +560,36 @@ void on(int id){
 }
 
 void preBlue(int id){
+  
+  preBlueAnim_Blue[id] = false;
+  sat_Blue[id] = 200;
+  
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i] = blue_Recette;
   }
-  preBlueAnim_Blue[id] = false;
-  sat_Blue[id] = 200;
+  
 }
 
 void blue(int id){
   //CHSV blue_Recette(135, 200, 190);
   
-  //if(blueChrono[id].hasPassed(delayAnim_Blue)){
-  if(sat_Blue[id] > 0 && stateAnim_Blue[id] == 0){
-    sat_Blue[id]--;
-  }else if(stateAnim_Blue[id] == 0){
-    sat_Blue[id] = 0;
-    stateAnim_Blue[id] = 1;
-  }else if(sat_Blue[id] < 200 && stateAnim_Blue[id] == 1){
-    sat_Blue[id]++;
-  }else if(stateAnim_Blue[id] == 1){
-    sat_Blue[id] = 200;
-    stateAnim_Blue[id] = 0;
+  if(blueChrono[id].hasPassed(delayAnim_Blue)){
+    if(sat_Blue[id] > 0 && stateAnim_Blue[id] == 0){
+      sat_Blue[id]--;
+    }else if(stateAnim_Blue[id] == 0){
+      sat_Blue[id] = 0;
+      stateAnim_Blue[id] = 1;
+    }else if(sat_Blue[id] < 200 && stateAnim_Blue[id] == 1){
+      sat_Blue[id]++;
+    }else if(stateAnim_Blue[id] == 1){
+      sat_Blue[id] = 200;
+      stateAnim_Blue[id] = 0;
+    }
+    for(int i = 0; i < NUM_LEDS_ATOM; i++){
+      leds[id][ledIndex_Blue[id]].setHSV(135, sat_Blue[id], 190);
+    }
+    blueChrono[id].restart();
   }
-  for(int i = 0; i < NUM_LEDS_ATOM; i++){
-    leds[id][ledIndex_Blue[id]].setHSV(135, sat_Blue[id], 190);
-  }
-  //blueChrono[id].restart();
-  //}
 }
 
 void orange(int id){
