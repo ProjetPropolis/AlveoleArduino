@@ -88,7 +88,7 @@ bool preBlueAnim_Blue[] = {true, true, true, true, true, true, true, true, true,
 int ledIndex_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int sat_Blue[] = {200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
 int stateAnim_Blue[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int delayAnim_Blue = 50;
+int delayAnim_Blue = 250;
 
 /*=== corrupt() Variables ===*/
 int ledIndexGlitch1_Corrupt[NUM_STRIPS];
