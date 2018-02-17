@@ -438,7 +438,7 @@ void stateCtrl(int id, int state, int prevState){
   
   if(prevState == 7 && state != 7){
     stateAnim_Blue[id] = 0;
-    preBlueAnim_Blue[id] = true;
+    //preBlueAnim_Blue[id] = true;
   }else if(prevState == 23 && state!= 23){
     hue_TURQUOISE_FADE[id] = 185;
   }else if(prevState == 24 && state != 24){
@@ -485,7 +485,7 @@ void stateCtrl(int id, int state, int prevState){
           blue(id);  
         }
         */
-        blue(id);
+        preBlue(id);
         break;
       case 8: 
         shield_On(id);
