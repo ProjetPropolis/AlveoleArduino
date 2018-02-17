@@ -565,23 +565,23 @@ void preBlue(int id){
 void blue(int id){
   //CHSV blue_Recette(135, 200, 190);
   
-  if(blueChrono[id].hasPassed(delayAnim_Blue)){
-    if(sat_Blue[id] > 0 && stateAnim_Blue[id] == 0){
-      sat_Blue[id]--;
-    }else if(stateAnim_Blue[id] == 0){
-      sat_Blue[id] = 0;
-      stateAnim_Blue[id] = 1;
-    }else if(sat_Blue[id] < 200 && stateAnim_Blue[id] == 1){
-      sat_Blue[id]++;
-    }else if(stateAnim_Blue[id] == 1){
-      sat_Blue[id] = 200;
-      stateAnim_Blue[id] = 0;
-    }
-    for(int i = 0; i < NUM_LEDS_ATOM; i++){
-      leds[id][ledIndex_Blue[id]].setHSV(135, sat_Blue[id], 190);
-    }
-    blueChrono[id].restart();
+  //if(blueChrono[id].hasPassed(delayAnim_Blue)){
+  if(sat_Blue[id] > 0 && stateAnim_Blue[id] == 0){
+    sat_Blue[id]--;
+  }else if(stateAnim_Blue[id] == 0){
+    sat_Blue[id] = 0;
+    stateAnim_Blue[id] = 1;
+  }else if(sat_Blue[id] < 200 && stateAnim_Blue[id] == 1){
+    sat_Blue[id]++;
+  }else if(stateAnim_Blue[id] == 1){
+    sat_Blue[id] = 200;
+    stateAnim_Blue[id] = 0;
   }
+  for(int i = 0; i < NUM_LEDS_ATOM; i++){
+    leds[id][ledIndex_Blue[id]].setHSV(135, sat_Blue[id], 190);
+  }
+  //blueChrono[id].restart();
+  //}
 }
 
 void orange(int id){
