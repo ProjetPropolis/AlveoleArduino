@@ -423,6 +423,7 @@ void readButtonStatus(){
           }
         }
       }
+      prevReceiveState[index] = receiveState[index];
       prevStateMolecule[index] = moleculeStatus[index];
     }
   }
