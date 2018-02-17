@@ -64,11 +64,6 @@ int digitalPin9 = 23;
 int digitalPin[] = {digitalPin0 ,digitalPin1 ,digitalPin2 ,digitalPin3 ,digitalPin4 ,digitalPin5 ,digitalPin6, digitalPin7, digitalPin8, digitalPin9};
 int referenceDigitalPin[] = {0,1,2,3,4,5,6,7,8,9};
 
-/*=== Recettes Variables ===*/
-int ledIndex_Recette[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int stateAnim_Recette[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int delayIndex_Recette = 10;
-
 /*=== blue() Variables ===*/
 int hue_Blue[] = {130, 130, 130, 130, 130, 130, 130, 130, 130, 130};
 bool state_Blue[] = {true, true, true, true, true, true, true, true, true, true};
@@ -442,7 +437,6 @@ void stateCtrl(int id, int state, int prevState){
   //Resets climax's anim when it's the alveole's prevState
   
   if(prevState == 7 && state != 7){
-    ledIndex_Blue[id] = 0;
     stateAnim_Blue[id] = 0;
     preBlueAnim_Blue[id] = true;
   }else if(prevState == 23 && state!= 23){
@@ -484,11 +478,14 @@ void stateCtrl(int id, int state, int prevState){
         break;
       case 7: 
         needReset[id] = 1;
+        /*
         if(preBlueAnim_Blue[id]){
           preBlue(id);
         }else{
           blue(id);  
         }
+        */
+        blue(id);
         break;
       case 8: 
         shield_On(id);
