@@ -105,6 +105,16 @@ int sat_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int a_ShieldOff[] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 int delayBrightness_ShieldOff = 2;
 
+/*=== shield_On Variables ===*/
+int ledIndexGlitch1_ShieldOn[NUM_STRIPS];
+int ledIndexGlitch2_ShieldOn[NUM_STRIPS];
+int ledIndexGlitch3_ShieldOn[NUM_STRIPS];
+int ledIndexGlitch4_ShieldOn[NUM_STRIPS];
+int ledIndexGlitch5_ShieldOn[NUM_STRIPS];
+int ledIndexGlitch6_ShieldOn[NUM_STRIPS];
+int ledIndexGlitch7_ShieldOn[NUM_STRIPS];
+int ledIndexGlitch8_ShieldOn[NUM_STRIPS];
+
 /*=== ANIM_TURQUOISE_FADE() Variables ===*/
 int hue_TURQUOISE_FADE[NUM_STRIPS] = {185, 185, 185, 185, 185, 185, 185, 185, 185, 185};
 int delayHue_TURQUOISE_FADE = 1;
@@ -689,8 +699,21 @@ void shield_On(int id){
     sat_ShieldOff[id] = 255;
     a_ShieldOff[id] = 255;
     
+    ledIndexGlitch1_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    ledIndexGlitch2_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    ledIndexGlitch3_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    ledIndexGlitch4_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    ledIndexGlitch5_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    ledIndexGlitch6_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    ledIndexGlitch7_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    ledIndexGlitch8_ShieldOn[id] = random8(NUM_LEDS_PER_STRIP);
+    
     for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-      leds[id][i] = cyan_ShieldOn;
+      if(i == ledIndexGlitch1_ShieldOn[id] || i == ledIndexGlitch2_ShieldOn[id] || i == ledIndexGlitch3_ShieldOn[id] || i == ledIndexGlitch4_ShieldOn[id] || i == ledIndexGlitch5_ShieldOn[id] || i == ledIndexGlitch6_ShieldOn[id] || i == ledIndexGlitch7_ShieldOn[id] || i == ledIndexGlitch8_ShieldOn[id]){
+        leds[id][i].setRGB(255, 255, 255);  
+      }else{
+        leds[id][i] = cyan_ShieldOn;  
+      }
     }
 }
 
