@@ -789,8 +789,15 @@ void ANIM_SNAKE_YELLOW(int id){
     hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
   }else if(stateAnimSNAKE_YELLOW[id] == true){
     hue_SNAKE_YELLOW[id] = 255;
-    //state_SNAKE_YELLOW[id] = false;
+    stateAnimSNAKE_YELLOW[id] = false;
   }
+
+  if(hue_SNAKE_YELLOW[id] >= 185 && stateAnimSNAKE_YELLOW[id] == false){
+    hue_SNAKE_YELLOW[id]-=delayHue_SNAKE_YELLOW;
+  }else{
+    hue_SNAKE_YELLOW[id] = 185;
+  }
+  
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
     leds[id][i].setHSV(hue_SNAKE_YELLOW[id], 255, 255);
   }
