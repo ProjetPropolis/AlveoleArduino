@@ -363,8 +363,8 @@ void decipherPacket(){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
-        prevReceiveState[i] = receiveState[i];
       }
+      prevReceiveState[i] = receiveState[i];
     }
     FastLED.show();
     //Serial.println("dataId : " + String(dataId));
