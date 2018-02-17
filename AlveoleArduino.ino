@@ -234,28 +234,15 @@ void loop() {
   readTheData();
   for(int i = 0; i < NUM_STRIPS; i++){
     int stripState = receiveState[i];
-    int prevStripState = prevReceiveState[i];
     //Serial.println("update led: " + String(receiveState[i]));
     if(i != indexShield && stripState != 15 && stripState != 16){
-      stateCtrl(i, stripState, prevStripState);
+      stateCtrl(i, stripState, prevReceiveState[i]);
     }else if(i == indexShield && (stripState == 13 || stripState == 14 || stripState == 17 || stripState == 18 || stripState == 19 || stripState == 20 || stripState == 21 || stripState == 22 || stripState == 23 || stripState == 24 || stripState == 25 || stripState == 26)){
-      stateCtrl(i, stripState, prevStripState);
+      stateCtrl(i, stripState, prevReceiveState[i]);
     }
     
     if(receiveState[i] != prevReceiveState[i]){
       prevReceiveState[i] = receiveState[i];
-      if(prevReceiveState[i] == 7 && receiveState[i] != 7){
-        ledIndex_Blue[i] = 0;
-        stateAnim_Blue[i] = 0;
-        preBlueAnim_Blue[i] = true;
-      }else if(prevReceiveState[i] == 23 && receiveState[i]!= 23){
-        hue_TURQUOISE_FADE[i] = 185;
-      }else if(prevReceiveState[i] == 24 && receiveState[i] != 24){
-        val_SNAKE_TURQUOISE[i] = 255;
-      }else if(prevReceiveState[i] == 25 && receiveState[i]!= 25){
-        hue_SNAKE_YELLOW[i] = 64;
-        stateAnimSNAKE_YELLOW[i] = true;
-      }
     }
   }
 
@@ -376,21 +363,7 @@ void decipherPacket(){
           // if(stripState != 2) add to the else if needed(were testing the condition)
           stateCtrl(referenceDigitalPin[i], stripState, prevReceiveState[i]);
         }
-        if(receiveState[i] != prevReceiveState[i]){
-          prevReceiveState[i] = receiveState[i];
-          if(prevReceiveState[i] == 7 && receiveState[i] != 7){
-            ledIndex_Blue[i] = 0;
-            stateAnim_Blue[i] = 0;
-            preBlueAnim_Blue[i] = true;
-          }else if(prevReceiveState[i] == 23 && receiveState[i]!= 23){
-            hue_TURQUOISE_FADE[i] = 185;
-          }else if(prevReceiveState[i] == 24 && receiveState[i] != 24){
-            val_SNAKE_TURQUOISE[i] = 255;
-          }else if(prevReceiveState[i] == 25 && receiveState[i]!= 25){
-            hue_SNAKE_YELLOW[i] = 64;
-            stateAnimSNAKE_YELLOW[i] = true;
-          }
-        }
+        prevReceiveState[i] = receiveState[i];
       }
     }
     FastLED.show();
@@ -466,7 +439,7 @@ void readButtonStatus(){
 void stateCtrl(int id, int state, int prevState){
   
   //Resets climax's anim when it's the alveole's prevState
-  /*
+  
   if(prevState == 7 && state != 7){
     ledIndex_Blue[id] = 0;
     stateAnim_Blue[id] = 0;
@@ -479,7 +452,7 @@ void stateCtrl(int id, int state, int prevState){
     hue_SNAKE_YELLOW[id] = 64;
     stateAnimSNAKE_YELLOW[id] = true;
   }
-  */
+  
   if(state < 30 && state >= 0){
     switch( state ) {
       case 0: 
