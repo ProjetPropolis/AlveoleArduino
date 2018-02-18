@@ -13,7 +13,7 @@
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2812B
 #define NUM_LEDS    80
-#define NUM_STRIPS 12
+#define NUM_STRIPS 7
 #define BRIGHTNESS  255
 #define FASTLED_ALLOW_INTERRUPTS 0
 #define LATENCY_DELAY 400
