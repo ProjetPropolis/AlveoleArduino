@@ -495,6 +495,9 @@ void stateCtrl(int id, int state, int prevState){
         needReset[id] = 1;
         waveCorrupted(id);
         break;
+      case 11:
+        blinkRecipe2(id);
+        break;
       case 13: 
         shield_On(id);
         break;
@@ -734,6 +737,13 @@ void shield_On(int id){
       leds[id][i] = cyan_ShieldOn;  
       //}
     }
+}
+
+void blinkRecipe2(int id){
+  //11
+  for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
+    leds[id][i].setRGB(120, 120, 120);
+  }
 }
 
 void ANIM_TURQUOISE(int id){
