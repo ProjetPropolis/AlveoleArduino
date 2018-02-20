@@ -742,6 +742,9 @@ void stateCtrl(int id, int state, int prevState){
     case 10:
       ultracorrupt_clearHint(id);
       break;
+    case 11:
+      blinkRecipe2(id);
+      break;
     case 15: 
       if(needReset[id] != 0){
         resetTile(id);
@@ -1214,6 +1217,13 @@ void ultracorrupt_clearHint(int id){
     for(int i = 0; i < NUM_LEDS; i++){
       leds[id][i].setHSV(185, sat_Ultracorrupt_clearHint[id], 255);
     }
+}
+
+void blinkRecipe2(int id){
+  //11
+  for(int i = 0; i < NUM_LEDS; i++){
+    leds[id][i].setRGB(120, 120, 120);  
+  }
 }
 
 void ANIM_TURQUOISE(int id){
