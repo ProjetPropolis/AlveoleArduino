@@ -258,7 +258,7 @@ float delayHue_TURQUOISE_FADE = 1;
 
 /*==== ANIM_SNAKE_TURQUOISE() Variables ===*/
 float val_SNAKE_TURQUOISE[NUM_STRIPS] = {255, 255, 255, 255, 255, 255, 255};
-float delayBrightness_SNAKE_TURQUOISE = 1.5;
+float delayBrightness_SNAKE_TURQUOISE = 1;
 
 /*==== ANIM_SNAKE_YELLOW() Variables ===*/
 float hue_SNAKE_YELLOW[NUM_STRIPS] = {64, 64, 64, 64, 64, 64, 64};
