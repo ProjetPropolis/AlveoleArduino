@@ -52,7 +52,7 @@ HX711 scale5(17,18);
 HX711 scale6(19,22);
 
 //datas array use for calculating the outcome of the receive data
-int threshold = 25000;
+int threshold = 15000;
 uint32_t prevValues[NUM_STRIPS];
 int dataId = 419;
 int dataState = 419;
@@ -63,7 +63,7 @@ long int sensorThreshold[NUM_STRIPS]; //originaly not an array and has 10 000 ha
 bool calibrationState = 0;
 int countCalibrated = 0;
 
-int resistance = 5; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
+int resistance = 8; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
 int currentSensor = 0;
 
 int prevTileStatus[NUM_STRIPS];
