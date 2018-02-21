@@ -1222,7 +1222,7 @@ void ultracorrupt_clearHint(int id){
 void blinkRecipe2(int id){
   //11
   for(int i = 0; i < NUM_LEDS; i++){
-    leds[id][i].setRGB(60, 60, 60);  
+    leds[id][i].setRGB(20, 0, 0);  
   }
 }
 
