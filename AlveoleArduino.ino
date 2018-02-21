@@ -742,7 +742,7 @@ void shield_On(int id){
 void blinkRecipe2(int id){
   //11
   for(int i = 0; i < NUM_LEDS_PER_STRIP; i++){
-    leds[id][i].setRGB(120, 120, 120);
+    leds[id][i].setRGB(20, 0, 0);
   }
 }
 
