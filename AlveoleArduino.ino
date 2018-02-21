@@ -63,7 +63,7 @@ long int sensorThreshold[NUM_STRIPS]; //originaly not an array and has 10 000 ha
 bool calibrationState = 0;
 int countCalibrated = 0;
 
-int resistance = 7; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
+int resistance = 5; //Number of time the threshold is multiply. Basic threshold are 10% of their initial value and each resistance multiply that number
 int currentSensor = 0;
 
 int prevTileStatus[NUM_STRIPS];
