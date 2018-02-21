@@ -52,7 +52,7 @@ HX711 scale5(17,18);
 HX711 scale6(19,22);
 
 //datas array use for calculating the outcome of the receive data
-int threshold = 10000;
+int threshold = 40000;
 uint32_t prevValues[NUM_STRIPS];
 int dataId = 419;
 int dataState = 419;
