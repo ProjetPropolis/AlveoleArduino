@@ -129,6 +129,20 @@ int ledAnimIndex_PreOn[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 int ledIndex_On[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 int ledAnimIndex_On[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 
+/*==== onPressed() Variables ===*/
+Chrono myChrono0_OnPressed;
+Chrono myChrono1_OnPressed;
+Chrono myChrono2_OnPressed;
+Chrono myChrono3_OnPressed;
+Chrono myChrono4_OnPressed;
+Chrono myChrono5_OnPressed;
+Chrono myChrono6_OnPressed;
+Chrono myChrono_OnPressed[NUM_STRIPS] = {myChrono0_OnPressed, myChrono1_OnPressed, myChrono2_OnPressed, myChrono3_OnPressed, myChrono4_OnPressed, myChrono5_OnPressed, myChrono6_OnPressed};
+bool active_OnPressed[] = {true, true, true, true, true, true, true};
+int stateSat_OnPressed[] = {0, 0, 0, 0, 0, 0, 0};
+int sat_OnPressed[] = {0, 0, 0, 0, 0, 0, 0};
+int delaySat_OnPressed = 40;
+
 /*==== off() Variables ===*/
 int ledIndex_Off[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 
@@ -709,7 +723,12 @@ void predictGameplay(int id, int prevState){
 
 void stateCtrl(int id, int state, int prevState){
 
-  //Resets climax's anim when it's the alveole's prevState
+  //Resets anims when it's the alveole's prevState
+  if(prevState == 1 && state != 1){
+    sat_OnPressed[id] = 0;
+    stateSat_OnPressed[id] = 0;
+    active_OnPressed[id] = true;
+  }
   if(prevState == 23 && state != 23){
     hue_TURQUOISE_FADE[id] = 185;  
   }
@@ -732,9 +751,11 @@ void stateCtrl(int id, int state, int prevState){
       }
       if(!masterChrono_On[id].hasPassed(500)){
         preOn(id);
+      }else if(prevState == 1 && active_OnPressed[id] == true){
+        onPressed(id); 
       }else{
         on(id);
-      } 
+      }
       break;
     case 2:  
       if(prevState == 1){
@@ -904,6 +925,47 @@ void on(int id){
      
 }
 
+void onPressed(int id){
+  
+  for(int i = 0; i < NUM_LEDS; i++){
+    leds[id][i].setHSV(34, sat_OnPressed[id], 255);
+  }  
+  
+  //if(myChrono_OnPressed[id].hasPassed(250)){
+  if(sat_OnPressed[id] <= (255 - delaySat_OnPressed) && stateSat_OnPressed[id] == 0){
+    sat_OnPressed[id]+=delaySat_OnPressed;
+  }else if(stateSat_OnPressed[id] == 0){
+    sat_OnPressed[id] = 255;
+    stateSat_OnPressed[id] = 1;
+  }
+
+  if(sat_OnPressed[id] >= (0 + delaySat_OnPressed) && stateSat_OnPressed[id] == 1){
+    sat_OnPressed[id]-=delaySat_OnPressed;
+  }else if(stateSat_OnPressed[id] == 1){
+    sat_OnPressed[id] = 0;
+    stateSat_OnPressed[id] = 2;
+  }
+
+  if(sat_OnPressed[id] <= (255 - delaySat_OnPressed) && stateSat_OnPressed[id] == 2){
+    sat_OnPressed[id]+=delaySat_OnPressed;
+  }else if(stateSat_OnPressed[id] == 2){
+    sat_OnPressed[id] = 0;
+    stateSat_OnPressed[id] = 0;
+    active_OnPressed[id] = false;
+    //myChrono_OnPressed[id].restart();
+  }
+
+    /*
+    if(sat_OnPressed[id] >= (0 + delaySat_OnPressed) && stateSat_OnPressed[id] == 3){
+      sat_OnPressed[id]-=delaySat_OnPressed;
+    }else if(stateSat_OnPressed[id] == 3){
+      sat_OnPressed[id] = 0;
+      stateSat_OnPressed[id] = 0;
+      myChrono_OnPressed[id].restart();
+    }
+    */
+  //}
+}
 
 void corrupt(int id){
 
