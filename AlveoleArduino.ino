@@ -954,10 +954,9 @@ void on(int id){
 void onPressed(int id){
   
   for(int i = 0; i < NUM_LEDS; i++){
-    leds[id][i].setHSV(50, sat_OnPressed[id], 255);
+    leds[id][i].setHSV(64, sat_OnPressed[id], 255);
   }  
   
-  //if(myChrono_OnPressed[id].hasPassed(250)){
   if(sat_OnPressed[id] <= (255 - delaySat_OnPressed) && stateSat_OnPressed[id] == 0){
     sat_OnPressed[id]+=delaySat_OnPressed;
   }else if(stateSat_OnPressed[id] == 0){
@@ -978,19 +977,7 @@ void onPressed(int id){
     sat_OnPressed[id] = satLimit_OnPressed;
     stateSat_OnPressed[id] = satLimit_OnPressed;
     active_OnPressed[id] = false;
-    //myChrono_OnPressed[id].restart();
   }
-
-    /*
-    if(sat_OnPressed[id] >= (0 + delaySat_OnPressed) && stateSat_OnPressed[id] == 3){
-      sat_OnPressed[id]-=delaySat_OnPressed;
-    }else if(stateSat_OnPressed[id] == 3){
-      sat_OnPressed[id] = 0;
-      stateSat_OnPressed[id] = 0;
-      myChrono_OnPressed[id].restart();
-    }
-    */
-  //}
 }
 
 void corrupt(int id){
