@@ -254,7 +254,7 @@ int ledIndex2_Ultracleanser[NUM_STRIPS];
 int ledIndex3_Ultracleanser[NUM_STRIPS];
 int ledIndex4_Ultracleanser[NUM_STRIPS];
 int stateLedIndex_Ultracleanser[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
-int delay_Ultracleanser = 150;
+int delay_Ultracleanser = 75;
 bool state1First_Ultracleanser[] = {true, true, true, true, true, true, true};
 bool state2First_Ultracleanser[] = {true, true, true, true, true, true, true};
 bool state3First_Ultracleanser[] = {true, true, true, true, true, true, true};
@@ -332,8 +332,8 @@ CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 CRGB greenTurquoise_ANIM(0, 200, 125);
 //CRGB greenTurquoise_ANIM(0, 200, 125);
 //CHSV green_Ultracleanser(85, 200, 255);
-CHSV green_Ultracleanser(85, 200, 255);
-CRGB white_Ultracleanser(255, 255, 255);
+CHSV green_Ultracleanser(80, 200, 255);
+CRGB white_Ultracleanser(0, 0, 0);
 CRGB black_Ultracleanser(0, 0, 0);
 
 void setup() {
@@ -1496,7 +1496,6 @@ void ultracleanser(int id){
       state4Third_Ultracleanser[id] = true;
       state4Fourth_Ultracleanser[id] = true;
     }
-  }else{
     myChrono_Ultracleanser[id].restart();
   }
 }
