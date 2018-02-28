@@ -692,6 +692,10 @@ void readPressurePlate(long int val, int id){
       sendHexStatus(index,0);
       predictGameplay(index,prevReceiveState[index]);
     }
+  }else{
+    sat_OnPressed[id] = satLimit_OnPressed;
+    stateSat_OnPressed[id] = 0;
+    active_OnPressed[id] = false;
   }
   prevTileStatus[index] = tileStatus[index];
   prevTilePressure[index] = tilePressure[index];
@@ -781,6 +785,9 @@ void stateCtrl(int id, int state, int prevState){
       }else if(prevState == 1 && active_OnPressed[id] == true){
         onPressed(id);
         resetYellow[id] = 1; 
+      }else if(resetYellow[id] == 1){
+        ANIM_YELLOW(id);
+        resetYellow[id] = 0;
       }else{
         on(id);
       }
@@ -978,7 +985,7 @@ void onPressed(int id){
   }else if(stateSat_OnPressed[id] == 2){
     sat_OnPressed[id] = satLimit_OnPressed;
     stateSat_OnPressed[id] = satLimit_OnPressed;
-    active_OnPressed[id] = false;
+    //active_OnPressed[id] = false;
   }
 }
 
