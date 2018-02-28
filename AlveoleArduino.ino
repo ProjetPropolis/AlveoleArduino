@@ -323,7 +323,7 @@ CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 CRGB greenTurquoise_ANIM(0, 200, 125);
 //CRGB greenTurquoise_ANIM(0, 200, 125);
 CHSV green_Ultracleanser(85, 200, 255);
-CRGB white_Ultracleanser(255, 255, 255);
+CRGB white_Ultracleanser(0, 0, 0);
 
 void setup() {
   Serial.begin(115200);
@@ -590,6 +590,7 @@ void decipherPacket(){
         Serial.println("update led: " + String(stripState));
         //if(stripState != 15 && stripState != 16){
         stateCtrl(i, stripState, prevReceiveState[i]);
+        prevReceiveState[i] = receiveState[i];
         //}
       }
       //prevReceiveState[i] = receiveState[i];
