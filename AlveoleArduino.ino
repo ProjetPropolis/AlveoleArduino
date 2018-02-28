@@ -325,7 +325,7 @@ CRGB greenTurquoise_ANIM(0, 200, 125);
 //CRGB greenTurquoise_ANIM(0, 200, 125);
 //CHSV green_Ultracleanser(85, 200, 255);
 CHSV green_Ultracleanser(85, 200, 255);
-CHSV white_Ultracleanser(125, 150, 255);
+CHSV white_Ultracleanser(125, 100, 255);
 CRGB black_Ultracleanser(0, 0, 0);
 
 void setup() {
