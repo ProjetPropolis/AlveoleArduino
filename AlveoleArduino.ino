@@ -789,7 +789,7 @@ void stateCtrl(int id, int state, int prevState){
         needReset[id] = 1;
       }
       if(!masterChrono_Corrupt[id].hasPassed(3000)){
-        //on(id);
+        on(id);
         corrupt(id);
       }else{
         if(needReset[id] != 0){
@@ -954,7 +954,7 @@ void on(int id){
 void onPressed(int id){
   
   for(int i = 0; i < NUM_LEDS; i++){
-    leds[id][i].setHSV(34, sat_OnPressed[id], 200);
+    leds[id][i].setHSV(34, sat_OnPressed[id], 180);
   }  
   
   //if(myChrono_OnPressed[id].hasPassed(250)){
