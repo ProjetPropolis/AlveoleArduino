@@ -138,7 +138,7 @@ Chrono myChrono4_OnPressed;
 Chrono myChrono5_OnPressed;
 Chrono myChrono6_OnPressed;
 Chrono myChrono_OnPressed[NUM_STRIPS] = {myChrono0_OnPressed, myChrono1_OnPressed, myChrono2_OnPressed, myChrono3_OnPressed, myChrono4_OnPressed, myChrono5_OnPressed, myChrono6_OnPressed};
-bool active_OnPressed[] = {true, true, true, true, true, true, true};
+bool active_OnPressed[] = {false, false, false, false, false, false, false};
 int stateSat_OnPressed[] = {0, 0, 0, 0, 0, 0, 0};
 int sat_OnPressed[] = {0, 0, 0, 0, 0, 0, 0};
 int delaySat_OnPressed = 40;
