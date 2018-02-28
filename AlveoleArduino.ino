@@ -217,14 +217,14 @@ int ledIndex2_Cleanser[NUM_STRIPS];
 int stateLedIndex1_Cleanser[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 //int stateLedIndex2_Cleanser[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
 int delayProgressLed_Cleanser = 10;
-bool state1First_Cleanser = true;
-bool state2First_Cleanser = true;
-bool state3First_Cleanser = true;
-bool state4First_Cleanser = true;
-bool state1Second_Cleanser = true;
-bool state2Second_Cleanser = true;
-bool state3Second_Cleanser = true;
-bool state4Second_Cleanser = true;
+bool state1First_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
+bool state2First_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
+bool state3First_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
+bool state4First_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
+bool state1Second_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
+bool state2Second_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
+bool state3Second_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
+bool state4Second_Cleanser[NUM_STRIPS] = {true, true, true, true, true, true, true};
 
 /*==== cleansing() Variables ===*/
 int ledIndex1_Cleansing[NUM_STRIPS];
@@ -254,7 +254,7 @@ int ledIndex2_Ultracleanser[NUM_STRIPS];
 int ledIndex3_Ultracleanser[NUM_STRIPS];
 int ledIndex4_Ultracleanser[NUM_STRIPS];
 int stateLedIndex_Ultracleanser[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
-int delay_Ultracleanser = 75;
+int delay_Ultracleanser = 150;
 bool state1First_Ultracleanser[] = {true, true, true, true, true, true, true};
 bool state2First_Ultracleanser[] = {true, true, true, true, true, true, true};
 bool state3First_Ultracleanser[] = {true, true, true, true, true, true, true};
@@ -1108,100 +1108,100 @@ void cleanser(int id){
     
     if(stateLedIndex1_Cleanser[id] == 0 || stateLedIndex1_Cleanser[id] == 1){
      //Writing BLUE for the strip's first half from firstLED
-     if((ledIndex1_Cleanser[id] < (NUM_LEDS*0.5)-1) && state1First_Cleanser){
+     if((ledIndex1_Cleanser[id] < (NUM_LEDS*0.5)-1) && state1First_Cleanser[id]){
        leds[id][ledIndex1_Cleanser[id]] = blue_Cleanser;
        ledIndex1_Cleanser[id]++;
      }else{
        leds[id][ledIndex1_Cleanser[id]] = blue_Cleanser;
        ledIndex1_Cleanser[id] = 0;
        stateLedIndex1_Cleanser[id]++;
-       state1First_Cleanser = false;
+       state1First_Cleanser[id] = false;
      }
      //Writing BLUE for the strip's second half from middleLED
-     if((ledIndex2_Cleanser[id] < NUM_LEDS-1) && state1Second_Cleanser){
+     if((ledIndex2_Cleanser[id] < NUM_LEDS-1) && state1Second_Cleanser[id]){
        leds[id][ledIndex2_Cleanser[id]] = blue_Cleanser;
        ledIndex2_Cleanser[id]++;
      }else{
        leds[id][ledIndex2_Cleanser[id]] = blue_Cleanser;
        ledIndex2_Cleanser[id] = NUM_LEDS*0.5;
        stateLedIndex1_Cleanser[id]++;
-       state1Second_Cleanser = false;
+       state1Second_Cleanser[id] = false;
      }
     }else if(stateLedIndex1_Cleanser[id] == 2 || stateLedIndex1_Cleanser[id] == 3){
      //Writing BLACK for the strip's first half from firstLED
-     if((ledIndex1_Cleanser[id] < (NUM_LEDS*0.5)-1) && state2First_Cleanser){
+     if((ledIndex1_Cleanser[id] < (NUM_LEDS*0.5)-1) && state2First_Cleanser[id]){
        leds[id][ledIndex1_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex1_Cleanser[id]++;
      }else{
        leds[id][ledIndex1_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex1_Cleanser[id] = (NUM_LEDS*0.5)-1;
        stateLedIndex1_Cleanser[id]++;
-       state2First_Cleanser = false;
+       state2First_Cleanser[id] = false;
      }
      //Writing BLACK for the strip's second half from middleLED
-     if((ledIndex2_Cleanser[id] < NUM_LEDS-1) && state2Second_Cleanser){
+     if((ledIndex2_Cleanser[id] < NUM_LEDS-1) && state2Second_Cleanser[id]){
        leds[id][ledIndex2_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex2_Cleanser[id]++;
      }else{
        leds[id][ledIndex2_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex2_Cleanser[id] = NUM_LEDS-1;
        stateLedIndex1_Cleanser[id]++;
-       state2Second_Cleanser = false;
+       state2Second_Cleanser[id] = false;
      }
     }else if(stateLedIndex1_Cleanser[id] == 4 || stateLedIndex1_Cleanser[id] == 5){
      //Writing BLUE for the strip's first half from middleLED
-     if((ledIndex1_Cleanser[id] > 0) && state3First_Cleanser){
+     if((ledIndex1_Cleanser[id] > 0) && state3First_Cleanser[id]){
        leds[id][ledIndex1_Cleanser[id]] = blue_Cleanser;
        ledIndex1_Cleanser[id]--;
      }else{
        leds[id][ledIndex1_Cleanser[id]] = blue_Cleanser;
        ledIndex1_Cleanser[id] = (NUM_LEDS*0.5)-1;
        stateLedIndex1_Cleanser[id]++;
-       state3First_Cleanser = false;
+       state3First_Cleanser[id] = false;
      }
      //Writing BLUE for the strip's second half from lastLED
-     if((ledIndex2_Cleanser[id] > NUM_LEDS*0.5) && state3Second_Cleanser){
+     if((ledIndex2_Cleanser[id] > NUM_LEDS*0.5) && state3Second_Cleanser[id]){
        leds[id][ledIndex2_Cleanser[id]] = blue_Cleanser;
        ledIndex2_Cleanser[id]--;
      }else{
        leds[id][ledIndex2_Cleanser[id]] = blue_Cleanser;
        ledIndex2_Cleanser[id] = NUM_LEDS-1;
        stateLedIndex1_Cleanser[id]++;
-       state3Second_Cleanser = false;
+       state3Second_Cleanser[id] = false;
      }
     }else if(stateLedIndex1_Cleanser[id] == 6 || stateLedIndex1_Cleanser[id] == 7){
      //Writing BLACK for the strip's second half from middleLED
-     if((ledIndex1_Cleanser[id] > 0) && state4First_Cleanser){
+     if((ledIndex1_Cleanser[id] > 0) && state4First_Cleanser[id]){
        leds[id][ledIndex1_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex1_Cleanser[id]--;
      }else{
        leds[id][ledIndex1_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex1_Cleanser[id] = 0;
        stateLedIndex1_Cleanser[id]++;
-       state4First_Cleanser = false;
+       state4First_Cleanser[id] = false;
      }
      //Writing BLACK for the strip's second half from lastLED
-     if((ledIndex2_Cleanser[id] > NUM_LEDS*0.5) && state4Second_Cleanser){
+     if((ledIndex2_Cleanser[id] > NUM_LEDS*0.5) && state4Second_Cleanser[id]){
        leds[id][ledIndex2_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex2_Cleanser[id]--;
      }else{
        leds[id][ledIndex2_Cleanser[id]].setHSV(140, 255, 0);
        ledIndex2_Cleanser[id] = NUM_LEDS*0.5;
        stateLedIndex1_Cleanser[id]++;
-       state4Second_Cleanser = false;
+       state4Second_Cleanser[id] = false;
      }
     }
     //Reset
     if(stateLedIndex1_Cleanser[id] >= 8){
      stateLedIndex1_Cleanser[id] = 0;
-     state1First_Cleanser = true;
-     state2First_Cleanser = true;
-     state3First_Cleanser = true;
-     state4First_Cleanser = true;
-     state1Second_Cleanser = true;
-     state2Second_Cleanser = true;
-     state3Second_Cleanser = true;
-     state4Second_Cleanser = true;
+     state1First_Cleanser[id] = true;
+     state2First_Cleanser[id] = true;
+     state3First_Cleanser[id] = true;
+     state4First_Cleanser[id] = true;
+     state1Second_Cleanser[id] = true;
+     state2Second_Cleanser[id] = true;
+     state3Second_Cleanser[id] = true;
+     state4Second_Cleanser[id] = true;
     }
 }
 
