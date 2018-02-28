@@ -954,7 +954,7 @@ void on(int id){
 void onPressed(int id){
   
   for(int i = 0; i < NUM_LEDS; i++){
-    leds[id][i].setHSV(34, sat_OnPressed[id], 255);
+    leds[id][i].setHSV(34, sat_OnPressed[id], 200);
   }  
   
   //if(myChrono_OnPressed[id].hasPassed(250)){
