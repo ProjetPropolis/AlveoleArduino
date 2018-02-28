@@ -322,8 +322,9 @@ CRGB orange_ANIM(200, 80, 0);
 CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 CRGB greenTurquoise_ANIM(0, 200, 125);
 //CRGB greenTurquoise_ANIM(0, 200, 125);
-CHSV green_Ultracleanser(85, 200, 255);
-CRGB white_Ultracleanser(0, 0, 0);
+//CHSV green_Ultracleanser(85, 200, 255);
+CHSV green_Ultracleanser(125, 255, 255);
+CRGB white_Ultracleanser(255, 255, 255);
 
 void setup() {
   Serial.begin(115200);
