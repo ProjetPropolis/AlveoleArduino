@@ -142,7 +142,7 @@ bool active_OnPressed[] = {false, false, false, false, false, false, false};
 int stateSat_OnPressed[] = {0, 0, 0, 0, 0, 0, 0};
 int sat_OnPressed[] = {50, 50, 50, 50, 50, 50, 50};
 int delaySat_OnPressed = 40;
-int satLimit_OnPressed = 0;
+int satLimit_OnPressed = 100;
 
 /*==== off() Variables ===*/
 int ledIndex_Off[NUM_STRIPS] = {0, 0, 0, 0, 0, 0, 0};
@@ -789,7 +789,7 @@ void stateCtrl(int id, int state, int prevState){
         needReset[id] = 1;
       }
       if(!masterChrono_Corrupt[id].hasPassed(3000)){
-        on(id);
+        //on(id);
         corrupt(id);
       }else{
         if(needReset[id] != 0){
@@ -954,7 +954,7 @@ void on(int id){
 void onPressed(int id){
   
   for(int i = 0; i < NUM_LEDS; i++){
-    leds[id][i].setHSV(34, sat_OnPressed[id], 100);
+    leds[id][i].setHSV(34, sat_OnPressed[id], 150);
   }  
   
   //if(myChrono_OnPressed[id].hasPassed(250)){
