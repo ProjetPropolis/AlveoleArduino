@@ -140,7 +140,7 @@ Chrono myChrono6_OnPressed;
 Chrono myChrono_OnPressed[NUM_STRIPS] = {myChrono0_OnPressed, myChrono1_OnPressed, myChrono2_OnPressed, myChrono3_OnPressed, myChrono4_OnPressed, myChrono5_OnPressed, myChrono6_OnPressed};
 bool active_OnPressed[] = {false, false, false, false, false, false, false};
 int stateSat_OnPressed[] = {0, 0, 0, 0, 0, 0, 0};
-int sat_OnPressed[] = {0, 0, 0, 0, 0, 0, 0};
+int sat_OnPressed[] = {50, 50, 50, 50, 50, 50, 50};
 int delaySat_OnPressed = 40;
 
 /*==== off() Variables ===*/
@@ -323,7 +323,7 @@ CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 CRGB greenTurquoise_ANIM(0, 200, 125);
 //CRGB greenTurquoise_ANIM(0, 200, 125);
 //CHSV green_Ultracleanser(85, 200, 255);
-CHSV green_Ultracleanser(125, 255, 255);
+CHSV green_Ultracleanser(115, 255, 255);
 CRGB white_Ultracleanser(255, 255, 255);
 
 void setup() {
@@ -697,6 +697,8 @@ void predictGameplay(int id, int prevState){
       Serial.println("enter case1");
       theState =1;
       receiveState[id] = theState;
+      sat_OnPressed[id] = 50;
+      stateSat_OnPressed[id] = 0;
       active_OnPressed[id] = true;
       stateCtrl(id,theState,prevState);
       FastLED.show();
@@ -705,6 +707,7 @@ void predictGameplay(int id, int prevState){
       Serial.println("enter case2");
       theState = 1;
       receiveState[id] = theState;
+      active_OnPressed[id] = false;
       stateCtrl(id,theState,prevState);
       FastLED.show();
       return;
@@ -726,11 +729,13 @@ void predictGameplay(int id, int prevState){
 void stateCtrl(int id, int state, int prevState){
 
   //Resets anims when it's the alveole's prevState
+  /*
   if(prevState == 1 && state != 1){
-    sat_OnPressed[id] = 0;
+    sat_OnPressed[id] = 50;
     stateSat_OnPressed[id] = 0;
     active_OnPressed[id] = true;
   }
+  */
   if(prevState == 23 && state != 23){
     hue_TURQUOISE_FADE[id] = 185;  
   }
@@ -753,7 +758,7 @@ void stateCtrl(int id, int state, int prevState){
       }
       if(!masterChrono_On[id].hasPassed(500)){
         preOn(id);
-      }else if(prevState == 1 && active_OnPressed[id] == true){
+      }else if(active_OnPressed[id] == true){
         onPressed(id); 
       }else{
         on(id);
@@ -941,18 +946,18 @@ void onPressed(int id){
     stateSat_OnPressed[id] = 1;
   }
 
-  if(sat_OnPressed[id] >= (0 + delaySat_OnPressed) && stateSat_OnPressed[id] == 1){
+  if(sat_OnPressed[id] >= (50 + delaySat_OnPressed) && stateSat_OnPressed[id] == 1){
     sat_OnPressed[id]-=delaySat_OnPressed;
   }else if(stateSat_OnPressed[id] == 1){
-    sat_OnPressed[id] = 0;
+    sat_OnPressed[id] = 50;
     stateSat_OnPressed[id] = 2;
   }
 
   if(sat_OnPressed[id] <= (255 - delaySat_OnPressed) && stateSat_OnPressed[id] == 2){
     sat_OnPressed[id]+=delaySat_OnPressed;
   }else if(stateSat_OnPressed[id] == 2){
-    sat_OnPressed[id] = 0;
-    stateSat_OnPressed[id] = 0;
+    sat_OnPressed[id] = 50;
+    stateSat_OnPressed[id] = 50;
     active_OnPressed[id] = false;
     //myChrono_OnPressed[id].restart();
   }
