@@ -323,8 +323,9 @@ CHSV purpleLit_PURPLE_WIPE(180, 100, 255);
 CRGB greenTurquoise_ANIM(0, 200, 125);
 //CRGB greenTurquoise_ANIM(0, 200, 125);
 //CHSV green_Ultracleanser(85, 200, 255);
-CHSV green_Ultracleanser(115, 255, 255);
+CHSV green_Ultracleanser(120, 200, 255);
 CRGB white_Ultracleanser(255, 255, 255);
+CRGB black_Ultracleanser(0, 0, 0);
 
 void setup() {
   Serial.begin(115200);
@@ -707,7 +708,6 @@ void predictGameplay(int id, int prevState){
       Serial.println("enter case2");
       theState = 1;
       receiveState[id] = theState;
-      active_OnPressed[id] = false;
       stateCtrl(id,theState,prevState);
       FastLED.show();
       return;
@@ -755,6 +755,7 @@ void stateCtrl(int id, int state, int prevState){
       needReset[id] = 1;
       if(prevState == 2 || prevState == 10){
         masterChrono_On[id].restart();
+        active_OnPressed[id] == false;
       }
       if(!masterChrono_On[id].hasPassed(500)){
         preOn(id);
@@ -1340,40 +1341,40 @@ void ultracleanser(int id){
   }else if(stateLedIndex_Ultracleanser[id] >= 4 && stateLedIndex_Ultracleanser[id] < 8){
     //Writing WHITE for the strip's first quarter from firstLED
     if((ledIndex1_Ultracleanser[id] < ((NUM_LEDS*0.25)-1)) && state2First_Ultracleanser[id]){
-      leds[id][ledIndex1_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex1_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex1_Ultracleanser[id]++;
     }else{
-      leds[id][ledIndex1_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex1_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex1_Ultracleanser[id] = (NUM_LEDS*0.25)-1;
       stateLedIndex_Ultracleanser[id]++;
       state2First_Ultracleanser[id] = false;
     }
     //Writing WHITE for the strip's second quarter from middleLED
     if((ledIndex2_Ultracleanser[id] < ((NUM_LEDS*0.5)-1)) && state2Second_Ultracleanser[id]){
-      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex2_Ultracleanser[id]++;
     }else{
-      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex2_Ultracleanser[id] = (NUM_LEDS*0.5)-1;
       stateLedIndex_Ultracleanser[id]++;
       state2Second_Ultracleanser[id] = false;
     }
     //Writing WHITE for the strip's third quarter from firstLED
     if((ledIndex3_Ultracleanser[id] < (((NUM_LEDS*0.5)+(NUM_LEDS*0.25))-1)) && state2Third_Ultracleanser[id]){
-      leds[id][ledIndex3_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex3_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex3_Ultracleanser[id]++;
     }else{
-      leds[id][ledIndex3_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex3_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex3_Ultracleanser[id] = ((NUM_LEDS*0.5)+(NUM_LEDS*0.25))-1;
       stateLedIndex_Ultracleanser[id]++;
       state2Third_Ultracleanser[id] = false;
     }
     //Writing WHITE for the strip's fourth quarter from middleLED
     if((ledIndex4_Ultracleanser[id] < (NUM_LEDS-1)) && state2Fourth_Ultracleanser[id]){
-      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex4_Ultracleanser[id]++;
     }else{
-      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex4_Ultracleanser[id] = NUM_LEDS-1;
       stateLedIndex_Ultracleanser[id]++;
       state2Fourth_Ultracleanser[id] = false;
@@ -1381,40 +1382,40 @@ void ultracleanser(int id){
   }else if(stateLedIndex_Ultracleanser[id] >= 8 && stateLedIndex_Ultracleanser[id] < 12){
     //Writing GREEN for the strip's first quarter from middleLED
     if((ledIndex1_Ultracleanser[id] > 0) && state3First_Ultracleanser[id]){
-      leds[id][ledIndex1_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex1_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex1_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex1_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex1_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex1_Ultracleanser[id] = (NUM_LEDS*0.25)-1;
       stateLedIndex_Ultracleanser[id]++;
       state3First_Ultracleanser[id] = false;
     }
     //Writing GREEN for the strip's second quarter from lastLED
     if((ledIndex2_Ultracleanser[id] > NUM_LEDS*0.25) && state3Second_Ultracleanser[id]){
-      leds[id][ledIndex2_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex2_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex2_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex2_Ultracleanser[id] = (NUM_LEDS*0.5)-1;
       stateLedIndex_Ultracleanser[id]++;
       state3Second_Ultracleanser[id] = false;
     }
     //Writing GREEN for the strip's third quarter from middleLED
     if((ledIndex3_Ultracleanser[id] > NUM_LEDS*0.5) && state3Third_Ultracleanser[id]){
-      leds[id][ledIndex3_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex3_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex3_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex3_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex3_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex3_Ultracleanser[id] = ((NUM_LEDS*0.5)+(NUM_LEDS*0.25))-1;
       stateLedIndex_Ultracleanser[id]++;
       state3Third_Ultracleanser[id] = false;
     }
     //Writing GREEN for the strip's fourth quarter from lastLED
     if((ledIndex4_Ultracleanser[id] > (NUM_LEDS*0.5)+(NUM_LEDS*0.25)) && state3Fourth_Ultracleanser[id]){
-      leds[id][ledIndex4_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex4_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex4_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex4_Ultracleanser[id] = NUM_LEDS-1;
       stateLedIndex_Ultracleanser[id]++;
       state3Fourth_Ultracleanser[id] = false;
@@ -1422,40 +1423,40 @@ void ultracleanser(int id){
   }else if(stateLedIndex_Ultracleanser[id] >= 12 && stateLedIndex_Ultracleanser[id] < 16){
     //Writing WHITE for the strip's first quarter from middleLED
     if((ledIndex1_Ultracleanser[id] > 0) && state4First_Ultracleanser[id]){
-      leds[id][ledIndex1_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex1_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex1_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex1_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex1_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex1_Ultracleanser[id] = 0;
       stateLedIndex_Ultracleanser[id]++;
       state4First_Ultracleanser[id] = false;
     }
     //Writing WHITE for the strip's second quarter from lastLED
     if((ledIndex2_Ultracleanser[id] > NUM_LEDS*0.25) && state4Second_Ultracleanser[id]){
-      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex2_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex2_Ultracleanser[id] = NUM_LEDS*0.25;
       stateLedIndex_Ultracleanser[id]++;
       state4Second_Ultracleanser[id] = false;
     }
     //Writing WHITE for the strip's third quarter from middleLED
     if((ledIndex3_Ultracleanser[id] > NUM_LEDS*0.5) && state4Third_Ultracleanser[id]){
-      leds[id][ledIndex3_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex3_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex3_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex3_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex3_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex3_Ultracleanser[id] = NUM_LEDS*0.5;
       stateLedIndex_Ultracleanser[id]++;
       state4Third_Ultracleanser[id] = false;
     }
     //Writing WHITE for the strip's fourth quarter from lastLED
     if((ledIndex4_Ultracleanser[id] > (NUM_LEDS*0.5)+(NUM_LEDS*0.25)) && state4Fourth_Ultracleanser[id]){
-      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex4_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = black_Ultracleanser;
       ledIndex4_Ultracleanser[id] = (NUM_LEDS*0.5)+(NUM_LEDS*0.25);
       stateLedIndex_Ultracleanser[id]++;
       state4Fourth_Ultracleanser[id] = false;
