@@ -781,13 +781,11 @@ void stateCtrl(int id, int state, int prevState){
       }else if(prevState == 1 && active_OnPressed[id] == true){
         onPressed(id);
         resetYellow[id] = 1; 
+      }else if(resetYellow[id] == 1){
+        ANIM_YELLOW(id);
+        resetYellow[id] = 0;
       }else{
-        if(resetYellow[id] == 1){
-          ANIM_YELLOW(id);
-          resetYellow[id] = 0;
-        }else{
-          on(id);
-        }
+        on(id);
       }
       break;
     case 2:  
