@@ -590,7 +590,6 @@ void decipherPacket(){
         Serial.println("update led: " + String(stripState));
         //if(stripState != 15 && stripState != 16){
         stateCtrl(i, stripState, prevReceiveState[i]);
-        prevReceiveState[i] = receiveState[i];
         //}
       }
       //prevReceiveState[i] = receiveState[i];
@@ -697,6 +696,7 @@ void predictGameplay(int id, int prevState){
       Serial.println("enter case1");
       theState =1;
       receiveState[id] = theState;
+      active_OnPressed[id] = true;
       stateCtrl(id,theState,prevState);
       FastLED.show();
       return;
