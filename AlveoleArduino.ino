@@ -119,6 +119,7 @@ Chrono masterChrono6_Ultracorrupt;
 Chrono masterChrono_Ultracorrupt[NUM_STRIPS] = {masterChrono0_Ultracorrupt, masterChrono1_Ultracorrupt, masterChrono2_Ultracorrupt, masterChrono3_Ultracorrupt, masterChrono4_Ultracorrupt, masterChrono5_Ultracorrupt, masterChrono6_Ultracorrupt};
 int pastHexStatus = 0;
 bool needReset[NUM_STRIPS] = {0,0,0,0,0,0,0};
+bool resetYellow[NUM_STRIPS] = {0,0,0,0,0,0,0};
 bool unlocked[] = {true, true, true, true, true, true, true};
 
 /*==== preOn() Variables ===*/
@@ -778,9 +779,15 @@ void stateCtrl(int id, int state, int prevState){
         preOn(id);
         //active_OnPressed[id] == false;
       }else if(prevState == 1 && active_OnPressed[id] == true){
-        onPressed(id); 
+        onPressed(id);
+        resetYellow[id] = 1; 
       }else{
-        on(id);
+        if(resetYellow[id] == 1){
+          ANIM_YELLOW(id);
+          resetYellow[id] = 0;
+        }else{
+          on(id);
+        }
       }
       break;
     case 2:  
