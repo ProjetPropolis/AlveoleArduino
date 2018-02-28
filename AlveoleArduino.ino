@@ -325,8 +325,8 @@ CRGB greenTurquoise_ANIM(0, 200, 125);
 //CRGB greenTurquoise_ANIM(0, 200, 125);
 //CHSV green_Ultracleanser(85, 200, 255);
 CHSV green_Ultracleanser(85, 200, 255);
-CRGB white_Ultracleanser(255, 255, 255);
-CHSV black_Ultracleanser(125, 150, 255);
+CHSV white_Ultracleanser(125, 150, 255);
+CRGB black_Ultracleanser(0, 0, 0);
 
 void setup() {
   Serial.begin(115200);
@@ -756,10 +756,10 @@ void stateCtrl(int id, int state, int prevState){
       needReset[id] = 1;
       if(prevState == 2 || prevState == 10){
         masterChrono_On[id].restart();
-        active_OnPressed[id] == false;
       }
       if(!masterChrono_On[id].hasPassed(500)){
         preOn(id);
+        active_OnPressed[id] == false;
       }else if(active_OnPressed[id] == true){
         onPressed(id); 
       }else{
