@@ -657,6 +657,9 @@ void readPressurePlate(long int val, int id){
       Serial.println(sensorThreshold[index]);
       tileStatus[index] = 1;
       isPressed_UltracorruptPressed[index] = 1;
+      sat_OnPressed[id] = satLimit_OnPressed;
+      stateSat_OnPressed[id] = 0;
+      active_OnPressed[id] = true;
       sendHexStatus(index,1);
       predictGameplay(index,prevReceiveState[index]);
     }else{
@@ -668,6 +671,9 @@ void readPressurePlate(long int val, int id){
       Serial.println(sensorThreshold[index]);
       tileStatus[index] = 0;
       isPressed_UltracorruptPressed[index] = 0;
+      sat_OnPressed[id] = satLimit_OnPressed;
+      stateSat_OnPressed[id] = 0;
+      active_OnPressed[id] = false;
       sendHexStatus(index,0);
       predictGameplay(index,prevReceiveState[index]);
     }
@@ -699,9 +705,6 @@ void predictGameplay(int id, int prevState){
       Serial.println("enter case1");
       theState =1;
       receiveState[id] = theState;
-      sat_OnPressed[id] = satLimit_OnPressed;
-      stateSat_OnPressed[id] = 0;
-      active_OnPressed[id] = true;
       stateCtrl(id,theState,prevState);
       FastLED.show();
       return;
@@ -759,8 +762,8 @@ void stateCtrl(int id, int state, int prevState){
       }
       if(!masterChrono_On[id].hasPassed(500)){
         preOn(id);
-        active_OnPressed[id] == false;
-      }else if(active_OnPressed[id] == true){
+        //active_OnPressed[id] == false;
+      }else if(prevState == 1 && active_OnPressed[id] == true){
         onPressed(id); 
       }else{
         on(id);
@@ -1311,10 +1314,10 @@ void ultracleanser(int id){
     }
     //Writing GREEN for the strip's second quarter from middleLED
     if((ledIndex2_Ultracleanser[id] < ((NUM_LEDS*0.5)-1)) && state1Second_Ultracleanser[id]){
-      leds[id][ledIndex2_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex2_Ultracleanser[id]++;
     }else{
-      leds[id][ledIndex2_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex2_Ultracleanser[id] = NUM_LEDS*0.25;
       stateLedIndex_Ultracleanser[id]++;
       state1Second_Ultracleanser[id] = false;
@@ -1331,10 +1334,10 @@ void ultracleanser(int id){
     }
     //Writing GREEN for the strip's fourth quarter from middleLED
     if((ledIndex4_Ultracleanser[id] < (NUM_LEDS-1)) && state1Fourth_Ultracleanser[id]){
-      leds[id][ledIndex4_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex4_Ultracleanser[id]++;
     }else{
-      leds[id][ledIndex4_Ultracleanser[id]] = green_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
       ledIndex4_Ultracleanser[id] = ((NUM_LEDS*0.5)+(NUM_LEDS*0.25));
       stateLedIndex_Ultracleanser[id]++;
       state1Fourth_Ultracleanser[id] = false;
@@ -1393,10 +1396,10 @@ void ultracleanser(int id){
     }
     //Writing GREEN for the strip's second quarter from lastLED
     if((ledIndex2_Ultracleanser[id] > NUM_LEDS*0.25) && state3Second_Ultracleanser[id]){
-      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = green_Ultracleanser;
       ledIndex2_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex2_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex2_Ultracleanser[id]] = green_Ultracleanser;
       ledIndex2_Ultracleanser[id] = (NUM_LEDS*0.5)-1;
       stateLedIndex_Ultracleanser[id]++;
       state3Second_Ultracleanser[id] = false;
@@ -1413,10 +1416,10 @@ void ultracleanser(int id){
     }
     //Writing GREEN for the strip's fourth quarter from lastLED
     if((ledIndex4_Ultracleanser[id] > (NUM_LEDS*0.5)+(NUM_LEDS*0.25)) && state3Fourth_Ultracleanser[id]){
-      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = green_Ultracleanser;
       ledIndex4_Ultracleanser[id]--;
     }else{
-      leds[id][ledIndex4_Ultracleanser[id]] = white_Ultracleanser;
+      leds[id][ledIndex4_Ultracleanser[id]] = green_Ultracleanser;
       ledIndex4_Ultracleanser[id] = NUM_LEDS-1;
       stateLedIndex_Ultracleanser[id]++;
       state3Fourth_Ultracleanser[id] = false;
