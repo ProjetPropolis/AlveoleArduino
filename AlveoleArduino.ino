@@ -789,8 +789,8 @@ void stateCtrl(int id, int state, int prevState){
         needReset[id] = 1;
       }
       if(!masterChrono_Corrupt[id].hasPassed(3000)){
-        on(id);
         corrupt(id);
+        on(id);
       }else{
         if(needReset[id] != 0){
           resetTile(id);
