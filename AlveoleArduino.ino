@@ -383,7 +383,7 @@ void readButtonStatus(){
       moleculeStatus[index] = digitalRead(digitalPin[index]);
       
       if(moleculeStatus[index] == LOW){
-        if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus)){ //&& indexState[index] < 2 && (receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 13 || receiveState[index] == 14 || receiveState[index] == 15 || receiveState[index] == 16)){
+        if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && indexState[index] < 2 && (receiveState[index] == 5 || receiveState[index] == 6 || receiveState[index] == 7 || receiveState[index] == 13 || receiveState[index] == 14 || receiveState[index] == 15 || receiveState[index] == 16)){
           if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
             boolStateMolecule[index] = true;
             receiveState[index] = 13;
@@ -394,24 +394,24 @@ void readButtonStatus(){
             //Serial.println(receiveState[index]);
             buttonChrono[index].restart();
             boolStateMolecule[index] = true;
-            //indexState[index]++;
-            //receiveState[index] = referenceState[indexState[index]];
-            //isPressedMolecule[referenceState[i]] = 1;
-            //stateCtrl(index, receiveState[index], prevReceiveState[index]);
+            indexState[index]++;
+            receiveState[index] = referenceState[indexState[index]];
+            isPressedMolecule[referenceState[i]] = 1;
+            stateCtrl(index, receiveState[index], prevReceiveState[index]);
             sendHexStatus(index, 1);
           }
         }
-        /*else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && index != indexShield){
+        else if(boolStateMolecule[index] == false && buttonChrono[index].hasPassed(delayMoleculeStatus) && index != indexShield){
           //Serial.print("Enter else if:");
           //Serial.println(receiveState[index]);
           buttonChrono[index].restart();
           boolStateMolecule[index] = true;
-          //indexState[index] = 0;
-          //receiveState[index] = referenceState[indexState[index]];
-          //isPressedMolecule[referenceState[i]] = 1;
-          //stateCtrl(index, receiveState[index], prevReceiveState[index]);
+          indexState[index] = 0;
+          receiveState[index] = referenceState[indexState[index]];
+          isPressedMolecule[referenceState[i]] = 1;
+          stateCtrl(index, receiveState[index], prevReceiveState[index]);
           sendHexStatus(index, 1);
-        }*/
+        }
       }else if (moleculeStatus[index] == HIGH) {
         if(index == indexShield && prevStateMolecule[index] != moleculeStatus[index]){
           boolStateMolecule[index] = false;
@@ -420,10 +420,10 @@ void readButtonStatus(){
           sendHexStatus(index, 0);
         }else if(index != indexShield){
           boolStateMolecule[index] = false;
-          //if(isPressedMolecule[referenceState[i]] == 1){
-          sendHexStatus(index, 0);
-            //isPressedMolecule[referenceState[i]] = 0;
-          //}
+          if(isPressedMolecule[referenceState[i]] == 1){
+            sendHexStatus(index, 0);
+            isPressedMolecule[referenceState[i]] = 0;
+          }
         }
       }
       //prevReceiveState[index] = receiveState[index];
