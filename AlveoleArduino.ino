@@ -421,7 +421,7 @@ void readButtonStatus(){
         }else if(index != indexShield){
           boolStateMolecule[index] = false;
           if(isPressedMolecule[referenceState[i]] == 1){
-            sendHexStatus(index, 0);
+            //sendHexStatus(index, 0);
             isPressedMolecule[referenceState[i]] = 0;
           }
         }
